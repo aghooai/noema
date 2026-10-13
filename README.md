@@ -9,6 +9,18 @@ chat endpoint) in the tenant's own AWS account. Noema never calls any non-Bedroc
 
 Intro video: [Introduce Noema: small models decide; big models answer.](https://www.youtube.com/watch?v=t0STMATTbko)
 
+## Architecture and data flow
+
+<p align="center">
+  <img src="docs/assets/noema-architecture.svg" width="100%"
+       alt="Noema architecture: clients call the API edge; the turn orchestrator runs the decision engine (small Bedrock models) and a speculative generation attempt concurrently, commits when the decided spec agrees, streams the answer over SSE and persists the turn; every model call goes to Amazon Bedrock in the tenant's AWS account via STS AssumeRole with an ExternalId.">
+</p>
+
+The animation follows one turn: ① the request is admitted at the API edge; ② the decision ensemble and a speculative
+generation attempt start together; ③ when the decided spec agrees, the attempt commits and the answer streams back
+over SSE (otherwise it restarts invisibly); ④ the turn is finalized and persisted. Media extraction and D4 labeling
+run alongside. Details: [docs/architecture.md](docs/architecture.md).
+
 The design is in `../docs/noema` (canonical, read-only for this repo). This repo is the Phase 1 implementation.
 
 ## Status: 0.1.0, Phase 1 MVP (tags `phase1-mvp` and `v0.1.0`)

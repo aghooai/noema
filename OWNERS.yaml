@@ -142,5 +142,5 @@ rules:
   - { pattern: "{docs/adr/**,docs/IMPL-DECISIONS.md,docs/impl-spec/**,docs/impl-decisions/**}", owners: [wave-a] }
   - { pattern: "README.md", owners: [orchestrator-control] }
   # Wave F as-built docs (docs/operations/observability.md matches the observability rule above first)
-  - pattern: "{CHANGELOG.md,CONTRIBUTING.md,SECURITY.md,docs/architecture.md,docs/development/**,docs/operations/**}"
+  - pattern: "{CHANGELOG.md,CONTRIBUTING.md,SECURITY.md,docs/architecture.md,docs/assets/**,docs/development/**,docs/operations/**}"
     owners: [repo-docs]
