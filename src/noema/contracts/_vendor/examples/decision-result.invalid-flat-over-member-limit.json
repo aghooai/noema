@@ -1,0 +1,327 @@
+{
+  "id": "dec_01J9ZT2H5N",
+  "object": "decision",
+  "created_at": 1791504500,
+  "status": "completed",
+  "answers": [
+    {
+      "type": "choice",
+      "name": "issue",
+      "choice": "shipping_marked_delivered_not_received",
+      "choice_method": "flat",
+      "unresolved_mass": 0,
+      "candidates": [
+        {
+          "value": "shipping_marked_delivered_not_received",
+          "probability": 0.2881,
+          "raw_score": 0.2881,
+          "votes": 1
+        },
+        {
+          "value": "billing_double_charge",
+          "probability": 0.2639,
+          "raw_score": 0.2639,
+          "votes": 0
+        },
+        {
+          "value": "shipping_not_delivered",
+          "probability": 0.096,
+          "raw_score": 0.096,
+          "votes": 0
+        },
+        {
+          "value": "billing_wrong_amount",
+          "probability": 0.072,
+          "raw_score": 0.072,
+          "votes": 0
+        },
+        {
+          "value": "billing_failed_payment",
+          "probability": 0.0576,
+          "raw_score": 0.0576,
+          "votes": 0
+        },
+        {
+          "value": "billing_refund_status",
+          "probability": 0.0384,
+          "raw_score": 0.0384,
+          "votes": 0
+        },
+        {
+          "value": "shipping_tracking_missing",
+          "probability": 0.0384,
+          "raw_score": 0.0384,
+          "votes": 0
+        },
+        {
+          "value": "shipping_delayed",
+          "probability": 0.024,
+          "raw_score": 0.024,
+          "votes": 0
+        },
+        {
+          "value": "billing_invoice_copy",
+          "probability": 0.0192,
+          "raw_score": 0.0192,
+          "votes": 0
+        },
+        {
+          "value": "billing_subscription_cancel",
+          "probability": 0.0144,
+          "raw_score": 0.0144,
+          "votes": 0
+        },
+        {
+          "value": "shipping_damaged_item",
+          "probability": 0.0144,
+          "raw_score": 0.0144,
+          "votes": 0
+        },
+        {
+          "value": "billing_promo_code",
+          "probability": 0.0096,
+          "raw_score": 0.0096,
+          "votes": 0
+        },
+        {
+          "value": "shipping_wrong_item",
+          "probability": 0.0096,
+          "raw_score": 0.0096,
+          "votes": 0
+        },
+        {
+          "value": "billing_tax_question",
+          "probability": 0.0048,
+          "raw_score": 0.0048,
+          "votes": 0
+        },
+        {
+          "value": "shipping_address_change",
+          "probability": 0.0048,
+          "raw_score": 0.0048,
+          "votes": 0
+        },
+        {
+          "value": "shipping_customs_hold",
+          "probability": 0.0048,
+          "raw_score": 0.0048,
+          "votes": 0
+        },
+        {
+          "value": "technical_login_failure",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "technical_app_crash",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "technical_export_error",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "technical_sync_problem",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "technical_api_error",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "technical_slow_performance",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "technical_data_missing",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "technical_integration_setup",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_feedback",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_account_deletion",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_partnership",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_press",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_privacy_request",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_accessibility",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_job_inquiry",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        },
+        {
+          "value": "other_unclear",
+          "probability": 0.0025,
+          "raw_score": 0.0025,
+          "votes": 0
+        }
+      ],
+      "calibration": {
+        "status": "uncalibrated",
+        "source": "verbalized",
+        "member_subset": [
+          "m1"
+        ]
+      },
+      "confidence": {
+        "kind": "heuristic",
+        "value": 0.2651,
+        "method": "normalized_max",
+        "band": "low",
+        "margin": 0.0242,
+        "normalized_entropy": 0.7489,
+        "agreement": 1.0,
+        "member_divergence": null
+      },
+      "quorum": {
+        "required": 1,
+        "responded": 1,
+        "refused": 0,
+        "total": 1
+      },
+      "members": [
+        {
+          "member_id": "m1",
+          "provider": "bedrock-converse",
+          "model": "us.openai.gpt-6-luna",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "distribution": {
+            "shipping_marked_delivered_not_received": 0.2881,
+            "billing_double_charge": 0.2639,
+            "shipping_not_delivered": 0.096,
+            "billing_wrong_amount": 0.072,
+            "billing_failed_payment": 0.0576,
+            "billing_refund_status": 0.0384,
+            "shipping_tracking_missing": 0.0384,
+            "shipping_delayed": 0.024,
+            "billing_invoice_copy": 0.0192,
+            "billing_subscription_cancel": 0.0144,
+            "shipping_damaged_item": 0.0144,
+            "billing_promo_code": 0.0096,
+            "shipping_wrong_item": 0.0096,
+            "billing_tax_question": 0.0048,
+            "shipping_address_change": 0.0048,
+            "shipping_customs_hold": 0.0048,
+            "technical_login_failure": 0.0025,
+            "technical_app_crash": 0.0025,
+            "technical_export_error": 0.0025,
+            "technical_sync_problem": 0.0025,
+            "technical_api_error": 0.0025,
+            "technical_slow_performance": 0.0025,
+            "technical_data_missing": 0.0025,
+            "technical_integration_setup": 0.0025,
+            "other_feedback": 0.0025,
+            "other_account_deletion": 0.0025,
+            "other_partnership": 0.0025,
+            "other_press": 0.0025,
+            "other_privacy_request": 0.0025,
+            "other_accessibility": 0.0025,
+            "other_job_inquiry": 0.0025,
+            "other_unclear": 0.0025
+          },
+          "weight": 1.0,
+          "latency_ms": 1430,
+          "usage": {
+            "input_tokens": 430,
+            "output_tokens": 90,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 6e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "trace_id": "9d1c7e3a5b8f4c2e8a6b0f3d7c1e5a92",
+    "profile_id": "lightweight-model-decide",
+    "profile_version": "1",
+    "question_signature": "sha256:47c9b21f54235ec1ba6bbc2f1bd5cd5fbfc4d4d51b44522d90ec15a67a8d4c58",
+    "input_digest": "hmac-sha256:472b3386038595182980943ba3ef2862c6747f15bd14d2b4e31dd9e66b250532",
+    "input_view_signature": "sha256:1aa22adb8a31d88cf33ff8ff877a0ee2c9cbb61d17d3365d1d25ca3fe95102af",
+    "option_order_seed": 1791504500,
+    "prompt_templates": {
+      "m1": "verbalized-dist@1"
+    },
+    "aggregation": {
+      "method": "linear_pool"
+    },
+    "deadline_ms": 3000,
+    "quorum": {
+      "required": 1,
+      "responded": 1,
+      "refused": 0,
+      "total": 1
+    },
+    "cache": {
+      "hit": false
+    },
+    "stages": [],
+    "started_at": "2026-10-09T00:07:00.000Z",
+    "completed_at": "2026-10-09T00:07:01.452Z"
+  },
+  "usage": {
+    "input_tokens": 430,
+    "output_tokens": 90,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "reasoning_tokens": 0,
+    "cost_usd": 6e-05,
+    "cost_estimated": true,
+    "tokens_estimated": false
+  }
+}

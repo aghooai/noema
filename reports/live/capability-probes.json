@@ -1,0 +1,25 @@
+{
+  "mock": false,
+  "results": {
+    "haiku-5.5 effort=None temperature=0.0": {
+      "accepted": false,
+      "expected": "rejected: PROBED temperature = False",
+      "kind": "invalid_request",
+      "message": "The model returned the following errors: `temperature` is deprecated for this model.",
+      "provider_code": "ValidationException"
+    },
+    "sol-6.1 effort=none temperature=None": {
+      "accepted": false,
+      "expected": "rejected: PROBED effort_rejected = {none}",
+      "kind": "invalid_request",
+      "message": "The model returned the following errors: {\"error\":{\"code\":\"unsupported_value\",\"message\":\"Unsupported value: 'none' is not supported with the 'us.openai.gpt-6.1-sol' model. Supported values are: 'low', 'medium', 'high', 'xhigh', and 'max'.\",\"param\":\"reasoning.effort\",\"type\":\"invalid_request_error\"}}",
+      "provider_code": "ValidationException"
+    },
+    "sonnet-5.5 effort=low temperature=None": {
+      "accepted": true,
+      "answer_391": true,
+      "expected": "unprobed (gap 43): config lists no effort for Sonnet 5.5",
+      "stop": "end_turn"
+    }
+  }
+}

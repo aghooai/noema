@@ -1,0 +1,60 @@
+{
+  "expected": {
+    "api": "ConverseStream",
+    "body": {
+      "inferenceConfig": {
+        "maxTokens": 4096
+      },
+      "messages": [
+        {
+          "content": [
+            {
+              "text": "What is the capital of France?"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "modelId": "us.openai.gpt-6.1-sol",
+      "outputConfig": {
+        "effort": "low"
+      },
+      "system": [
+        {
+          "text": "You are an assistant served through the Noema platform."
+        },
+        {
+          "text": "Answer briefly."
+        }
+      ]
+    }
+  },
+  "model_alias": "sol-6.1",
+  "name": "sol_stream_effort_low",
+  "op": "converse-stream",
+  "request": {
+    "call_kind": "generation",
+    "effort": "low",
+    "logprobs": false,
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "What is the capital of France?"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model_alias": "sol-6.1",
+    "retry": "default",
+    "stop": [],
+    "system": [
+      "You are an assistant served through the Noema platform.",
+      "Answer briefly."
+    ],
+    "temperature": null,
+    "top_logprobs": null
+  }
+}

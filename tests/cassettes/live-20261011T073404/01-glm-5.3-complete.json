@@ -1,0 +1,31 @@
+{
+  "alias": "glm-5.3",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "generation",
+  "e2e_ms": 370,
+  "effort": "none",
+  "error": {
+    "kind": "invalid_request",
+    "message": "provider rejected the request",
+    "provider_code": "ValidationException"
+  },
+  "estimated_input_tokens": 16,
+  "max_tokens": 128,
+  "model_id": "us.zai.glm-5.3",
+  "n": 1,
+  "op": "complete",
+  "test": "tests/live/test_adapters_live.py::test_l1_converse_complete_glm_effort_none",
+  "test_call": 1,
+  "wire": {
+    "error": {
+      "code": "ValidationException",
+      "exception": "ClientError",
+      "http_status": 400,
+      "message": "The model returned the following errors: {\"error\":{\"code\":\"unsupported_value\",\"message\":\"Unsupported value: 'none' is not supported with this model. Supported values are: 'low', 'medium', 'high', 'xhigh', and 'max'.\",\"param\":\"reasoning_effort\",\"type\":\"invalid_request_error\"}}"
+    },
+    "events": [],
+    "response": []
+  }
+}

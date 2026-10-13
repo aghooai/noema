@@ -1,0 +1,55 @@
+{
+  "F3b": {
+    "baseline_ttft": {
+      "max": 693.9,
+      "n": 200,
+      "p50": 610.2,
+      "p95": 615.3
+    },
+    "opened_during_baseline": false,
+    "recover_outcomes": {
+      "completed": 112
+    },
+    "slow_outcomes": {
+      "completed": 59,
+      "error:all_routes_unavailable": 41
+    },
+    "slow_refused_without_model_call": 41,
+    "slow_ttft": {
+      "max": 2425.7,
+      "n": 59,
+      "p50": 2410.3,
+      "p95": 2419.5
+    },
+    "time_to_close_after_restore_s": 0.1,
+    "time_to_open_after_slowdown_s": 4.07,
+    "transitions": [
+      [
+        0.03,
+        null,
+        null
+      ],
+      [
+        84.79,
+        2.0,
+        2.0
+      ],
+      [
+        100.29,
+        1.0,
+        2.0
+      ],
+      [
+        102.52,
+        1.0,
+        1.0
+      ],
+      [
+        102.8,
+        0.0,
+        0.0
+      ]
+    ],
+    "turns": 412
+  }
+}

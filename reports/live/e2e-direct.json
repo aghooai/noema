@@ -1,0 +1,26 @@
+{
+  "effort": "low",
+  "model": "sol-6.1",
+  "samples": [
+    {
+      "e2e": 6780,
+      "first_text": 758
+    },
+    {
+      "e2e": 6877,
+      "first_text": 681
+    },
+    {
+      "e2e": 8326,
+      "first_text": 703
+    },
+    {
+      "e2e": 6919,
+      "first_text": 841
+    },
+    {
+      "e2e": 7299,
+      "first_text": 813
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "kind": "invalid_request",
+  "model_id": "arn:aws:bedrock:us-east-1:123456789012:inference-profile/us.openai.gpt-6-luna",
+  "ok": false,
+  "provider_code": "ValidationException",
+  "signer": {
+    "equal_to_botocore": true,
+    "model_path_colon_encoded": true,
+    "session_token": true,
+    "signed": [
+      "authorization",
+      "content-type",
+      "x-amz-date",
+      "x-amz-security-token"
+    ]
+  }
+}

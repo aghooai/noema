@@ -1,0 +1,84 @@
+{
+  "expected": {
+    "api": "ConverseStream",
+    "body": {
+      "inferenceConfig": {
+        "maxTokens": 4096
+      },
+      "messages": [
+        {
+          "content": [
+            {
+              "text": "[image-1]"
+            },
+            {
+              "image": {
+                "format": "jpeg",
+                "source": {
+                  "bytes": {
+                    "$bytes_b64": "iVBORw0KGgoAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhc="
+                  }
+                }
+              }
+            },
+            {
+              "text": "Describe image-1."
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "modelId": "us.openai.gpt-6.1-sol",
+      "outputConfig": {
+        "effort": "low"
+      },
+      "system": [
+        {
+          "text": "You are an assistant served through the Noema platform."
+        },
+        {
+          "text": "Answer briefly."
+        }
+      ]
+    }
+  },
+  "model_alias": "sol-6.1",
+  "name": "sol_image_block",
+  "op": "converse-stream",
+  "request": {
+    "call_kind": "generation",
+    "effort": "low",
+    "logprobs": false,
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "[image-1]"
+          },
+          {
+            "image": {
+              "$bytes_b64": "iVBORw0KGgoAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhc=",
+              "format": "jpeg",
+              "height": 600,
+              "width": 800
+            }
+          },
+          {
+            "text": "Describe image-1."
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model_alias": "sol-6.1",
+    "retry": "default",
+    "stop": [],
+    "system": [
+      "You are an assistant served through the Noema platform.",
+      "Answer briefly."
+    ],
+    "temperature": null,
+    "top_logprobs": null
+  }
+}

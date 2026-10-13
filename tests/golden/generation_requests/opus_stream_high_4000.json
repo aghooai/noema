@@ -1,0 +1,60 @@
+{
+  "expected": {
+    "api": "ConverseStream",
+    "body": {
+      "inferenceConfig": {
+        "maxTokens": 4000
+      },
+      "messages": [
+        {
+          "content": [
+            {
+              "text": "What is the capital of France?"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "modelId": "us.anthropic.claude-opus-5-5",
+      "outputConfig": {
+        "effort": "high"
+      },
+      "system": [
+        {
+          "text": "You are an assistant served through the Noema platform."
+        },
+        {
+          "text": "Answer briefly."
+        }
+      ]
+    }
+  },
+  "model_alias": "opus-5.5",
+  "name": "opus_stream_high_4000",
+  "op": "converse-stream",
+  "request": {
+    "call_kind": "generation",
+    "effort": "high",
+    "logprobs": false,
+    "max_tokens": 4000,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "What is the capital of France?"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model_alias": "opus-5.5",
+    "retry": "default",
+    "stop": [],
+    "system": [
+      "You are an assistant served through the Noema platform.",
+      "Answer briefly."
+    ],
+    "temperature": null,
+    "top_logprobs": null
+  }
+}

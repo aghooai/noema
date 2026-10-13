@@ -1,0 +1,18 @@
+{
+  "calls": 4,
+  "members": {
+    "deepseek.v3.2": [
+      "token_logprobs",
+      "ok"
+    ],
+    "us.anthropic.claude-haiku-5-5": [
+      "verbalized",
+      "ok"
+    ],
+    "us.openai.gpt-6-luna": [
+      "verbalized",
+      "ok"
+    ]
+  },
+  "status": "completed"
+}

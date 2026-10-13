@@ -1,0 +1,17 @@
+{
+  "mode": "ambient IAM user",
+  "results": {
+    "bearer": {
+      "answer_391": true,
+      "latency_ms": 323,
+      "ok": true,
+      "stop": "end_turn"
+    },
+    "sigv4": {
+      "answer_391": true,
+      "latency_ms": 299,
+      "ok": true,
+      "stop": "end_turn"
+    }
+  }
+}

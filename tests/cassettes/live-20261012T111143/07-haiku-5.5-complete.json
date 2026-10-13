@@ -1,0 +1,59 @@
+{
+  "alias": "haiku-5.5",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "verification_member",
+  "e2e_ms": 1994,
+  "effort": "low",
+  "estimated_input_tokens": 759,
+  "estimated_input_tokens_chars4": 572,
+  "input_chars": 2285,
+  "latency_ms": 1994,
+  "logprob_tokens": null,
+  "max_tokens": 600,
+  "model_id": "us.anthropic.claude-haiku-5-5",
+  "n": 7,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race",
+  "test_call": 7,
+  "text_chars": 20,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 750,
+    "output_tokens": 270,
+    "reasoning_tokens": 265,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "metrics.latencyMs:int",
+      "output.message.content[].reasoningContent.reasoningText.signature:str",
+      "output.message.content[].reasoningContent.reasoningText.text:str",
+      "output.message.content[].text:str",
+      "output.message.role:str",
+      "stopReason:str",
+      "usage.cacheReadInputTokens:int",
+      "usage.cacheWriteInputTokens:int",
+      "usage.inputTokens:int",
+      "usage.outputTokens:int",
+      "usage.totalTokens:int"
+    ],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": false,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date"
+      ]
+    }
+  }
+}

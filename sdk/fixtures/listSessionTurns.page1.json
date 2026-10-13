@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "turn_id": "turn_1",
+        "seq": 1,
+        "role": "user",
+        "text": "Hi, my email is [redacted]",
+        "created_at": 1791633601,
+        "redactions": [
+          {
+            "start": 16,
+            "end": 26,
+            "reason": "email"
+          }
+        ]
+      },
+      {
+        "turn_id": "turn_1",
+        "seq": 1,
+        "role": "assistant",
+        "text": "Hello!",
+        "created_at": 1791633601,
+        "redactions": []
+      }
+    ],
+    "has_more": true,
+    "next_cursor": "t2"
+  }
+}

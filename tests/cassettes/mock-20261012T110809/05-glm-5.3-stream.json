@@ -1,0 +1,53 @@
+{
+  "alias": "glm-5.3",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "generation",
+  "cancelled": "CancelledError",
+  "counts": {
+    "MessageStart": 1
+  },
+  "e2e_ms": 703,
+  "effort": "low",
+  "estimated_input_tokens": 173,
+  "estimated_input_tokens_chars4": 148,
+  "events": [
+    "MessageStart"
+  ],
+  "input_chars": 589,
+  "max_tokens": 512,
+  "model_id": "us.zai.glm-5.3",
+  "n": 5,
+  "op": "stream",
+  "t_first_MessageStart_ms": 203,
+  "test": "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race",
+  "test_call": 2,
+  "wire": {
+    "decoder": {
+      "botocore_errors": 0,
+      "botocore_extra": 0,
+      "bytes": 118,
+      "chunks": 1,
+      "equal": 1,
+      "fallback": false,
+      "messages": 1
+    },
+    "error": null,
+    "events": [
+      "messageStart.role"
+    ],
+    "response": [],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": true,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date",
+        "x-amz-security-token"
+      ]
+    }
+  }
+}

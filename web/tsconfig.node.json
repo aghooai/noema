@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": ["server/**/*.ts", "test/**/*.ts", "test/**/*.tsx", "e2e/**/*.ts", "*.config.ts", "src/**/*.ts", "src/**/*.tsx"]
+}

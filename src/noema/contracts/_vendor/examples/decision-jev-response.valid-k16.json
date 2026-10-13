@@ -1,0 +1,74 @@
+{
+  "model": "aghoo/router-default@1",
+  "answers": {
+    "product_area": {
+      "type": "choice",
+      "choice": "reporting",
+      "probabilities": {
+        "accounts": 0.02,
+        "billing": 0.01,
+        "checkout": 0.01,
+        "catalog": 0.01,
+        "search": 0.03,
+        "recommendations": 0.01,
+        "notifications": 0.03,
+        "mobile_app": 0.02,
+        "web_app": 0.06,
+        "api": 0.12,
+        "integrations": 0.08,
+        "reporting": 0.3,
+        "exports": 0.22,
+        "permissions": 0.05,
+        "security": 0.01,
+        "other": 0.01
+      },
+      "confidence": 0.25
+    },
+    "checklist_items": {
+      "type": "score",
+      "score": 10.51,
+      "legend": {
+        "0": "No checklist item",
+        "1": "1 of 15",
+        "2": "2 of 15",
+        "3": "3 of 15",
+        "4": "4 of 15",
+        "5": "5 of 15",
+        "6": "6 of 15",
+        "7": "7 of 15",
+        "8": "8 of 15",
+        "9": "9 of 15",
+        "10": "10 of 15",
+        "11": "11 of 15",
+        "12": "12 of 15",
+        "13": "13 of 15",
+        "14": "14 of 15",
+        "15": "Every checklist item"
+      },
+      "probabilities": {
+        "0": 0.01,
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.01,
+        "4": 0.01,
+        "5": 0.02,
+        "6": 0.02,
+        "7": 0.03,
+        "8": 0.04,
+        "9": 0.07,
+        "10": 0.1,
+        "11": 0.15,
+        "12": 0.21,
+        "13": 0.13,
+        "14": 0.08,
+        "15": 0.07
+      },
+      "confidence": 0.47
+    }
+  },
+  "usage": {
+    "input_tokens": 1830,
+    "output_tokens": 214
+  },
+  "decision_id": "dec_01J9ZU8K4W"
+}

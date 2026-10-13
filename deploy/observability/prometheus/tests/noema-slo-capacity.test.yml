@@ -1,0 +1,281 @@
+# promtool test rules: SLO and capacity alerts (make observability-check).
+rule_files:
+  - ../rules/noema-recording.rules.yml
+  - ../rules/noema-alerts-slo-capacity.rules.yml
+evaluation_interval: 1m
+
+tests:
+  # 2% of requests shed (98 turns + 2 sheds per minute): above 14.4 x 0.001 in both windows.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+98x30'
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-a"}'
+        values: '0+2x30'
+    promql_expr_test:
+      - expr: noema:availability_errors:ratio_rate5m
+        eval_time: 10m
+        exp_samples:
+          - labels: 'noema:availability_errors:ratio_rate5m'
+            value: 0.02
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: noema-availability-slo-fast-burn
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: Turn API availability budget burning at 14.4x or more
+              description: >-
+                2% of turn requests were shed with 429 queue_timeout over the last hour (the last 5 minutes agree).
+                At this rate the 99.9% monthly error budget is spent in about 2 days. The api processes are at their
+                turn cap: add pods.
+              runbook_url: docs/operations/runbooks.md#noema-availability-slo-fast-burn
+
+  # 0.5% shed, and a process that never shed (no counter series yet): no fast burn.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+199x30'
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-a"}'
+        values: '0+1x30'
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-b",profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+200x30'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-availability-slo-fast-burn
+        exp_alerts: []
+
+  # Overhead proxy: mean TTFT 330 ms - mean first text 300 ms = 30 ms on holdback turns; gate turns are excluded.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_ttft_seconds_sum{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+33x30'
+      - series: 'aghoo_ttft_seconds_count{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+100x30'
+      - series: 'aghoo_first_answer_seconds_sum{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+30x30'
+      - series: 'aghoo_first_answer_seconds_count{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+100x30'
+      - series: 'aghoo_ttft_seconds_sum{profile="sol-fast",model="sol",strategy="gate"}'
+        values: '0+90x30'
+      - series: 'aghoo_ttft_seconds_count{profile="sol-fast",model="sol",strategy="gate"}'
+        values: '0+100x30'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: noema-proxy-overhead-high
+        exp_alerts: []
+      - eval_time: 20m
+        alertname: noema-proxy-overhead-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Gateway overhead above 25 ms for 10 minutes
+              description: >-
+                Mean TTFT minus mean model first text (holdback turns) is 30ms, above the 25 ms p95 overhead SLO
+                (design 08 §7). The proxy over-reads: it also counts the holdback wait for the decision, spec
+                restarts and failovers. Check event-loop lag, pod CPU, decision latency and fallbacks.
+              runbook_url: docs/operations/runbooks.md#noema-proxy-overhead-high
+      - eval_time: 20m
+        alertname: noema-overhead-slo-burn
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Gateway overhead above the 25 ms SLO for the last hour
+              description: >-
+                The 1-hour mean overhead proxy is 30ms and the last 5 minutes agree: the proxy-overhead SLO
+                (p95 <= 25 ms, design 08 §7) may be missed for a sustained period. The proxy also counts holdback
+                waits and spec restarts, so rule out slow decisions first.
+              runbook_url: docs/operations/runbooks.md#noema-overhead-slo-burn
+
+  # Streams per pod (plan 100): api-a's two processes hold 55 + 50 = 105 slots, api-b's 50 + 40 = 90.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_turn_slots_held{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '55x10'
+      - series: 'aghoo_turn_slots_held{job="noema-api",pod="api-a",instance="10.0.0.1:9465"}'
+        values: '50x10'
+      - series: 'aghoo_turn_slots_held{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '50x10'
+      - series: 'aghoo_turn_slots_held{job="noema-api",pod="api-b",instance="10.0.0.2:9465"}'
+        values: '40x10'
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: noema-pod-streams-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pod: api-a
+            exp_annotations:
+              summary: "api-a holds more than 100 concurrent streams"
+              description: >-
+                api-a holds 105 turn slots (both api processes). Pods are planned at 100 streams, 80% of the measured
+                125-stream knee (reports/perf/sizing.md §5); past the knee the TTFT overhead p50 exceeds 10 ms. Scale
+                out.
+              runbook_url: docs/operations/runbooks.md#noema-pod-streams-high
+
+  # Pod CPU (plan 0.62): api-a's api container uses 0.7 cores, api-b's 0.6; the pod-level cgroup series
+  # (container="") is not added, and a pod without Noema api processes is ignored.
+  - interval: 1m
+    input_series:
+      - series: 'container_cpu_usage_seconds_total{pod="api-a",container="api"}'
+        values: '0+42x30'
+      - series: 'container_cpu_usage_seconds_total{pod="api-a",container=""}'
+        values: '0+42x30'
+      - series: 'container_cpu_usage_seconds_total{pod="api-b",container="api"}'
+        values: '0+36x30'
+      - series: 'container_cpu_usage_seconds_total{pod="other-x",container="api"}'
+        values: '0+60x30'
+      - series: 'aghoo_event_loop_lag_seconds{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '0.001x30'
+      - series: 'aghoo_event_loop_lag_seconds{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '0.001x30'
+    promql_expr_test:
+      - expr: noema:pod_cpu_cores:rate5m
+        eval_time: 10m
+        exp_samples:
+          - labels: 'noema:pod_cpu_cores:rate5m{pod="api-a"}'
+            value: 0.7
+          - labels: 'noema:pod_cpu_cores:rate5m{pod="api-b"}'
+            value: 0.6
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-pod-cpu-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pod: api-a
+            exp_annotations:
+              summary: "api-a uses more than 0.62 vCPU"
+              description: >-
+                api-a uses 0.70 cores. 0.62 vCPU = 100 streams x ~6.2 millicores per stream at the L1 workload
+                (reports/perf/sizing.md §5); the ratio is workload-dependent. Scale out.
+              runbook_url: docs/operations/runbooks.md#noema-pod-cpu-high
+
+  # Event-loop lag: one api process of api-a lags 80 ms on every scrape; api-b stays at 4 ms.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_event_loop_lag_seconds{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '0.08x15'
+      - series: 'aghoo_event_loop_lag_seconds{job="noema-api",pod="api-a",instance="10.0.0.1:9465"}'
+        values: '0.004x15'
+      - series: 'aghoo_event_loop_lag_seconds{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '0.004x15'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: noema-event-loop-lag-high
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              pod: api-a
+            exp_annotations:
+              summary: "api-a event-loop lag p99 above 50 ms"
+              description: >-
+                The worst api process of api-a has an event-loop lag p99 of 80ms over 5 minutes (C2 bound 50 ms;
+                4.0-4.1 ms at the knee, reports/perf/sizing.md §6). Every stream on that process is delayed: the pod
+                is under-provisioned.
+              runbook_url: docs/operations/runbooks.md#noema-event-loop-lag-high
+
+  # Any shed fires at once, including the first one of a process: the counter is exported only after its first add,
+  # so api-a's series appears at 8m with the value 4. api-b's flat counter does not fire, nor does api-c's after a
+  # failed scrape (stale), nor api-d's counter exported at 0.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '_x8 4x6'
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '7x14'
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-c",instance="10.0.0.3:9464"}'
+        values: '3x5 stale 3x8'
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-d",instance="10.0.0.4:9464"}'
+        values: '0x14'
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: noema-turns-shed
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: noema-turns-shed
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pod: api-a
+            exp_annotations:
+              summary: "api-a is shedding requests at the per-process turn cap"
+              description: >-
+                api-a answered 4 requests with 429 queue_timeout in 5 minutes (NOEMA_MAX_TURNS_PER_PROCESS reached).
+                Any shed means a process is at its cap: under-provisioned (reports/perf/sizing.md §5), or one tenant
+                is flooding.
+              runbook_url: docs/operations/runbooks.md#noema-turns-shed
+      - eval_time: 11m
+        alertname: noema-turns-shed
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pod: api-a
+            exp_annotations:
+              summary: "api-a is shedding requests at the per-process turn cap"
+              description: >-
+                api-a answered 4 requests with 429 queue_timeout in 5 minutes (NOEMA_MAX_TURNS_PER_PROCESS reached).
+                Any shed means a process is at its cap: under-provisioned (reports/perf/sizing.md §5), or one tenant
+                is flooding.
+              runbook_url: docs/operations/runbooks.md#noema-turns-shed
+
+  # Slow burn: 1% shed (99 turns + 1 shed per minute) is above 6 x 0.001 over 6 h and 30 min, below the fast burn's
+  # 14.4 x 0.001.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+99x60'
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-a"}'
+        values: '0+1x60'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: noema-availability-slo-slow-burn
+        exp_alerts: []
+      - eval_time: 40m
+        alertname: noema-availability-slo-fast-burn
+        exp_alerts: []
+      - eval_time: 40m
+        alertname: noema-availability-slo-slow-burn
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Turn API availability budget burning at 6x or more
+              description: >-
+                1% of turn requests were shed with 429 queue_timeout over the last 6 hours (the last 30 minutes
+                agree). At this rate the 99.9% monthly error budget is spent in about 5 days.
+              runbook_url: docs/operations/runbooks.md#noema-availability-slo-slow-burn
+
+  # 0.5% shed is below the slow burn's 6 x 0.001.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+199x60'
+      - series: 'aghoo_turns_shed_total{job="noema-api",pod="api-a"}'
+        values: '0+1x60'
+    alert_rule_test:
+      - eval_time: 40m
+        alertname: noema-availability-slo-slow-burn
+        exp_alerts: []
+
+  # Overhead proxy 20 ms (mean TTFT 320 ms - mean first text 300 ms): neither overhead alert fires.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_ttft_seconds_sum{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+32x30'
+      - series: 'aghoo_ttft_seconds_count{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+100x30'
+      - series: 'aghoo_first_answer_seconds_sum{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+30x30'
+      - series: 'aghoo_first_answer_seconds_count{profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+100x30'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-proxy-overhead-high
+        exp_alerts: []
+      - eval_time: 20m
+        alertname: noema-overhead-slo-burn
+        exp_alerts: []

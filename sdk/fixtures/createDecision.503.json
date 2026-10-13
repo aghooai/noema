@@ -1,0 +1,18 @@
+{
+  "status": 503,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000",
+    "retry-after": "1"
+  },
+  "body": {
+    "error": {
+      "type": "upstream_error",
+      "code": "all_routes_unavailable",
+      "message": "every route is unavailable",
+      "param": null,
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": true
+    }
+  }
+}

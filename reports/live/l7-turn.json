@@ -1,0 +1,29 @@
+{
+  "by_call_kind": {
+    "decision_member:deepseek-3.2": 6,
+    "decision_member:haiku-5.5": 5,
+    "decision_member:luna-6": 5,
+    "generation:sol-6.1": 2,
+    "verification_member:haiku-5.5": 2,
+    "verification_member:luna-6": 2
+  },
+  "calls": 22,
+  "events": {
+    "decision.completed": 1,
+    "generation.cancelled": 1,
+    "generation.committed": 1,
+    "generation.completed": 1,
+    "generation.delta": 147,
+    "generation.started": 2,
+    "preflight.completed": 1,
+    "route.confirmed": 1,
+    "route.selected": 1,
+    "turn.completed": 1,
+    "turn.created": 1,
+    "turn.verified": 1
+  },
+  "marks": {
+    "e2e": 9893,
+    "first_delta": 6476
+  }
+}

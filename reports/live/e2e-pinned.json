@@ -1,0 +1,27 @@
+{
+  "p50_ratio_e2e": 1.093,
+  "p50_ratio_first_delta": 1.36,
+  "profile": "sol-fast",
+  "samples": [
+    {
+      "e2e": 6861,
+      "first_delta": 1031
+    },
+    {
+      "e2e": 7561,
+      "first_delta": 1472
+    },
+    {
+      "e2e": 8166,
+      "first_delta": 934
+    },
+    {
+      "e2e": 7628,
+      "first_delta": 1227
+    },
+    {
+      "e2e": 6414,
+      "first_delta": 640
+    }
+  ]
+}

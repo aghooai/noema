@@ -1,0 +1,212 @@
+[project]
+name = "noema"
+version = "0.1.0"
+description = "Noema: a multi-tenant decision + generation gateway over Amazon Bedrock (Phase 1 MVP)."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "Proprietary" }
+# Runtime dependencies of every process image (api, jobs, media-worker). The heavy media parsers are
+# in the `media` dependency group and only in the media-sandbox image (spec-01 §2 rule 7, ADR-002 §8).
+dependencies = [
+  # HTTP / ASGI
+  "fastapi>=0.143,<0.200",
+  "starlette>=1.7,<2",
+  "uvicorn>=0.54,<1",
+  "uvloop>=0.23,<1",
+  "httptools>=0.9,<1",
+  "python-multipart>=0.0.32,<0.1",
+  "anyio>=4.15,<5",
+  "orjson>=3.13,<4",
+  "httpx>=0.28.1,<0.29",
+  # AWS (Bedrock Converse needs botocore >= 1.43 for outputConfig; aiobotocore pins botocore exactly)
+  "aiobotocore==3.9.2",
+  "aws-bedrock-token-generator>=1.1,<2",
+  # contracts and config
+  "pydantic>=2.12,<3",
+  "jsonschema-rs>=0.58.6,<0.59",
+  "jsonschema>=4.23,<5",
+  "pyyaml>=6.0.3,<7",
+  # storage
+  "asyncpg>=0.32,<0.33",
+  "sqlalchemy[asyncio]>=2.1,<2.2",
+  "alembic>=1.20,<2",
+  "redis>=8.1,<9",
+  # telemetry
+  "opentelemetry-api>=1.45.1,<2",
+  "opentelemetry-sdk>=1.45.1,<2",
+  "opentelemetry-exporter-otlp-proto-http>=1.45.1,<2",
+  "opentelemetry-semantic-conventions==0.66b1",
+  "opentelemetry-exporter-prometheus==0.66b1",
+  "prometheus-client>=0.26,<1",
+  # numerics for calibrator fitting, ECE and bootstrap CIs (labeling jobs; ADR-003)
+  "numpy>=2.2,<3",
+]
+
+[dependency-groups]
+dev = [
+  # test runner and plugins (async tests use anyio's pytest plugin, which ships with anyio)
+  "pytest>=9.1,<10",
+  "pytest-xdist>=3.8,<4",
+  "pytest-timeout>=2.4,<3",
+  "pytest-socket>=0.8.1,<0.9",
+  "pytest-cov>=7.1,<8",
+  "hypothesis>=6.168,<7",
+  "hypothesis-jsonschema>=0.23.1,<0.24",
+  "schemathesis>=4.30,<5",
+  "respx>=0.23.1,<0.24",
+  "moto[server]==5.2.3",
+  "asgi-lifespan>=2.1,<3",
+  "httpx-sse>=0.4.3,<0.5",
+  # used only by tests/integration/decision/test_facade_openai_sdk.py (base_url = the local server; IMPL-080)
+  "openai>=3.28,<4",
+  # code generation and static checks
+  "datamodel-code-generator==0.83.0",
+  "ruff==0.17.0",
+  "mypy==2.4.0",
+  "import-linter==2.15",
+  "types-pyyaml>=6.0.12.20260906",
+  "types-jsonschema>=4.26.0.20261006",
+  "asyncpg-stubs==0.32.0",
+  "types-aiobotocore[bedrock-runtime,s3,secretsmanager,sts]==3.9.2",
+  # supply chain (spec-09 §9)
+  "pip-audit>=2.10,<3",
+]
+# Heavy parsers: only noema.media.extractors may import them (spec-01 §2 rule 7); installed only in the
+# media-sandbox image (`uv sync --frozen --no-dev --group media`), never in the api/jobs/media-worker images.
+media = [
+  "pillow>=12.3,<13",
+  "pillow-heif>=1.8,<2",
+  "pikepdf>=10.16,<11",
+  "pypdfium2>=5.14,<6",
+  "docling>=2.137,<3",
+  "docling-core>=2.101,<3",
+  "docling-parse>=7.22,<8",
+  "torch==2.14.1",
+  "torchvision==0.29.1",
+  "magika>=1.0.3,<2",
+  "onnxruntime>=1.31,<2",
+  "python-magic>=0.4.27,<0.5",
+  "markdown-it-py>=4.2,<5",
+  "pytesseract>=0.3.13,<0.4",
+]
+# Upload fuzzing (ADR-002 SEC-SBX-08, nightly): only in the media image's test layer
+# (`uv sync --frozen --no-dev --group media --group fuzz`); linux x86_64 wheels only.
+fuzz = [
+  "atheris==3.1.0; sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/noema"]
+
+[tool.uv]
+default-groups = ["dev"]
+required-version = ">=0.9"
+python-preference = "managed"
+
+# torch/torchvision: CPU-only wheels (ADR-002 §8); the PyTorch index is used for these two packages only.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Static checks
+# ---------------------------------------------------------------------------------------------------------------------
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests", "tools"]
+extend-exclude = [
+  "src/noema/contracts/_vendor",      # byte copy of docs/noema/contracts (tools/sync_contracts.py)
+  "src/noema/contracts/_generated",   # datamodel-codegen output
+  "src/noema/contracts/build",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "C4", "RUF", "PT", "ASYNC", "TID", "N", "PERF", "S", "DTZ", "T20", "PIE", "RET"]
+ignore = [
+  "S101",     # assert is used in tests and for internal invariants
+  "N818",     # exception names are fixed by the spec (LeaseLost, TenantAccessMisconfigured, ContractViolation, ...)
+  "RUF001",   # spec text uses non-ASCII punctuation (e.g. the datamark U+02C6)
+  "RUF002",
+  "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "N802", "T20", "PT017", "PT018"]
+"conftest.py" = ["S"]
+"tools/**" = ["T20", "S603", "S607"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"boto3".msg = "Use aiobotocore (spec-01 §2 rule 8)."
+"requests".msg = "Use httpx (spec-01 §2 rule 8)."
+"anthropic".msg = "Bedrock only (D1)."
+
+[tool.ruff.lint.isort]
+known-first-party = ["noema"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src/noema"]
+mypy_path = "src"
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+exclude = ["src/noema/contracts/_vendor/"]
+
+[[tool.mypy.overrides]]
+module = ["noema.contracts._vendor.*"]
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["noema.contracts._generated.*"]   # datamodel-codegen output: typed for importers, not linted itself
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["aws_bedrock_token_generator.*", "moto.*", "hypothesis_jsonschema.*", "pytest_socket.*"]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Tests (spec-10 §1)
+# ---------------------------------------------------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+# pytest-socket: sockets may only connect to loopback (unit tests open none; integration tests use the compose ports
+# and servers bound on port 0). Async tests run on anyio's plugin (asyncio backend; conftest.py marks every
+# `async def` test).
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib", "--allow-hosts=127.0.0.1,::1"]
+timeout = 60
+markers = [
+  "unit: pure in-process tests (no network, no compose services)",
+  "integration: uses the compose services (Postgres, Valkey, moto) or servers on port 0",
+  "e2e: drives the full compose stack (make e2e)",
+  "live: real Bedrock calls; needs NOEMA_LIVE=1 and counts against the 60-call budget",
+  "slow: takes more than a few seconds",
+  "perf: performance measurement; never part of make check",
+]
+filterwarnings = [
+  "error::DeprecationWarning:noema.*",
+]
+xfail_strict = true
+
+[tool.coverage.run]
+source = ["src/noema"]
+branch = true
+omit = ["src/noema/contracts/_vendor/*", "src/noema/contracts/_generated/*"]

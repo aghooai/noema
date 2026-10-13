@@ -1,0 +1,53 @@
+== step 0: streams/pod 100 n 4311 tps 14.37 | TTFT ovh p50 9.57 [9.52, 9.63] p95 14.57 [14.24, 15.01] p99 21.0 | e2e p50/p95 16.3/23.8 | lag p99/p99.9/max 4.6/7.0/40 | cpu 0.631 cores = 43.9 ms/turn | valid True (mock lag 0.982, hb 1.0) | load 4.43 | rss 569.9 | errors {}
+   api-0: gen2 n=5 every 60.00 s p50 20.6 p99 25.0 max 25.1 ms; gen1 n=578 p50 1.40 ms; gen0 n=6355; GC 0.8% of wall
+   api-1: gen2 n=9 every 33.33 s p50 32.3 p99 34.3 max 34.3 ms; gen1 n=868 p50 1.74 ms; gen0 n=9555; GC 1.5% of wall
+   pod: gen2 p50 30.3 p99 34.3 max 34.3 ms (n=14)
+   census tracked per process at step end: [58625, 74972]
+== step 1: streams/pod 200 n 12991 tps 28.87 | TTFT ovh p50 12.74 [12.66, 12.81] p95 23.73 [23.19, 24.23] p99 48.7 | e2e p50/p95 22.3/44.4 | lag p99/p99.9/max 6.5/10.7/92 | cpu 1.213 cores = 42.0 ms/turn | valid True (mock lag 1.236, hb 0.99992) | load 6.15 | rss 812.9 | errors {}
+   api-0: gen2 n=20 every 22.50 s p50 56.8 p99 63.7 max 63.8 ms; gen1 n=2073 p50 2.46 ms; gen0 n=22806; GC 3.1% of wall
+   api-1: gen2 n=22 every 20.45 s p50 69.9 p99 78.4 max 78.7 ms; gen1 n=2191 p50 2.99 ms; gen0 n=24100; GC 3.9% of wall
+   pod: gen2 p50 61.3 p99 78.1 max 78.7 ms (n=42)
+   census tracked per process at step end: [127977, 130589]
+tracked objects per live turn (steps 0->1, 50 more live turns per process): [1387, 1112]
+
+live tracked over the pod: 122655 -> 249680 (garbage at the census 10942 -> 8886); per live turn 1270
+   115.2  list
+   114.3  tuple
+   103.3  dict
+    87.3  coroutine
+    80.3  cell
+    61.9  set
+    59.0  method
+    48.1  Event
+    44.7  _TurnLog
+    39.2  deque
+    38.8  TextBlock
+    35.9  Context
+    30.9  function
+    27.7  ReferenceType
+    25.8  CancelScope
+    24.1  OptionSpec
+    16.9  Message
+    13.8  builtin_function_or_method
+    11.8  Future
+    11.8  TaskState
+    11.8  FutureIter
+    11.8  Task
+    10.8  TaskHandle
+     9.0  generator
+     8.8  HistoryTurn
+     8.2  TaskGroup
+     7.0  hamt
+     7.0  hamt_bitmap_node
+     7.0  CompiledQuestion
+     6.9  TimerHandle
+     6.9  UVTimer
+     6.5  AnswerSummary
+     5.9  UsageRecord
+     4.7  _AgnosticContextManager
+     4.3  _GeneratorContextManager
+     4.0  Bucket
+     4.0  AsyncExitStack
+     3.9  ContentPart
+     3.9  SpanContext
+     3.9  Msg

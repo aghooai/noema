@@ -1,0 +1,47 @@
+{
+  "profile": "router-default@1",
+  "questions": [
+    {
+      "type": "choice",
+      "name": "department",
+      "instructions": "Which team should handle this message?",
+      "choices": [
+        {
+          "value": "billing",
+          "description": "Payments, refunds, invoices"
+        },
+        {
+          "value": "technical",
+          "description": "Bugs and errors"
+        },
+        {
+          "value": "shipping",
+          "description": "Delivery problems"
+        },
+        {
+          "value": "other",
+          "description": null
+        }
+      ]
+    }
+  ],
+  "include": [
+    "members",
+    "stages"
+  ],
+  "input": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "Which team handles this?"
+        },
+        {
+          "type": "input_image",
+          "file_id": "file_01J9ZR2Q"
+        }
+      ]
+    }
+  ]
+}

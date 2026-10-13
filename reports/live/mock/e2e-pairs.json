@@ -1,0 +1,131 @@
+{
+  "effort": "low",
+  "n": 6,
+  "p50_direct_e2e_ms": 5876.5,
+  "p50_direct_first_text_ms": 943.0,
+  "p50_pinned_e2e_ms": 5757.5,
+  "p50_pinned_first_delta_ms": 818.0,
+  "p50_ratio_e2e": 0.98,
+  "p50_ratio_first_delta": 0.867,
+  "pair_ratio_e2e": {
+    "max": 1.06,
+    "median": 0.972,
+    "min": 0.915
+  },
+  "pair_ratio_first_delta": {
+    "max": 1.656,
+    "median": 0.82,
+    "min": 0.575
+  },
+  "pairs": [
+    {
+      "direct": {
+        "e2e": 5890,
+        "first_text": 957
+      },
+      "direct_output_tokens": [
+        300
+      ],
+      "order": "direct-first",
+      "pair": 1,
+      "pinned": {
+        "e2e": 5651,
+        "first_delta": 710
+      },
+      "pinned_output_tokens": [
+        300
+      ]
+    },
+    {
+      "direct": {
+        "e2e": 5711,
+        "first_text": 777
+      },
+      "direct_output_tokens": [
+        300
+      ],
+      "order": "pinned-first",
+      "pair": 2,
+      "pinned": {
+        "e2e": 5766,
+        "first_delta": 826
+      },
+      "pinned_output_tokens": [
+        300
+      ]
+    },
+    {
+      "direct": {
+        "e2e": 6188,
+        "first_text": 1253
+      },
+      "direct_output_tokens": [
+        300
+      ],
+      "order": "direct-first",
+      "pair": 3,
+      "pinned": {
+        "e2e": 5662,
+        "first_delta": 721
+      },
+      "pinned_output_tokens": [
+        300
+      ]
+    },
+    {
+      "direct": {
+        "e2e": 5425,
+        "first_text": 489
+      },
+      "direct_output_tokens": [
+        300
+      ],
+      "order": "pinned-first",
+      "pair": 4,
+      "pinned": {
+        "e2e": 5749,
+        "first_delta": 810
+      },
+      "pinned_output_tokens": [
+        300
+      ]
+    },
+    {
+      "direct": {
+        "e2e": 6116,
+        "first_text": 1182
+      },
+      "direct_output_tokens": [
+        300
+      ],
+      "order": "direct-first",
+      "pair": 5,
+      "pinned": {
+        "e2e": 5823,
+        "first_delta": 879
+      },
+      "pinned_output_tokens": [
+        300
+      ]
+    },
+    {
+      "direct": {
+        "e2e": 5863,
+        "first_text": 929
+      },
+      "direct_output_tokens": [
+        300
+      ],
+      "order": "pinned-first",
+      "pair": 6,
+      "pinned": {
+        "e2e": 5772,
+        "first_delta": 832
+      },
+      "pinned_output_tokens": [
+        300
+      ]
+    }
+  ],
+  "profile": "sol-fast"
+}

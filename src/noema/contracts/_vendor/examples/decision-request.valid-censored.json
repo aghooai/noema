@@ -1,0 +1,41 @@
+{
+  "profile": "router-default@1",
+  "input": "I was charged but now I can't sign in to see the receipt.",
+  "questions": [
+    {
+      "type": "choice",
+      "name": "product_line",
+      "instructions": "Which product line is the message about?",
+      "choices": [
+        {
+          "value": "A",
+          "description": "Accounts and sign-in"
+        },
+        {
+          "value": "B",
+          "description": "Payments"
+        },
+        {
+          "value": "C",
+          "description": "Orders"
+        },
+        {
+          "value": "D",
+          "description": "Shipping"
+        },
+        {
+          "value": "E",
+          "description": "Returns"
+        },
+        {
+          "value": "F",
+          "description": "Gift cards"
+        }
+      ]
+    }
+  ],
+  "min_quorum": 1,
+  "include": [
+    "members"
+  ]
+}

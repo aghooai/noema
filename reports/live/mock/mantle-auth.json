@@ -1,0 +1,16 @@
+{
+  "mode": "ambient IAM user",
+  "results": {
+    "bearer": {
+      "answer_391": true,
+      "latency_ms": 355,
+      "ok": true,
+      "stop": "end_turn"
+    },
+    "sigv4": {
+      "kind": "tenant_access",
+      "ok": false,
+      "provider_code": "401"
+    }
+  }
+}

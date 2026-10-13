@@ -1,0 +1,18 @@
+{
+  "status": 429,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000",
+    "retry-after": "1"
+  },
+  "body": {
+    "error": {
+      "type": "rate_limit_error",
+      "code": "rpm_exceeded",
+      "message": "requests per minute exceeded",
+      "param": null,
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": true
+    }
+  }
+}

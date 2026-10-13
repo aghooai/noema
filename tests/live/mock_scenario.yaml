@@ -1,0 +1,53 @@
+# The wire-mock rehearsal of the live smoke (NOEMA_LIVE_MOCK=1, tests/live/conftest.py): the same requests as the
+# live run, answered by tools/mockbedrock with the probe latencies (spec-10 §2.2; since Wave E2 the rows follow the
+# 2026-10-11 live cassettes), so the rehearsal predicts the live call counts (DeepSeek backups at 400 ms) and its
+# cassettes are the mock side of the fidelity diff (spec-10 §2.3, tests/live/fidelity.py). Rules are tried in order.
+scenario: live-smoke-rehearsal
+seed: 11
+mantle_auth: bearer_short_term
+defaults:
+  latency: probe
+rules:
+  # --- adapter level (test_adapters_live.py): "What is 17 * 23? ..." (L1, L2, L3, capability probes) ----------------
+  - match: { op: converse-stream, prompt_contains: "17 * 23" }
+    stream: { text: "391", stop: end_turn }
+  - match: { prompt_contains: "17 * 23" }
+    answer: { raw_text: "391" }
+  # L4 Sonnet media: "What number is shown? ..."
+  - match: { prompt_contains: "What number is shown" }
+    answer: { raw_text: "4471" }
+  # L8 direct streams and pinned turns: "In about 300 tokens, explain ..."
+  - match: { op: converse-stream, prompt_contains: "In about 300 tokens" }
+    stream: { tokens: 300, stop: end_turn }
+  # L9 labelers (labeler@1, one letter)
+  - match: { prompt_contains: "speak with a human" }
+    answer: { raw_text: "A" }
+  # --- API level (test_api_live.py): every other stream is a turn's generation --------------------------------------
+  - match: { op: converse-stream }
+    stream: { tokens: 120, stop: end_turn }
+  # router-default / smoke-router intent, complexity
+  - match: { prompt_contains: "primary intent" }
+    answer: { dist: { factual_qa: 0.8, other: 0.15, chitchat: 0.05 } }
+  # live L7 decided complexity = hard (p 0.437), so bindings[2] restarted Sol at effort high: the same path here
+  - match: { prompt_contains: "How hard" }
+    answer: { dist: { trivial: 0.05, moderate: 0.3, hard: 0.55, expert: 0.1 } }
+  # answer-verifier: live Haiku 5.5 hid its reasoning on every verify-dist@1 call (L7: 88 of 88 tokens, no text;
+  # cassettes live-20261011T073404/35, 37); 200 hidden tokens is an assumption (live showed only the lower bound 88)
+  - match: { model: us.anthropic.claude-haiku-5-5, prompt_contains: "directly addresses" }
+    answer: { dist: { "true": 0.95, "false": 0.05 } }
+    stream: { reasoning: { hidden_tokens: 200 } }
+  - match: { model: us.anthropic.claude-haiku-5-5, prompt_contains: "candidate answers in <answer" }
+    answer: { dist: { "true": 0.05, "false": 0.95 } }
+    stream: { reasoning: { hidden_tokens: 200 } }
+  - match: { prompt_contains: "directly addresses" }
+    answer: { dist: { "true": 0.95, "false": 0.05 } }
+  # the /v1/decisions questions (department, urgency, refund_requested)
+  - match: { prompt_contains: "Which team should handle" }
+    answer: { dist: { billing: 0.8, shipping: 0.15, other: 0.05 } }
+  - match: { prompt_contains: "How urgent" }
+    answer: { dist: { low: 0.1, medium: 0.2, high: 0.7 } }
+  - match: { prompt_contains: "money back" }
+    answer: { dist: { "true": 0.9, "false": 0.1 } }
+  # every other predicate (needs_fresh_info, sensitive_data, injection_suspected, unsupported_claims, ...)
+  - match: {}
+    answer: { dist: { "true": 0.05, "false": 0.95 } }

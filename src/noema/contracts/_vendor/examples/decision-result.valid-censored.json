@@ -1,0 +1,179 @@
+{
+  "id": "dec_01J9ZU4C7P",
+  "object": "decision",
+  "created_at": 1791504600,
+  "status": "completed",
+  "answers": [
+    {
+      "type": "choice",
+      "name": "product_line",
+      "choice": "A",
+      "unresolved_mass": 0.001,
+      "candidates": [
+        {
+          "value": "A",
+          "probability": 0.632,
+          "raw_score": 0.632,
+          "votes": 1
+        },
+        {
+          "value": "B",
+          "probability": 0.2141,
+          "raw_score": 0.2141,
+          "votes": 0
+        },
+        {
+          "value": "C",
+          "probability": 0.0917,
+          "raw_score": 0.0917,
+          "votes": 0
+        },
+        {
+          "value": "D",
+          "probability": 0.0408,
+          "raw_score": 0.0408,
+          "votes": 0
+        },
+        {
+          "value": "E",
+          "probability": 0.0204,
+          "raw_score": 0.0204,
+          "votes": 0
+        },
+        {
+          "value": "F",
+          "probability": 0.0,
+          "raw_score": 0.0,
+          "votes": 0
+        }
+      ],
+      "calibration": {
+        "status": "uncalibrated",
+        "source": "logprob",
+        "member_subset": [
+          "m1"
+        ]
+      },
+      "confidence": {
+        "kind": "heuristic",
+        "value": 0.5707,
+        "method": "normalized_max",
+        "band": "medium",
+        "margin": 0.4179,
+        "normalized_entropy": 0.5427,
+        "agreement": 1.0,
+        "member_divergence": null
+      },
+      "quorum": {
+        "required": 1,
+        "responded": 1,
+        "refused": 0,
+        "total": 3
+      },
+      "members": [
+        {
+          "member_id": "m1",
+          "provider": "bedrock-mantle-chat",
+          "model": "deepseek.v3.2",
+          "region": "us-east-1",
+          "elicitation": "token_logprobs",
+          "input_view": "native",
+          "status": "ok",
+          "distribution": {
+            "A": 0.632,
+            "B": 0.2141,
+            "C": 0.0917,
+            "D": 0.0408,
+            "E": 0.0204
+          },
+          "censored_options": [
+            "F"
+          ],
+          "unresolved_mass": 0.001,
+          "weight": 1.0,
+          "latency_ms": 488,
+          "usage": {
+            "input_tokens": 60,
+            "output_tokens": 2,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m2",
+          "provider": "bedrock-converse",
+          "model": "us.openai.gpt-6-luna",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "error",
+          "weight": 0,
+          "latency_ms": 140,
+          "error": {
+            "code": "throttled",
+            "message": "Bedrock throttled the call (ThrottlingException); member calls are not retried"
+          }
+        },
+        {
+          "member_id": "m3",
+          "provider": "bedrock-converse",
+          "model": "us.anthropic.claude-haiku-5-5",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "error",
+          "weight": 0,
+          "latency_ms": 95,
+          "error": {
+            "code": "throttled",
+            "message": "Bedrock throttled the call (ThrottlingException); member calls are not retried"
+          }
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "trace_id": "2c6e0a9f4b7d4e1a9c3f5b8d0e2a4c61",
+    "profile_id": "router-default",
+    "profile_version": "1",
+    "question_signature": "sha256:57cdce3df3a548502eaba06b39ca431845269a535876201b8b72ce6d4b2b9228",
+    "input_digest": "hmac-sha256:0a2e5314d4e97b9e9157c284d334757e2e2b2ae5230ffe28ab39146939553c28",
+    "input_view_signature": "sha256:716bdc51d6e157793517073b27f81cf6dcc78e68072f802ac010abf3e5a46eec",
+    "option_order_seed": 1791504600,
+    "prompt_templates": {
+      "m1": "logprob-codes@2",
+      "m2": "verbalized-dist@1",
+      "m3": "verbalized-dist@1"
+    },
+    "aggregation": {
+      "method": "linear_pool"
+    },
+    "deadline_ms": 1000,
+    "quorum": {
+      "required": 1,
+      "responded": 1,
+      "refused": 0,
+      "total": 3
+    },
+    "cache": {
+      "hit": false
+    },
+    "stages": [],
+    "started_at": "2026-10-09T00:08:00.000Z",
+    "completed_at": "2026-10-09T00:08:00.512Z"
+  },
+  "usage": {
+    "input_tokens": 60,
+    "output_tokens": 2,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "reasoning_tokens": 0,
+    "cost_usd": 2e-05,
+    "cost_estimated": true,
+    "tokens_estimated": false
+  }
+}

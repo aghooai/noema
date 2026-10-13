@@ -1,0 +1,24 @@
+{
+  "alias": "sol-6.1",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "generation",
+  "cancelled": "CancelledError",
+  "counts": {},
+  "e2e_ms": 955,
+  "effort": "low",
+  "estimated_input_tokens": 148,
+  "events": [],
+  "max_tokens": 512,
+  "model_id": "us.openai.gpt-6.1-sol",
+  "n": 33,
+  "op": "stream",
+  "test": "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification",
+  "test_call": 17,
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": []
+  }
+}

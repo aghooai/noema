@@ -1,0 +1,974 @@
+{
+  "C3-slow-clients": {
+    "baseline_ttft": {
+      "max": 884.5,
+      "n": 8,
+      "p50": 677.7,
+      "p95": 884.5
+    },
+    "normal": 8,
+    "normal_e2e_s": {
+      "max": 91.1,
+      "n": 8,
+      "p50": 90.9,
+      "p95": 91.1
+    },
+    "normal_outcomes": {
+      "completed": 8
+    },
+    "normal_ttft": {
+      "max": 709.9,
+      "n": 8,
+      "p50": 654.6,
+      "p95": 709.9
+    },
+    "run_s": 92.4,
+    "slow": 4,
+    "slow_bytes_received": [
+      796372,
+      796372,
+      796372,
+      796372
+    ],
+    "slow_coalesced_frames": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "slow_error_frames": [
+      [],
+      [],
+      [],
+      []
+    ],
+    "slow_frame_in_flight_bytes": [
+      625359,
+      625359,
+      625360,
+      621221
+    ],
+    "slow_frames_received": [
+      45,
+      45,
+      45,
+      46
+    ],
+    "slow_read_bps": 12480,
+    "slow_server_end_s": [
+      90.6,
+      90.6,
+      90.6,
+      90.6
+    ],
+    "slow_status": {
+      "200": 4
+    },
+    "slow_stored": {
+      "completed": 4
+    }
+  },
+  "F1": {
+    "a_committed_on_sol": 75,
+    "a_first_attempt_model": {
+      "us.anthropic.claude-opus-5-5": 40,
+      "us.openai.gpt-6.1-sol": 60
+    },
+    "a_outcomes": {
+      "completed": 75,
+      "error:all_routes_unavailable": 25
+    },
+    "a_turns": 100,
+    "b_outcomes": {
+      "completed": 100
+    },
+    "b_ttft_clean": {
+      "max": 882.0,
+      "n": 100,
+      "p50": 631.6,
+      "p95": 736.4
+    },
+    "b_ttft_fault": {
+      "max": 820.0,
+      "n": 100,
+      "p50": 624.9,
+      "p95": 743.5
+    },
+    "fallback": {
+      "fallback_started": 15,
+      "fallback_started_served": 15,
+      "first_attempt_failed": 40,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 25
+      },
+      "served": 15
+    },
+    "fallback_gap_ms": {
+      "max": 91.9,
+      "n": 15,
+      "p50": 52.4,
+      "p95": 91.9
+    },
+    "opus_throttled_requests": 40,
+    "throttled_akids": {
+      "ASIARTX3GSDSSKY6R4G3": 20,
+      "ASIARTX3GSDSVMUCZXVE": 20
+    },
+    "turns": 200
+  },
+  "F10-down": {
+    "admission_degraded": 2.0,
+    "after_outcomes": {
+      "completed": 40
+    },
+    "before_outcomes": {
+      "completed": 50
+    },
+    "cross_pod_attach": {
+      "envelope": {
+        "error": {
+          "code": "internal_error",
+          "message": "The original request can't be attached; retry.",
+          "param": null,
+          "request_id": "req_01M4N2JCTK8T1HCW9YWCTFZW6D",
+          "retryable": true,
+          "type": "server_error"
+        }
+      },
+      "events": 0,
+      "ms": 5.906818434596062,
+      "status": 500
+    },
+    "cross_pod_cancel": 500,
+    "during": 125,
+    "during_e2e_ms": {
+      "max": 951.5,
+      "n": 125,
+      "p50": 920.9,
+      "p95": 932.5
+    },
+    "during_outcomes": {
+      "completed": 125
+    },
+    "l2_misses": {
+      "bypass": 0.0,
+      "error": 255.0
+    },
+    "outage_s": 25.0,
+    "same_pod_cancel": 202,
+    "turns": 225
+  },
+  "F10-hung": {
+    "admission_degraded": 2.0,
+    "after_outcomes": {
+      "completed": 40
+    },
+    "before_outcomes": {
+      "completed": 50
+    },
+    "cross_pod_attach": {
+      "envelope": {
+        "error": {
+          "code": "internal_error",
+          "message": "The original request can't be attached; retry.",
+          "param": null,
+          "request_id": "req_01M4N2NPQGM4WVT10QDPV8P7C6",
+          "retryable": true,
+          "type": "server_error"
+        }
+      },
+      "events": 0,
+      "ms": 5.369178950786591,
+      "status": 500
+    },
+    "cross_pod_cancel": 500,
+    "during": 125,
+    "during_e2e_ms": {
+      "max": 1618.9,
+      "n": 125,
+      "p50": 1468.4,
+      "p95": 1597.9
+    },
+    "during_outcomes": {
+      "completed": 125
+    },
+    "l2_misses": {
+      "bypass": 0.0,
+      "error": 252.0
+    },
+    "outage_s": 25.0,
+    "same_pod_cancel": 202,
+    "turns": 225
+  },
+  "F11": {
+    "checked_turns": 80,
+    "generation_lines_per_turn": {
+      "1": 80
+    },
+    "in_flight": {
+      "completed": 10
+    },
+    "in_flight_finalized_ms_after_down": {
+      "max": 4.8,
+      "n": 10,
+      "p50": 4.8,
+      "p95": 4.8
+    },
+    "missing_turns": 0,
+    "outage_s": 60.0,
+    "store_false_by_10s": {
+      "+0s": {
+        "completed": 20
+      },
+      "+10s": {
+        "completed": 20
+      },
+      "+20s": {
+        "completed": 20
+      },
+      "+30s": {
+        "completed": 20
+      },
+      "+40s": {
+        "completed": 19
+      },
+      "+50s": {
+        "completed": 1,
+        "http:500:internal_error": 19
+      },
+      "+60s": {
+        "completed": 20
+      },
+      "+70s": {
+        "completed": 20
+      },
+      "+80s": {
+        "completed": 11
+      },
+      "-10s": {
+        "completed": 20
+      }
+    },
+    "store_false_failures": {
+      "The database is temporarily unavailable.": 19
+    },
+    "store_true_by_10s": {
+      "+0s": {
+        "http:500:internal_error": 20
+      },
+      "+10s": {
+        "http:500:internal_error": 20
+      },
+      "+20s": {
+        "http:500:internal_error": 20
+      },
+      "+30s": {
+        "http:500:internal_error": 20
+      },
+      "+40s": {
+        "http:500:internal_error": 20
+      },
+      "+50s": {
+        "http:500:internal_error": 20
+      },
+      "+60s": {
+        "completed": 20
+      },
+      "+70s": {
+        "completed": 20
+      },
+      "+80s": {
+        "completed": 10
+      },
+      "-10s": {
+        "completed": 19
+      },
+      "-20s": {
+        "completed": 1
+      }
+    },
+    "store_true_during_ingress_ms": {
+      "max": 5.6,
+      "n": 120,
+      "p50": 4.2,
+      "p95": 5.0
+    },
+    "turn_rows": {
+      "1": 80
+    },
+    "turns": 380,
+    "turns_without_generation_line": 0
+  },
+  "F12-rate0.25": {
+    "amplification": 1.045,
+    "amplification_per_attempted_turn": 1.045,
+    "attempts_per_turn": {
+      "1": 720,
+      "2": 26,
+      "3": 4
+    },
+    "fallback": {
+      "fallback_started": 30,
+      "fallback_started_served": 25,
+      "first_attempt_failed": 178,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 148
+      },
+      "served": 25
+    },
+    "faulted_requests": 187,
+    "generation_requests": 784,
+    "outcomes": {
+      "glm-reason": {
+        "completed": 204,
+        "error:all_routes_unavailable": 46
+      },
+      "opus-deep": {
+        "completed": 207,
+        "error:all_routes_unavailable": 43
+      },
+      "sol-fast": {
+        "completed": 186,
+        "error:all_routes_unavailable": 64
+      }
+    },
+    "rate_turns_per_s": 12.5,
+    "requests_by_model": {
+      "us.anthropic.claude-opus-5-5": 250,
+      "us.openai.gpt-6.1-sol": 284,
+      "us.zai.glm-5.3": 250
+    },
+    "turns": 750
+  },
+  "F12-rate0.5": {
+    "amplification": 0.372,
+    "amplification_per_attempted_turn": 1.094,
+    "attempts_per_turn": {
+      "0": 495,
+      "1": 238,
+      "2": 10,
+      "3": 7
+    },
+    "fallback": {
+      "fallback_started": 17,
+      "fallback_started_served": 15,
+      "first_attempt_failed": 130,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 113
+      },
+      "served": 15
+    },
+    "faulted_requests": 139,
+    "generation_requests": 279,
+    "outcomes": {
+      "glm-reason": {
+        "completed": 60,
+        "error:all_routes_unavailable": 190
+      },
+      "opus-deep": {
+        "completed": 70,
+        "error:all_routes_unavailable": 180
+      },
+      "sol-fast": {
+        "completed": 10,
+        "error:all_routes_unavailable": 240
+      }
+    },
+    "rate_turns_per_s": 12.5,
+    "requests_by_model": {
+      "us.anthropic.claude-opus-5-5": 122,
+      "us.openai.gpt-6.1-sol": 50,
+      "us.zai.glm-5.3": 107
+    },
+    "turns": 750
+  },
+  "F2a": {
+    "foreign": {
+      "a_outcomes": {
+        "completed": 20
+      },
+      "b_causes": {
+        "external_id_invalid": 20
+      },
+      "b_ingress_ms": {
+        "max": 21.6,
+        "n": 20,
+        "p50": 15.1,
+        "p95": 21.4
+      },
+      "b_mock_requests": 0,
+      "b_outcomes": {
+        "http:503:tenant_access_misconfigured": 20
+      },
+      "b_retryable": {
+        "False": 20
+      },
+      "tenant_access_failures_counted": 0.0
+    },
+    "missing": {
+      "a_outcomes": {
+        "completed": 20
+      },
+      "b_causes": {
+        "external_id_unavailable": 20
+      },
+      "b_ingress_ms": {
+        "max": 20.1,
+        "n": 20,
+        "p50": 9.9,
+        "p95": 20.0
+      },
+      "b_mock_requests": 0,
+      "b_outcomes": {
+        "http:503:tenant_access_misconfigured": 20
+      },
+      "b_retryable": {
+        "False": 20
+      },
+      "tenant_access_failures_counted": 0.0
+    },
+    "moto_down": {
+      "a_outcomes": {
+        "completed": 20
+      },
+      "b_causes": {
+        "sts_unavailable": 20
+      },
+      "b_ingress_ms": {
+        "max": 19.3,
+        "n": 20,
+        "p50": 9.2,
+        "p95": 19.2
+      },
+      "b_mock_requests": 0,
+      "b_outcomes": {
+        "http:503:tenant_access_misconfigured": 20
+      },
+      "b_retryable": {
+        "False": 20
+      },
+      "tenant_access_failures_counted": 0.0
+    },
+    "per_variant_turns": 40
+  },
+  "F2b": {
+    "a_attempt_models": {
+      "('us.anthropic.claude-opus-5-5',)": 50
+    },
+    "a_outcomes": {
+      "error:tenant_access_misconfigured": 50
+    },
+    "a_retryable": {
+      "False": 50
+    },
+    "a_sol_requests": 0,
+    "b_outcomes": {
+      "completed": 50
+    },
+    "opus_circuit_after": [
+      0.0,
+      0.0
+    ],
+    "turns": 100
+  },
+  "F2c": {
+    "decision_status": {
+      "completed": 44,
+      "quorum": 56
+    },
+    "haiku_circuit_after": [
+      0.0,
+      0.0
+    ],
+    "haiku_votes": {
+      "('error', 'tenant_access_misconfigured')": 500
+    },
+    "other_votes": {
+      "late": 155,
+      "ok": 845
+    },
+    "outcomes": {
+      "completed": 100
+    },
+    "turns": 100
+  },
+  "F3": {
+    "failed_requests_before_open": 38,
+    "outcomes": {
+      "completed": 208,
+      "error:all_routes_unavailable": 342
+    },
+    "outcomes_after_recovery": {
+      "completed": 205
+    },
+    "pace_turns_per_s": 10.0,
+    "refused_without_model_call": 254,
+    "sol_faulted": 39,
+    "sol_requests": 247,
+    "time_to_open_s": 4.08,
+    "time_to_recover_after_window_s": 4.95,
+    "transitions": [
+      [
+        0.04,
+        0.0,
+        0.0
+      ],
+      [
+        4.08,
+        2.0,
+        2.0
+      ],
+      [
+        34.08,
+        1.0,
+        1.0
+      ],
+      [
+        34.95,
+        0.0,
+        0.0
+      ]
+    ],
+    "turns": 550,
+    "turns_sent_while_open": 255
+  },
+  "F3b": {
+    "baseline_ttft": {
+      "max": 679.8,
+      "n": 200,
+      "p50": 611.7,
+      "p95": 620.8
+    },
+    "opened_during_baseline": false,
+    "recover_outcomes": {
+      "completed": 76,
+      "error:all_routes_unavailable": 36
+    },
+    "slow_outcomes": {
+      "completed": 57,
+      "error:all_routes_unavailable": 43
+    },
+    "slow_refused_without_model_call": 43,
+    "slow_ttft": {
+      "max": 2432.3,
+      "n": 57,
+      "p50": 2411.4,
+      "p95": 2421.0
+    },
+    "time_to_close_after_restore_s": 15.04,
+    "time_to_open_after_slowdown_s": 4.49,
+    "transitions": [
+      [
+        0.04,
+        0.0,
+        0.0
+      ],
+      [
+        85.26,
+        2.0,
+        2.0
+      ],
+      [
+        100.51,
+        1.0,
+        2.0
+      ],
+      [
+        101.07,
+        1.0,
+        1.0
+      ],
+      [
+        103.36,
+        0.0,
+        0.0
+      ],
+      [
+        122.3,
+        2.0,
+        2.0
+      ],
+      [
+        137.44,
+        2.0,
+        1.0
+      ],
+      [
+        138.01,
+        1.0,
+        1.0
+      ],
+      [
+        138.29,
+        0.0,
+        0.0
+      ]
+    ],
+    "turns": 412
+  },
+  "F4a": {
+    "committed_model": {
+      "None": 10,
+      "us.openai.gpt-6.1-sol": 90
+    },
+    "deadline_ms": 30000,
+    "e2e_ms": {
+      "max": 11916.3,
+      "n": 100,
+      "p50": 1418.9,
+      "p95": 11559.6
+    },
+    "fallback": {
+      "fallback_started": 40,
+      "fallback_started_served": 40,
+      "first_attempt_failed": 50,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 10
+      },
+      "served": 40
+    },
+    "first_attempt_failed_at_ms": {
+      "max": 10843.9,
+      "n": 50,
+      "p50": 10310.1,
+      "p95": 10837.5
+    },
+    "outcomes": {
+      "completed": 90,
+      "error:all_routes_unavailable": 10
+    },
+    "turns": 100
+  },
+  "F4b": {
+    "attempted": 65,
+    "deadline_ms": 10000,
+    "e2e_ms": {
+      "max": 5859.3,
+      "n": 100,
+      "p50": 5138.2,
+      "p95": 5818.1
+    },
+    "error_at_ms_attempted": {
+      "max": 5511.7,
+      "n": 65,
+      "p50": 5131.2,
+      "p95": 5503.2
+    },
+    "outcomes": {
+      "error:all_routes_unavailable": 100
+    },
+    "refused_by_open_breaker": 35,
+    "turns": 100
+  },
+  "F5-post": {
+    "committed": 100,
+    "error_at_ms": {
+      "max": 32785.9,
+      "n": 100,
+      "p50": 31831.8,
+      "p95": 32768.3
+    },
+    "error_retryable": {
+      "True": 100
+    },
+    "outcomes": {
+      "error:upstream_stalled": 100
+    },
+    "rendered_partial": {
+      "True": 100
+    },
+    "stored_attempt_outcomes": {
+      "('committed',)": 20
+    },
+    "stored_checked": 20,
+    "stored_text_is_partial": {
+      "True": 20
+    },
+    "turns": 100
+  },
+  "F5-pre": {
+    "committed_model": {
+      "None": 13,
+      "us.openai.gpt-6.1-sol": 87
+    },
+    "e2e_ms": {
+      "max": 31954.7,
+      "n": 100,
+      "p50": 30070.4,
+      "p95": 31930.5
+    },
+    "fallback": {
+      "fallback_started": 40,
+      "fallback_started_served": 40,
+      "first_attempt_failed": 53,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 13
+      },
+      "served": 40
+    },
+    "outcomes": {
+      "completed": 87,
+      "error:all_routes_unavailable": 13
+    },
+    "turns": 100
+  },
+  "F6-post": {
+    "internalServerException": {
+      "committed": 12,
+      "errors": {
+        "('all_routes_unavailable', True)": 12
+      },
+      "outcomes": {
+        "error:all_routes_unavailable": 20
+      },
+      "rendered_5_chunks": {
+        "True": 12
+      },
+      "turns": 20
+    },
+    "modelStreamErrorException": {
+      "committed": 11,
+      "errors": {
+        "('all_routes_unavailable', True)": 11
+      },
+      "outcomes": {
+        "error:all_routes_unavailable": 20
+      },
+      "rendered_5_chunks": {
+        "True": 11
+      },
+      "turns": 20
+    },
+    "serviceUnavailableException": {
+      "committed": 12,
+      "errors": {
+        "('all_routes_unavailable', True)": 12
+      },
+      "outcomes": {
+        "error:all_routes_unavailable": 20
+      },
+      "rendered_5_chunks": {
+        "True": 12
+      },
+      "turns": 20
+    },
+    "throttlingException": {
+      "committed": 13,
+      "errors": {
+        "('all_routes_unavailable', True)": 13
+      },
+      "outcomes": {
+        "error:all_routes_unavailable": 20
+      },
+      "rendered_5_chunks": {
+        "True": 13
+      },
+      "turns": 20
+    },
+    "turns": 100,
+    "validationException": {
+      "committed": 12,
+      "errors": {
+        "('all_routes_unavailable', True)": 12
+      },
+      "outcomes": {
+        "error:all_routes_unavailable": 20
+      },
+      "rendered_5_chunks": {
+        "True": 12
+      },
+      "turns": 20
+    }
+  },
+  "F6-pre": {
+    "committed_model": {
+      "None": 29,
+      "us.openai.gpt-6.1-sol": 71
+    },
+    "fallback": {
+      "fallback_started": 24,
+      "fallback_started_served": 24,
+      "first_attempt_failed": 53,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 29
+      },
+      "served": 24
+    },
+    "outcomes": {
+      "completed": 71,
+      "error:all_routes_unavailable": 29
+    },
+    "turns": 100
+  },
+  "F7": {
+    "committed_from_glm": 0,
+    "completed_with_empty_text": 0,
+    "empty_text": {
+      "fallback": {
+        "fallback_started": 20,
+        "fallback_started_served": 20,
+        "first_attempt_failed": 50,
+        "not_started_outcomes": {
+          "error:all_routes_unavailable": 30
+        },
+        "served": 20
+      },
+      "outcomes": {
+        "completed": 20,
+        "error:all_routes_unavailable": 30
+      }
+    },
+    "reasoning_only": {
+      "fallback": {
+        "fallback_started": 20,
+        "fallback_started_served": 20,
+        "first_attempt_failed": 50,
+        "not_started_outcomes": {
+          "error:all_routes_unavailable": 30
+        },
+        "served": 20
+      },
+      "outcomes": {
+        "completed": 20,
+        "error:all_routes_unavailable": 30
+      }
+    },
+    "turns": 100
+  },
+  "F8-attempt": {
+    "crc": {
+      "fallback": {
+        "fallback_started": 14,
+        "fallback_started_served": 14,
+        "first_attempt_failed": 20,
+        "not_started_outcomes": {
+          "error:all_routes_unavailable": 6
+        },
+        "served": 14
+      },
+      "outcomes": {
+        "completed": 44,
+        "error:all_routes_unavailable": 6
+      },
+      "status": {
+        "200": 50
+      }
+    },
+    "trunc": {
+      "fallback": {
+        "fallback_started": 13,
+        "fallback_started_served": 13,
+        "first_attempt_failed": 20,
+        "not_started_outcomes": {
+          "error:all_routes_unavailable": 7
+        },
+        "served": 13
+      },
+      "outcomes": {
+        "completed": 43,
+        "error:all_routes_unavailable": 7
+      },
+      "status": {
+        "200": 50
+      }
+    },
+    "turns": 100
+  },
+  "F8-members": {
+    "deepseek-malformed": {
+      "outcomes": {
+        "completed": 16
+      },
+      "turns": 16,
+      "votes": {
+        "('error', 'upstream_error')": 57,
+        "('late', None)": 23
+      }
+    },
+    "deepseek-trunc": {
+      "outcomes": {
+        "completed": 16
+      },
+      "turns": 16,
+      "votes": {
+        "('error', 'upstream_error')": 52,
+        "('late', None)": 28
+      }
+    },
+    "haiku-notjson": {
+      "outcomes": {
+        "completed": 17
+      },
+      "turns": 17,
+      "votes": {
+        "('error', 'parse_error')": 85
+      }
+    },
+    "luna-missing": {
+      "outcomes": {
+        "completed": 17
+      },
+      "turns": 17,
+      "votes": {
+        "('error', 'missing_options')": 85
+      }
+    },
+    "luna-notjson": {
+      "outcomes": {
+        "completed": 17
+      },
+      "turns": 17,
+      "votes": {
+        "('error', 'parse_error')": 85
+      }
+    },
+    "luna-sum": {
+      "outcomes": {
+        "completed": 17
+      },
+      "turns": 17,
+      "votes": {
+        "('error', 'sum_out_of_range')": 85
+      }
+    },
+    "turns": 100
+  },
+  "F9": {
+    "answer_types": {
+      "unavailable": 1000
+    },
+    "committed_route": {
+      "sol-fast": 200
+    },
+    "member_circuits_after": {
+      "deepseek.v3.2": [
+        2.0,
+        2.0
+      ],
+      "us.anthropic.claude-haiku-5-5": [
+        2.0,
+        2.0
+      ],
+      "us.openai.gpt-6-luna": [
+        2.0,
+        2.0
+      ]
+    },
+    "member_requests": 228,
+    "member_requests_per_turn": 1.14,
+    "outcomes": {
+      "completed": 200
+    },
+    "routing_reason": {
+      "decision unavailable: all_members_failed": 181,
+      "decision unavailable: no_quorum": 19
+    },
+    "ttft_ms": {
+      "max": 990.1,
+      "n": 200,
+      "p50": 615.1,
+      "p95": 790.4
+    },
+    "turns": 200
+  }
+}

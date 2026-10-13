@@ -1,0 +1,495 @@
+{
+  "id": "dec_01J9ZQ6M3K8V",
+  "object": "decision",
+  "created_at": 1791504300,
+  "status": "completed",
+  "answers": [
+    {
+      "type": "choice",
+      "name": "department",
+      "candidates": [
+        {
+          "value": "shipping",
+          "probability": 0.4466,
+          "raw_score": 0.4466,
+          "votes": 1
+        },
+        {
+          "value": "billing",
+          "probability": 0.3694,
+          "raw_score": 0.3694,
+          "votes": 1
+        },
+        {
+          "value": "technical",
+          "probability": 0.1332,
+          "raw_score": 0.1332,
+          "votes": 1
+        },
+        {
+          "value": "other",
+          "probability": 0.0508,
+          "raw_score": 0.0508,
+          "votes": 0
+        }
+      ],
+      "calibration": {
+        "status": "uncalibrated",
+        "source": "mixed",
+        "member_subset": [
+          "m1",
+          "m2",
+          "m3"
+        ]
+      },
+      "confidence": {
+        "kind": "heuristic",
+        "value": 0.2621,
+        "method": "normalized_max",
+        "band": "high",
+        "margin": 0.0772,
+        "normalized_entropy": 0.828,
+        "agreement": 0.3333,
+        "member_divergence": 0.0472
+      },
+      "quorum": {
+        "required": 2,
+        "responded": 3,
+        "refused": 0,
+        "total": 3
+      },
+      "members": [
+        {
+          "member_id": "m1",
+          "provider": "bedrock-mantle-chat",
+          "model": "deepseek.v3.2",
+          "region": "us-east-1",
+          "elicitation": "token_logprobs",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 488,
+          "distribution": {
+            "billing": 0.2181,
+            "technical": 0.3597,
+            "shipping": 0.3597,
+            "other": 0.0625
+          },
+          "usage": {
+            "input_tokens": 60,
+            "output_tokens": 2,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m2",
+          "provider": "bedrock-converse",
+          "model": "us.openai.gpt-6-luna",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 883,
+          "distribution": {
+            "billing": 0.44,
+            "technical": 0.01,
+            "shipping": 0.53,
+            "other": 0.02
+          },
+          "usage": {
+            "input_tokens": 120,
+            "output_tokens": 29,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m3",
+          "provider": "bedrock-converse",
+          "model": "us.anthropic.claude-haiku-5-5",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 938,
+          "distribution": {
+            "billing": 0.45,
+            "technical": 0.03,
+            "shipping": 0.45,
+            "other": 0.07
+          },
+          "usage": {
+            "input_tokens": 130,
+            "output_tokens": 35,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        }
+      ],
+      "choice": "shipping"
+    },
+    {
+      "type": "predicate",
+      "name": "needs_human",
+      "candidates": [
+        {
+          "value": false,
+          "probability": 0.945,
+          "raw_score": 0.945,
+          "votes": 3
+        },
+        {
+          "value": true,
+          "probability": 0.055,
+          "raw_score": 0.055,
+          "votes": 0
+        }
+      ],
+      "calibration": {
+        "status": "uncalibrated",
+        "source": "mixed",
+        "member_subset": [
+          "m1",
+          "m2",
+          "m3"
+        ]
+      },
+      "confidence": {
+        "kind": "heuristic",
+        "value": 0.89,
+        "method": "normalized_max",
+        "band": "high",
+        "margin": 0.89,
+        "normalized_entropy": 0.3073,
+        "agreement": 1.0,
+        "member_divergence": 0.0018
+      },
+      "quorum": {
+        "required": 2,
+        "responded": 3,
+        "refused": 0,
+        "total": 3
+      },
+      "members": [
+        {
+          "member_id": "m1",
+          "provider": "bedrock-mantle-chat",
+          "model": "deepseek.v3.2",
+          "region": "us-east-1",
+          "elicitation": "token_logprobs",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 488,
+          "distribution": {
+            "true": 0.03,
+            "false": 0.97
+          },
+          "usage": {
+            "input_tokens": 60,
+            "output_tokens": 2,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m2",
+          "provider": "bedrock-converse",
+          "model": "us.openai.gpt-6-luna",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 883,
+          "distribution": {
+            "true": 0.05,
+            "false": 0.95
+          },
+          "usage": {
+            "input_tokens": 120,
+            "output_tokens": 29,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m3",
+          "provider": "bedrock-converse",
+          "model": "us.anthropic.claude-haiku-5-5",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 938,
+          "distribution": {
+            "true": 0.085,
+            "false": 0.915
+          },
+          "usage": {
+            "input_tokens": 130,
+            "output_tokens": 35,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        }
+      ],
+      "probability": 0.055
+    },
+    {
+      "type": "score",
+      "name": "urgency",
+      "candidates": [
+        {
+          "value": "medium",
+          "probability": 0.6001,
+          "raw_score": 0.696,
+          "votes": 3,
+          "index": 1
+        },
+        {
+          "value": "high",
+          "probability": 0.2498,
+          "raw_score": 0.204,
+          "votes": 0,
+          "index": 2
+        },
+        {
+          "value": "low",
+          "probability": 0.1501,
+          "raw_score": 0.1,
+          "votes": 0,
+          "index": 0
+        }
+      ],
+      "calibration": {
+        "status": "calibrated",
+        "source": "mixed",
+        "method": "temperature",
+        "calibrator_id": "cal_urgency_v3",
+        "member_subset": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "binding": {
+          "profile_id": "router-default",
+          "profile_version": "1",
+          "question_signature": "sha256:448b2b57d3b8f9e3e6652008989e397d8376d8a393929b43a05635046e5f5e85",
+          "input_view_signature": "sha256:716bdc51d6e157793517073b27f81cf6dcc78e68072f802ac010abf3e5a46eec",
+          "choice_method": "flat"
+        },
+        "holdout": {
+          "dataset_id": "ds_tenant42_urgency_2026q4",
+          "label_source": "llm_consensus",
+          "labelers": [
+            "us.openai.gpt-6.1-sol",
+            "us.anthropic.claude-sonnet-5-5"
+          ],
+          "consensus_rate": 0.81,
+          "consensus_rate_by_class": {
+            "low": 0.86,
+            "medium": 0.77,
+            "high": 0.83
+          },
+          "n": 1200,
+          "n_by_class": {
+            "low": 330,
+            "medium": 600,
+            "high": 270
+          },
+          "ece": 0.031,
+          "brier": 0.284,
+          "nll": 0.71,
+          "nll_uncalibrated": 0.78,
+          "flagged_classes": [],
+          "scope": {
+            "target": "llm_consensus_agreement",
+            "retained_share": 0.78,
+            "slices": [
+              {
+                "name": "input_view:text_only",
+                "n": 1200
+              },
+              {
+                "name": "language:en",
+                "n": 1140
+              }
+            ]
+          },
+          "family_overlap": {
+            "max_member_lift": 0.04,
+            "threshold": 0.1
+          },
+          "evaluated_at": "2026-10-01T12:00:00Z"
+        }
+      },
+      "confidence": {
+        "kind": "heuristic",
+        "value": 0.4002,
+        "method": "ordinal_dispersion",
+        "band": "medium",
+        "margin": 0.3504,
+        "normalized_entropy": 0.8534,
+        "agreement": 1.0,
+        "member_divergence": 0.0049
+      },
+      "quorum": {
+        "required": 2,
+        "responded": 3,
+        "refused": 0,
+        "total": 3
+      },
+      "members": [
+        {
+          "member_id": "m1",
+          "provider": "bedrock-mantle-chat",
+          "model": "deepseek.v3.2",
+          "region": "us-east-1",
+          "elicitation": "token_logprobs",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 488,
+          "distribution": {
+            "low": 0.15,
+            "medium": 0.65,
+            "high": 0.2
+          },
+          "usage": {
+            "input_tokens": 60,
+            "output_tokens": 2,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m2",
+          "provider": "bedrock-converse",
+          "model": "us.openai.gpt-6-luna",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 883,
+          "distribution": {
+            "low": 0.05,
+            "medium": 0.78,
+            "high": 0.17
+          },
+          "usage": {
+            "input_tokens": 120,
+            "output_tokens": 29,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m3",
+          "provider": "bedrock-converse",
+          "model": "us.anthropic.claude-haiku-5-5",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 938,
+          "distribution": {
+            "low": 0.1,
+            "medium": 0.658,
+            "high": 0.242
+          },
+          "usage": {
+            "input_tokens": 130,
+            "output_tokens": 35,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        }
+      ],
+      "score": 1.0997,
+      "level": "medium"
+    }
+  ],
+  "provenance": {
+    "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+    "profile_id": "router-default",
+    "profile_version": "1",
+    "question_signature": "sha256:20ae3292dcef68cf333ae600791621a9cd9a965f860507198869398b64a1c153",
+    "input_digest": "hmac-sha256:6342ada01b44e302f088d50254a46043ae823d8cca430da9fd8c98ffacb54abc",
+    "input_view_signature": "sha256:716bdc51d6e157793517073b27f81cf6dcc78e68072f802ac010abf3e5a46eec",
+    "option_order_seed": 1791504300,
+    "prompt_templates": {
+      "m1": "logprob-codes@2",
+      "m2": "verbalized-dist@1",
+      "m3": "verbalized-dist@1"
+    },
+    "aggregation": {
+      "method": "linear_pool"
+    },
+    "deadline_ms": 1000,
+    "quorum": {
+      "required": 2,
+      "responded": 3,
+      "refused": 0,
+      "total": 3
+    },
+    "cache": {
+      "hit": false
+    },
+    "stages": [],
+    "started_at": "2026-10-09T00:05:00.000Z",
+    "completed_at": "2026-10-09T00:05:00.945Z"
+  },
+  "usage": {
+    "input_tokens": 930,
+    "output_tokens": 198,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "reasoning_tokens": 0,
+    "cost_usd": 0.00018,
+    "cost_estimated": true,
+    "tokens_estimated": false
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@aghoo/sdk",
+  "version": "0.3.0",
+  "description": "TypeScript client for the Noema API (decisions, turns, sessions, files, usage). Every model call behind it runs on Amazon Bedrock.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "sync": "node scripts/sync-contracts.mjs",
+    "sync:check": "node scripts/sync-contracts.mjs --check",
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "check": "npm run sync:check && npm run typecheck && npm run test"
+  },
+  "devDependencies": {
+    "js-yaml": "4.3.2",
+    "msw": "3.0.3",
+    "openai": "7.32.0",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}

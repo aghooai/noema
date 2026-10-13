@@ -1,0 +1,138 @@
+# Noema alerts: Bedrock upstream, generation, cost, outbox and datastores (docs/operations/observability.md). Alert
+# names are kebab-case and double as the runbook anchors in docs/operations/runbooks.md. Severity: critical = page,
+# warning = ticket.
+groups:
+  - name: noema-upstream.alerts
+    rules:
+      - alert: noema-circuit-open
+        expr: max by (model, region) (aghoo_circuit_state) >= 2
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Circuit breaker open for {{ $labels.model }} in {{ $labels.region }}"
+          description: >-
+            The breaker for {{ $labels.model }} / {{ $labels.region }} is open (aghoo_circuit_state 2). Traffic shifts
+            to fallback members automatically (design 08 §6); it closes after the half-open probes pass.
+          runbook_url: docs/operations/runbooks.md#noema-circuit-open
+      - alert: noema-bedrock-throttling
+        expr: sum by (tenant, model) (rate(aghoo_bedrock_throttles_total[10m])) > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Bedrock throttles tenant {{ $labels.tenant }} on {{ $labels.model }}"
+          description: >-
+            Bedrock returned {{ $value | printf "%.3f" }} ThrottlingException/s for tenant {{ $labels.tenant }} on
+            {{ $labels.model }} over 10 minutes. Admission should throttle before Bedrock does (C1: 0 upstream
+            throttles), so the configured model quota is above the account's real quota.
+          runbook_url: docs/operations/runbooks.md#noema-bedrock-throttling
+      # Counters are exported only after their first add, and increase() cannot count the step from absent to the
+      # first value: the second clause of the "any increase" alerts fires while a series is younger than the window.
+      - alert: noema-stuck-attempts
+        expr: |
+          sum by (pod) (increase(aghoo_stuck_attempts_total[15m])) > 0
+          or sum by (pod) (aghoo_stuck_attempts_total unless increase(aghoo_stuck_attempts_total[1h] offset 15m)) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.pod }} left generation attempts non-terminal"
+          description: >-
+            {{ $value | printf "%.0f" }} attempts on {{ $labels.pod }} were still running when their turn exited and
+            were marked cancelled(deadline) with estimated usage (spec-11 §6 watchdog; the C4 soak gate expects 0).
+          runbook_url: docs/operations/runbooks.md#noema-stuck-attempts
+      # 0.05 USD is a placeholder: no per-turn budget is configured anywhere; set it per deployment.
+      - alert: noema-cost-per-turn-high
+        expr: noema:cost_usd_per_turn:rate1h > 0.05
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: Recorded cost per turn above budget
+          description: >-
+            Turns cost {{ $value | printf "%.4f" }} USD on average over the last hour (decision, generation,
+            verification and waste lines), above the 0.05 USD budget set in this rule (design 08 §7).
+          runbook_url: docs/operations/runbooks.md#noema-cost-per-turn-high
+
+  - name: noema-outbox.alerts
+    rules:
+      - alert: noema-outbox-records-dropped
+        expr: |
+          sum by (pod) (increase(aghoo_outbox_dropped_total[5m])) > 0
+          or sum by (pod) (aghoo_outbox_dropped_total unless increase(aghoo_outbox_dropped_total[1h] offset 5m)) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.pod }} dropped outbox records"
+          description: >-
+            {{ $value | printf "%.0f" }} write-behind records (usage lines, audit events, turn finalizes) were lost on
+            {{ $labels.pod }}: the in-process deque hit its bound with Redis down, or a flush timed out (spec-11 §3).
+          runbook_url: docs/operations/runbooks.md#noema-outbox-records-dropped
+      - alert: noema-outbox-memory-backlog
+        expr: max by (pod) (min_over_time(aghoo_outbox_backlog{sink="memory"}[5m])) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.pod }} holds outbox records in memory only"
+          description: >-
+            At least {{ $value | printf "%.0f" }} records stayed in the in-process deque for 5 minutes: Postgres and
+            Redis are both unreachable from {{ $labels.pod }} (spec-11 §3). They are lost if the process stops.
+          runbook_url: docs/operations/runbooks.md#noema-outbox-memory-backlog
+      - alert: noema-outbox-redis-backlog
+        expr: max(min_over_time(aghoo_outbox_backlog{sink="redis"}[15m])) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: Outbox records waiting in Redis for 15 minutes
+          description: >-
+            At least {{ $value | printf "%.0f" }} records waited in the Redis outbox streams for 15 minutes: Postgres
+            is down or rejects them. A record dead-letters (ops.outbox_dead, ERROR log) after 10 deliveries.
+          runbook_url: docs/operations/runbooks.md#noema-outbox-redis-backlog
+
+  - name: noema-datastores.alerts
+    rules:
+      - alert: noema-postgres-pool-saturated
+        expr: max by (pod, pool) (noema:db_pool_utilization:avg5m) >= 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.pod }} Postgres pool at 90% or more"
+          description: >-
+            A process of {{ $labels.pod }} had {{ $value | humanizePercentage }} of its {{ $labels.pool }} pool
+            (DB_POOL_MAX) checked out on average over 5 minutes; at most 1 of 20 was in use up to 1,000 streams per
+            pod in E3 (reports/perf/sizing.md §3).
+          runbook_url: docs/operations/runbooks.md#noema-postgres-pool-saturated
+      - alert: noema-postgres-latency-high
+        expr: noema:db_command_seconds:p95_5m > 0.02
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Postgres unit of work p95 above 20 ms ({{ $labels.pool }})"
+          description: >-
+            A unit of work (acquire to release) takes {{ $value | humanizeDuration }} at p95 (design 08 §9 Postgres
+            scale signal: p95 > 20 ms; E3 mean 2.3-5.1 ms, reports/perf/sizing.md §3). It is on the ingress path.
+          runbook_url: docs/operations/runbooks.md#noema-postgres-latency-high
+      - alert: noema-redis-pool-saturated
+        expr: max by (pod) (noema:redis_pool_utilization:avg5m) >= 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.pod }} Redis pool at 90% or more"
+          description: >-
+            A process of {{ $labels.pod }} had {{ $value | humanizePercentage }} of its bounded Redis pool checked
+            out on average over 5 minutes (5-7 of 256 in use in E3, reports/perf/sizing.md §3).
+          runbook_url: docs/operations/runbooks.md#noema-redis-pool-saturated
+      - alert: noema-redis-latency-high
+        expr: noema:redis_command_seconds:p99_5m > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Redis command p99 above 50 ms
+          description: >-
+            Redis commands take {{ $value | humanizeDuration }} at p99; at 50 ms admission treats Redis as down and
+            falls back to the local buckets (spec-11 §1.2). E3 mean 0.29-0.85 ms (reports/perf/sizing.md §3).
+          runbook_url: docs/operations/runbooks.md#noema-redis-latency-high

@@ -1,0 +1,31 @@
+{
+  "alias": "sol-6.1",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "generation",
+  "e2e_ms": 2,
+  "effort": "none",
+  "error": {
+    "kind": "invalid_request",
+    "message": "provider rejected the request",
+    "provider_code": "ValidationException"
+  },
+  "estimated_input_tokens": 16,
+  "max_tokens": 128,
+  "model_id": "us.openai.gpt-6.1-sol",
+  "n": 14,
+  "op": "complete",
+  "test": "tests/live/test_adapters_live.py::test_capability_provider_probes",
+  "test_call": 2,
+  "wire": {
+    "error": {
+      "code": "ValidationException",
+      "exception": "ClientError",
+      "http_status": 400,
+      "message": "The model returned the following errors: {\"error\":{\"code\":\"unsupported_value\",\"message\":\"Unsupported value: 'none' is not supported with the 'us.openai.gpt-6.1-sol' model. Supported values are: 'low', 'medium', 'high', 'xhigh', and 'max'.\",\"param\":\"reasoning.effort\",\"type\":\"invalid_request_error\"}}"
+    },
+    "events": [],
+    "response": []
+  }
+}

@@ -1,0 +1,81 @@
+# Noema alerts: decisions, calibration and labeling (docs/operations/observability.md). Alert names are kebab-case
+# and double as the runbook anchors in docs/operations/runbooks.md. Severity: critical = page, warning = ticket.
+groups:
+  - name: noema-decisions.alerts
+    rules:
+      - alert: noema-decision-quorum-slow
+        expr: noema:decision_quorum_seconds:p95_10m > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Commit-critical quorum p95 above the 1,000 ms deadline ({{ $labels.profile }})"
+          description: >-
+            Decisions of profile {{ $labels.profile }} reach quorum on every commit-critical question in
+            {{ $value | humanizeDuration }} at p95, above the default 1,000 ms decision deadline (design 08 §7,
+            06 §4 L4). Profiles with a longer deadline (e.g. hierarchical ones) need their own threshold.
+          runbook_url: docs/operations/runbooks.md#noema-decision-quorum-slow
+      - alert: noema-spec-restart-rate-high
+        expr: noema:spec_restart_ratio:rate1h > 0.10
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: Spec restarts above 10% of turns
+          description: >-
+            {{ $value | humanizePercentage }} of turns restarted generation because the decided spec changed
+            (design 08 §6 and §7: > 10%). Stickiness is ineffective or conditioning is too chatty.
+          runbook_url: docs/operations/runbooks.md#noema-spec-restart-rate-high
+      - alert: noema-member-parse-errors-high
+        expr: noema:member_parse_error_ratio:rate30m > 0.01
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Decision member {{ $labels.member }} parse errors above 1%"
+          description: >-
+            {{ $value | humanizePercentage }} of {{ $labels.member }}'s answers did not parse over 30 minutes
+            (design 08 §6 and §7: > 1%). Model or template drift.
+          runbook_url: docs/operations/runbooks.md#noema-member-parse-errors-high
+      # Inert today: decision/run.py observes aghoo_decision_seconds with member="" (observability.md "Gaps").
+      - alert: noema-deepseek-p99-high
+        expr: |
+          histogram_quantile(0.99, sum by (le) (rate(aghoo_decision_seconds_bucket{member=~"deepseek.*"}[10m]))) > 1.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: DeepSeek decision member p99 above 1.5 s
+          description: >-
+            The DeepSeek member's p99 latency is {{ $value | humanizeDuration }} (design 08 §6: > 1.5 s; L5 measured
+            929.5 ms with backups, reports/qa/wave-e-summary.md). Check the backup-request rate and backup_after_ms.
+          runbook_url: docs/operations/runbooks.md#noema-deepseek-p99-high
+      # The weekly drift job's downgrades of active calibrators (ADR-003 §5), not the aghoo_calibration_ece gauge,
+      # which a rejected fit also sets. The second clause counts the counter's first sample (see the outbox alerts).
+      - alert: noema-calibrator-ece-drift
+        expr: |
+          sum by (reason) (increase(aghoo_calibrator_downgrades_total[1d])) > 0
+          or sum by (reason) (aghoo_calibrator_downgrades_total unless increase(aghoo_calibrator_downgrades_total[1h] offset 1d)) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Calibrator downgraded by the drift job ({{ $labels.reason }})"
+          description: >-
+            The weekly drift job downgraded {{ $value | printf "%.0f" }} active calibrator(s) to uncalibrated in the
+            last day, reason {{ $labels.reason }} (drift_ece: ECE above ADR-003 drift_ece_max 0.08; drift_ci: the ECE
+            lower bound above ece_max). The answers they covered are served uncalibrated.
+          runbook_url: docs/operations/runbooks.md#noema-calibrator-ece-drift
+      - alert: noema-label-consensus-drop
+        # The gauge is set per labeling run by the jobs process that ran it: worst process series vs its own week.
+        expr: |
+          max by (profile, question, class) (aghoo_label_consensus_ratio)
+          < max by (profile, question, class) (avg_over_time(aghoo_label_consensus_ratio[7d] offset 1d)) - 0.10
+        labels:
+          severity: warning
+        annotations:
+          summary: "Labeler consensus dropped more than 10 points ({{ $labels.question }} / {{ $labels.class }})"
+          description: >-
+            Consensus for profile {{ $labels.profile }}, question {{ $labels.question }}, class {{ $labels.class }}
+            is {{ $value | humanizePercentage }}, more than 10 points below its average over the previous week
+            (design 08 §7). Ambiguous class definition, labeler drift or poisoning.
+          runbook_url: docs/operations/runbooks.md#noema-label-consensus-drop

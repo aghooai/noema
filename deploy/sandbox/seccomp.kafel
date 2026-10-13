@@ -1,0 +1,25 @@
+// Inner seccomp policy of every media jail (ADR-002 §4): default-allow with a deny-list.
+// sandboxd passes this file to nsjail as seccomp_string. Comments must use // (kafel reads # as a preprocessor
+// directive). Syscalls the pinned kafel does not name are written as SYSCALL[<x86_64 number>].
+// SYSCALL[166] is umount2 (the pinned kafel names it `umount`).
+// A KILL_PROCESS hit ends the jail with SIGSYS (nsjail exit 159) -> sandboxd status "violation".
+
+POLICY noema_sandbox {
+  KILL_PROCESS {
+    ptrace, process_vm_readv, process_vm_writev, kcmp,
+    bpf, perf_event_open, userfaultfd,
+    io_uring_setup, io_uring_enter, io_uring_register,
+    keyctl, add_key, request_key,
+    init_module, finit_module, delete_module, kexec_load, kexec_file_load,
+    mount, SYSCALL[166], pivot_root, chroot, setns, unshare,
+    fsopen, fsconfig, fsmount, fspick, move_mount, open_tree, mount_setattr,
+    open_by_handle_at, name_to_handle_at, pidfd_getfd,
+    reboot, swapon, swapoff, acct, quotactl, quotactl_fd, syslog, iopl, ioperm, lookup_dcookie, fanotify_init,
+    settimeofday, clock_settime, clock_adjtime, adjtimex,
+    clone(flags, stack, ptid, ctid, tls) { (flags & 0x10000000) != 0 }
+  },
+  ERRNO(38) { clone3 },
+  ERRNO(97) { socket(domain, type, protocol) { domain != 1 } }
+}
+
+USE noema_sandbox DEFAULT ALLOW

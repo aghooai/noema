@@ -1,0 +1,58 @@
+{
+  "profile": "lightweight-model-decide@1",
+  "output_format": "jev",
+  "input": "My package says delivered but I was also charged twice. Can you fix this today?",
+  "questions": [
+    {
+      "type": "choice",
+      "name": "department",
+      "instructions": "Which team should handle this message?",
+      "choices": [
+        {
+          "value": "billing",
+          "description": "Payments, refunds, invoices"
+        },
+        {
+          "value": "technical",
+          "description": "Bugs and errors"
+        },
+        {
+          "value": "shipping",
+          "description": "Delivery problems"
+        },
+        {
+          "value": "other",
+          "description": null
+        }
+      ]
+    },
+    {
+      "type": "score",
+      "name": "urgency",
+      "instructions": "How urgent is the request?",
+      "levels": [
+        {
+          "label": "low",
+          "description": "Can wait days"
+        },
+        {
+          "label": "medium",
+          "description": "Within a day"
+        },
+        {
+          "label": "high",
+          "description": "Blocking now"
+        }
+      ]
+    },
+    {
+      "type": "noul",
+      "name": "needs_human",
+      "instructions": "The customer explicitly asks to speak with a human.",
+      "criteria": {
+        "true": "Asks for a person, agent or call back",
+        "false": "No such request"
+      }
+    }
+  ]
+}

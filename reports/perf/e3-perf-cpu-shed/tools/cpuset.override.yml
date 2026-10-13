@@ -1,0 +1,13 @@
+# perf-cpu-shed (Wave E3): keep this role's e2e stack off the load-measurement cores (CPUs 0-3 and their siblings)
+services:
+  postgres: {cpuset: "0-3,24-27"}
+  toxiproxy-host: {cpuset: "0-3,24-27"}
+  mockbedrock: {cpuset: "0-3,24-27"}
+  moto: {cpuset: "0-3,24-27"}
+  valkey: {cpuset: "0-3,24-27"}
+  toxiproxy: {cpuset: "0-3,24-27"}
+  jobs: {cpuset: "0-3,24-27"}
+  media-sandbox: {cpuset: "0-3,24-27"}
+  media-worker: {cpuset: "0-3,24-27"}
+  api-1: {cpuset: "0-3,24-27"}
+  api-2: {cpuset: "0-3,24-27"}

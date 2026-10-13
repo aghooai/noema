@@ -1,0 +1,5 @@
+== step 0: streams/pod 4 n 70 tps 0.58 | TTFT ovh p50 8.49 [8.34, 8.78] p95 11.74 [10.04, 22.13] p99 22.9 | e2e p50/p95 14.8/25.4 | lag p99/p99.9/max 0.9/4.3/17 | cpu 0.050 cores = 86.2 ms/turn | valid True (mock lag 1.581, hb 1.0) | load 6.94 | rss 329.3 | errors {}
+   api-0: no gen2; GC 0.0% of wall
+   api-1: no gen2; GC 0.0% of wall
+   census tracked per process at step end: [8069, 7558]
+

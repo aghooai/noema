@@ -1,0 +1,45 @@
+{
+  "alias": "luna-6",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "verification_member",
+  "e2e_ms": 853,
+  "effort": "none",
+  "estimated_input_tokens": 342,
+  "latency_ms": 852,
+  "logprob_tokens": null,
+  "max_tokens": 88,
+  "model_id": "us.openai.gpt-6-luna",
+  "n": 45,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification",
+  "test_call": 23,
+  "text_chars": 22,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 341,
+    "output_tokens": 6,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "metrics.latencyMs:int",
+      "output.message.content[].text:str",
+      "output.message.role:str",
+      "stopReason:str",
+      "usage.cacheReadInputTokens:int",
+      "usage.cacheWriteInputTokens:int",
+      "usage.inputTokens:int",
+      "usage.outputTokens:int",
+      "usage.totalTokens:int"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "id": "router-default",
+        "version": "1",
+        "kind": "decision",
+        "description": "Ensemble router",
+        "models": [
+          "us.openai.gpt-6-luna",
+          "us.anthropic.claude-haiku-5-5",
+          "deepseek.v3-2"
+        ],
+        "modalities": [
+          "text",
+          "image"
+        ]
+      },
+      {
+        "id": "sol-fast",
+        "version": "7",
+        "kind": "generation",
+        "description": "Fast generation",
+        "models": [
+          "us.openai.gpt-6.1-sol"
+        ],
+        "mode": "single",
+        "modalities": [
+          "text",
+          "image",
+          "document"
+        ],
+        "streaming": "live"
+      }
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "F10-down": {
+    "admission_degraded": 4.0,
+    "after_outcomes": {
+      "completed": 40
+    },
+    "before_outcomes": {
+      "completed": 50
+    },
+    "cross_pod_attach": {
+      "envelope": {
+        "error": {
+          "code": "resume_window_expired",
+          "details": {
+            "turn_id": "turn_01M4SDJCFCZ9XQD5H4GCMNM2JV"
+          },
+          "message": "The event stream of the original request has expired.",
+          "param": null,
+          "request_id": "req_01M4SDJD2GH3EZWD7WCWSWPA9D",
+          "retryable": false,
+          "type": "invalid_request_error"
+        }
+      },
+      "events": 0,
+      "ms": 2533.012857660651,
+      "status": 410
+    },
+    "cross_pod_cancel": 500,
+    "during": 125,
+    "during_e2e_ms": {
+      "max": 955.3,
+      "n": 125,
+      "p50": 914.0,
+      "p95": 917.7
+    },
+    "during_outcomes": {
+      "completed": 125
+    },
+    "l2_misses": {
+      "bypass": 0.0,
+      "error": 255.0
+    },
+    "outage_s": 25.0,
+    "same_pod_cancel": "202",
+    "turns": 225
+  },
+  "F10-hung": {
+    "admission_degraded": 4.0,
+    "after_outcomes": {
+      "completed": 40
+    },
+    "before_outcomes": {
+      "completed": 50
+    },
+    "cross_pod_attach": {
+      "envelope": {
+        "error": {
+          "code": "resume_window_expired",
+          "details": {
+            "turn_id": "turn_01M4SDNP579VD6PF5GNQ18CVX2"
+          },
+          "message": "The event stream of the original request has expired.",
+          "param": null,
+          "request_id": "req_01M4SDNQ3CQG2JAQ1KKQV58NVR",
+          "retryable": false,
+          "type": "invalid_request_error"
+        }
+      },
+      "events": 0,
+      "ms": 3269.1795993596315,
+      "status": 410
+    },
+    "cross_pod_cancel": 500,
+    "during": 125,
+    "during_e2e_ms": {
+      "max": 1596.9,
+      "n": 125,
+      "p50": 1436.0,
+      "p95": 1586.5
+    },
+    "during_outcomes": {
+      "completed": 125
+    },
+    "l2_misses": {
+      "bypass": 0.0,
+      "error": 252.0
+    },
+    "outage_s": 25.0,
+    "same_pod_cancel": "202",
+    "turns": 225
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "group_by": "model",
+    "from": "2026-09-11",
+    "to": "2026-10-10",
+    "data": [
+      {
+        "key": null,
+        "line": "cache_savings",
+        "usage": {
+          "input_tokens": 1200,
+          "output_tokens": 300,
+          "cached_input_tokens": 200,
+          "cache_write_input_tokens": 0,
+          "reasoning_tokens": 40,
+          "cost_usd": 0.0123,
+          "cost_estimated": true,
+          "tokens_estimated": false
+        }
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null
+  }
+}

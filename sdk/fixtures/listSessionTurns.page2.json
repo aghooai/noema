@@ -1,0 +1,29 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "turn_id": "turn_1",
+        "seq": 2,
+        "role": "user",
+        "text": "Thanks",
+        "created_at": 1791633602,
+        "redactions": []
+      },
+      {
+        "turn_id": "turn_1",
+        "seq": 2,
+        "role": "assistant",
+        "text": "You're welcome.",
+        "created_at": 1791633602,
+        "redactions": []
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null
+  }
+}

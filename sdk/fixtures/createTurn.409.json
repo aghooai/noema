@@ -1,0 +1,17 @@
+{
+  "status": 409,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "error": {
+      "type": "conflict_error",
+      "code": "session_busy",
+      "message": "another turn of this session is running",
+      "param": null,
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": true
+    }
+  }
+}

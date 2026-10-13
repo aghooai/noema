@@ -1,0 +1,663 @@
+{
+  "Idempotent replay (no model call, no billing)": {
+    "identical": 60,
+    "keyed": {
+      "decision": 20,
+      "json": 20,
+      "sse": 20
+    },
+    "model_calls_during_replay": 0,
+    "replay_header": 60,
+    "usage_after": [
+      [
+        "decision",
+        136619,
+        4780,
+        0.233572
+      ],
+      [
+        "generation",
+        5480,
+        760,
+        0.0128
+      ]
+    ],
+    "usage_before": [
+      [
+        "decision",
+        136619,
+        4780,
+        0.233572
+      ],
+      [
+        "generation",
+        5480,
+        760,
+        0.0128
+      ]
+    ]
+  },
+  "L2 agree T_d=300 TTFA=2400": {
+    "bound_ms": 2450,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 369.0,
+      "n": 200,
+      "p50": 312.0,
+      "p95": 322.0,
+      "p99": 332.0
+    },
+    "driver_lag_p99_ms": 1.2,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 2.49,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 2470.5,
+      "n": 200,
+      "p50": 2409.7,
+      "p95": 2417.9,
+      "p99": 2422.6
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L2 agree T_d=300 TTFA=300": {
+    "bound_ms": 350,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 347.0,
+      "n": 200,
+      "p50": 312.0,
+      "p95": 318.0,
+      "p99": 329.0
+    },
+    "driver_lag_p99_ms": 1.12,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 2.12,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 355.9,
+      "n": 200,
+      "p50": 318.8,
+      "p95": 328.0,
+      "p99": 342.4
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L2 agree T_d=300 TTFA=720": {
+    "bound_ms": 770,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 348.0,
+      "n": 200,
+      "p50": 313.0,
+      "p95": 323.0,
+      "p99": 334.0
+    },
+    "driver_lag_p99_ms": 1.2,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.43,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 748.8,
+      "n": 200,
+      "p50": 730.5,
+      "p95": 738.4,
+      "p99": 748.1
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L2 agree T_d=900 TTFA=2400": {
+    "bound_ms": 2450,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 974.0,
+      "n": 200,
+      "p50": 915.0,
+      "p95": 924.0,
+      "p99": 954.0
+    },
+    "driver_lag_p99_ms": 1.14,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.27,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 2466.7,
+      "n": 200,
+      "p50": 2409.3,
+      "p95": 2416.1,
+      "p99": 2427.2
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L2 agree T_d=900 TTFA=300": {
+    "bound_ms": 950,
+    "committed_reason": {
+      "holdback_deadline": 200
+    },
+    "decision_ms": {
+      "max": 937.0,
+      "n": 200,
+      "p50": 916.0,
+      "p95": 924.0,
+      "p99": 932.0
+    },
+    "driver_lag_p99_ms": 1.15,
+    "holdback_deadline_share": 1.0,
+    "mock_lateness_p99_ms": 2.11,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "None": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 765.5,
+      "n": 200,
+      "p50": 710.5,
+      "p95": 721.5,
+      "p99": 735.8
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L2 agree T_d=900 TTFA=720": {
+    "bound_ms": 950,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 1071.0,
+      "n": 200,
+      "p50": 915.0,
+      "p95": 921.0,
+      "p99": 1003.0
+    },
+    "driver_lag_p99_ms": 1.12,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 2.84,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 1084.7,
+      "n": 200,
+      "p50": 921.8,
+      "p95": 929.7,
+      "p99": 1041.9
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L3 disagree T_d=300 TTFA=2400": {
+    "bound_ms": 2800,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 358.0,
+      "n": 200,
+      "p50": 311.0,
+      "p95": 321.0,
+      "p99": 335.0
+    },
+    "driver_lag_p99_ms": 1.13,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.33,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 2771.6,
+      "n": 200,
+      "p50": 2722.1,
+      "p95": 2737.6,
+      "p99": 2751.1
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=300 TTFA=300": {
+    "bound_ms": 700,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 360.0,
+      "n": 200,
+      "p50": 311.0,
+      "p95": 322.0,
+      "p99": 330.0
+    },
+    "driver_lag_p99_ms": 1.11,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.33,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 673.0,
+      "n": 200,
+      "p50": 622.8,
+      "p95": 638.3,
+      "p99": 663.4
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=300 TTFA=720": {
+    "bound_ms": 1120,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 363.0,
+      "n": 200,
+      "p50": 310.0,
+      "p95": 317.0,
+      "p99": 341.0
+    },
+    "driver_lag_p99_ms": 1.13,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.3,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 1097.7,
+      "n": 200,
+      "p50": 1042.1,
+      "p95": 1049.8,
+      "p99": 1070.3
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=900 TTFA=2400": {
+    "bound_ms": 3400,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 969.0,
+      "n": 200,
+      "p50": 915.0,
+      "p95": 928.0,
+      "p99": 959.0
+    },
+    "driver_lag_p99_ms": 1.16,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.44,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 3381.3,
+      "n": 200,
+      "p50": 3325.0,
+      "p95": 3349.3,
+      "p99": 3368.0
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=900 TTFA=300": {
+    "bound_ms": 1300,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 979.0,
+      "n": 200,
+      "p50": 917.0,
+      "p95": 937.0,
+      "p99": 960.0
+    },
+    "driver_lag_p99_ms": 1.11,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 4.85,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [
+      {
+        "committed": "spec_agrees",
+        "decision": "partial",
+        "decision_ms": 1006,
+        "routes": [
+          "sol-fast"
+        ],
+        "routing_reason": "decision unavailable: deadline_exceeded"
+      }
+    ],
+    "premise_share": 0.996,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 1,
+      "1": 249
+    },
+    "ttft_ms": {
+      "max": 1290.3,
+      "n": 200,
+      "p50": 1228.9,
+      "p95": 1263.3,
+      "p99": 1277.4
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L3 disagree T_d=900 TTFA=720": {
+    "bound_ms": 1720,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 995.0,
+      "n": 200,
+      "p50": 914.0,
+      "p95": 922.0,
+      "p99": 940.0
+    },
+    "driver_lag_p99_ms": 1.1,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.81,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 1724.9,
+      "n": 200,
+      "p50": 1644.7,
+      "p95": 1652.5,
+      "p99": 1675.2
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L5 DeepSeek p99 with backups": {
+    "answers": {
+      "predicate:ok": 5050
+    },
+    "backup_share": 1.0,
+    "bound_ms": 1500.0,
+    "client_ms": {
+      "max": 6241.7,
+      "n": 5000,
+      "p50": 538.3,
+      "p95": 614.9,
+      "p99": 938.1
+    },
+    "driver_lag_p99_ms": 1.88,
+    "member_latency_ms": {
+      "max": 6233.0,
+      "n": 5000,
+      "p50": 528.0,
+      "p95": 604.0,
+      "p99": 929.0
+    },
+    "mock_calls_by_k_outcome": {
+      "k0:disconnected": 102,
+      "k0:ok": 4948,
+      "k1:disconnected": 4948,
+      "k1:ok": 102
+    },
+    "mock_deepseek_calls": 10100,
+    "mock_lateness_p99_ms": 0.0,
+    "n": 5000,
+    "valid": true,
+    "warmup": 50
+  },
+  "Q8 late disagreement T_d=900 TTFA=300": {
+    "bound_ms": null,
+    "committed_reason": {
+      "holdback_deadline": 200
+    },
+    "decision_ms": {
+      "max": 974.0,
+      "n": 200,
+      "p50": 915.0,
+      "p95": 922.0,
+      "p99": 933.0
+    },
+    "driver_lag_p99_ms": 1.11,
+    "hold_cap_ms": 700,
+    "holdback_deadline_share": 1.0,
+    "mock_lateness_p99_ms": 1.74,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "None": 200
+    },
+    "served": 250,
+    "served_spec_differs_rate": 1.0,
+    "spec_restarts": {
+      "0": 250
+    },
+    "stored_served_spec_differs": {
+      "True": 200
+    },
+    "ttft_ms": {
+      "max": 769.8,
+      "n": 200,
+      "p50": 710.0,
+      "p95": 721.3,
+      "p99": 739.9
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "Q9 lightweight-model-decide deadline_ms=1000": {
+    "deadline_exceeded_share": 1.0,
+    "members": {
+      "us.openai.gpt-6-luna:timeout": 200
+    },
+    "n": 200,
+    "outcomes": {
+      "unavailable:deadline_exceeded": 200
+    }
+  },
+  "Q9 lightweight-model-decide deadline_ms=3000": {
+    "deadline_exceeded_share": 0.0,
+    "members": {
+      "us.openai.gpt-6-luna:ok": 200
+    },
+    "n": 200,
+    "outcomes": {
+      "choice:hierarchical": 200
+    }
+  },
+  "Q9 router-default deadline_ms=1000": {
+    "deadline_exceeded_share": 1.0,
+    "members": {
+      "deepseek.v3.2:late": 40,
+      "deepseek.v3.2:timeout": 160,
+      "us.anthropic.claude-haiku-5-5:timeout": 200,
+      "us.openai.gpt-6-luna:timeout": 200
+    },
+    "n": 200,
+    "outcomes": {
+      "unavailable:deadline_exceeded": 200
+    }
+  },
+  "Q9 router-default deadline_ms=3000": {
+    "deadline_exceeded_share": 0.0,
+    "members": {
+      "deepseek.v3.2:ok": 199,
+      "deepseek.v3.2:timeout": 1,
+      "us.anthropic.claude-haiku-5-5:ok": 142,
+      "us.anthropic.claude-haiku-5-5:timeout": 58,
+      "us.openai.gpt-6-luna:ok": 200
+    },
+    "n": 200,
+    "outcomes": {
+      "choice:hierarchical": 200
+    }
+  },
+  "R4 replay set (restarts, waste)": {
+    "agreement_rate": 0.77,
+    "member_waste_output_tokens": 0.0,
+    "p0_met": {
+      "restarts": false,
+      "waste": false
+    },
+    "p0_thresholds": {
+      "spec_restart_share_le": 0.1,
+      "waste_share_le": 0.05
+    },
+    "served": 200,
+    "sessions": 40,
+    "spec_restart_share": 0.23,
+    "spec_restarts": 46,
+    "timings_wasted_output_tokens": 3144,
+    "turns": 200,
+    "usage_lines": {
+      "decision": {
+        "cost_usd": 1.2983600000000013,
+        "output_tokens": 22600.0
+      },
+      "generation": {
+        "cost_usd": 0.08087999999999994,
+        "output_tokens": 3800.0
+      },
+      "waste": {
+        "cost_usd": 0.032691,
+        "output_tokens": 3144.0
+      }
+    },
+    "waste_share_of_generation_cost": 0.4042
+  }
+}

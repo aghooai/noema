@@ -1,0 +1,44 @@
+{
+  "model": "aghoo/router-default",
+  "safety_identifier": "user-7f3a",
+  "input": [
+    {
+      "role": "user",
+      "type": "message",
+      "content": "Export fails in Safari but works in Chrome."
+    }
+  ],
+  "questions": [
+    {
+      "type": "score",
+      "instructions": "How severe is this?",
+      "levels": [
+        {
+          "label": "Cosmetic"
+        },
+        {
+          "label": "Workaround available"
+        },
+        {
+          "label": "Fully blocked"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "name": "regression",
+      "instructions": "Is this a regression?",
+      "choices": [
+        {
+          "value": true
+        },
+        {
+          "value": "true"
+        },
+        {
+          "value": false
+        }
+      ]
+    }
+  ]
+}

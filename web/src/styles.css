@@ -1,0 +1,62 @@
+/* Noema Web UI. One external stylesheet (CSP style-src 'self'); no inline styles, no remote fonts or images. */
+:root { --fg: #1d2330; --muted: #6b7385; --line: #d9dde6; --bg: #f6f7fa; --panel: #fff; --accent: #2457c5;
+  --ok: #1f7a3d; --warn: #9a5b00; --bad: #b42318; font: 14px/1.45 system-ui, sans-serif; color: var(--fg); background: var(--bg); }
+* { box-sizing: border-box; }
+body { margin: 0; }
+button { font: inherit; cursor: pointer; }
+.link-button { background: none; border: 0; color: var(--accent); padding: 0 0.3em; text-decoration: underline; }
+.muted { color: var(--muted); }
+.error { color: var(--bad); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.topbar { display: flex; gap: 1.5em; align-items: center; padding: 0.5em 1em; background: var(--panel); border-bottom: 1px solid var(--line); }
+.topbar nav a { margin-right: 1em; color: var(--fg); text-decoration: none; }
+.topbar nav a.active { color: var(--accent); font-weight: 600; }
+.topbar .who { margin-left: auto; }
+.login { max-width: 40em; margin: 4em auto; background: var(--panel); padding: 2em; border: 1px solid var(--line); }
+.chat-layout { display: grid; grid-template-columns: 16em minmax(0, 1fr) 26em; height: calc(100vh - 2.6em); }
+.pane { overflow: auto; padding: 0.75em; background: var(--panel); border-right: 1px solid var(--line); }
+.pane h2 { font-size: 1em; margin: 0 0 0.5em; }
+.pane-conversation { display: flex; flex-direction: column; }
+.pane-sessions ul { list-style: none; padding: 0; }
+.session { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 0.3em; }
+.session.active { background: #e8eefb; }
+.conversation { flex: 1; overflow: auto; }
+.message { margin: 0.5em 0; padding: 0.5em 0.75em; border-radius: 6px; background: var(--bg); }
+.message-user { background: #eef2f8; }
+.message.inspected { outline: 2px solid var(--accent); }
+.message-role { font-size: 0.85em; color: var(--muted); }
+.message-text { white-space: pre-wrap; }
+.refining { color: var(--warn); font-style: italic; }
+.composer { display: grid; grid-template-columns: 1fr auto auto; gap: 0.4em; border-top: 1px solid var(--line); padding-top: 0.5em; }
+.composer textarea { grid-row: 2; }
+.composer-attachments { grid-column: 1 / -1; }
+.badge { display: inline-block; padding: 0 0.4em; border-radius: 4px; background: #eceef3; font-size: 0.85em; }
+.badge-calibrated { background: #dcf2e3; color: var(--ok); }
+.badge-uncalibrated { background: #fff1d6; color: var(--warn); }
+.band-low { color: var(--bad); } .band-medium { color: var(--warn); } .band-high { color: var(--ok); }
+.inspector-section { border-bottom: 1px solid var(--line); padding: 0.4em 0; }
+.inspector-section h3 { font-size: 0.9em; margin: 0.2em 0; }
+.answer { margin: 0.4em 0; }
+.answer-name { font-weight: 600; }
+.answer-type { color: var(--muted); }
+.candidates { width: 100%; border-collapse: collapse; }
+.candidates th { text-align: left; font-weight: normal; }
+.candidates meter { width: 8em; }
+.members { list-style: none; padding-left: 0.5em; font-size: 0.9em; }
+.check { margin-right: 0.6em; font-size: 0.9em; }
+.check-pass { color: var(--ok); } .check-fail { color: var(--bad); }
+.files-page, .calibration-page, .usage-page { padding: 1em; max-width: 80em; }
+.dropzone { border: 2px dashed var(--line); padding: 2em; text-align: center; background: var(--panel); margin-bottom: 1em; }
+.dropzone.over { border-color: var(--accent); }
+.file-card { background: var(--panel); border: 1px solid var(--line); padding: 0.5em 0.75em; margin: 0.4em 0; }
+.file-card.compact { padding: 0.2em 0.5em; }
+.status-ready { color: var(--ok); } .status-rejected, .status-failed { color: var(--bad); }
+.notice { background: #fff6e0; border-left: 3px solid var(--warn); padding: 0.3em 0.6em; margin: 0.3em 0; }
+.preview-image { max-width: 24em; max-height: 24em; display: block; border: 1px solid var(--line); }
+.preview-text { max-height: 20em; overflow: auto; background: var(--bg); padding: 0.5em; white-space: pre-wrap; }
+.calibrator { background: var(--panel); border: 1px solid var(--line); padding: 0.5em 0.75em; margin: 0.5em 0; }
+table.runs, table.usage-table, table.reliability { border-collapse: collapse; width: 100%; background: var(--panel); }
+table.runs td, table.runs th, .usage-table td, .usage-table th, .reliability td, .reliability th { border: 1px solid var(--line); padding: 0.2em 0.4em; }
+.excerpt { white-space: pre-wrap; background: var(--bg); padding: 0.4em; max-height: 10em; overflow: auto; }
+.md-link-warning { color: var(--warn); font-size: 0.85em; }
+.md-image-blocked, .md-link-blocked { color: var(--muted); }

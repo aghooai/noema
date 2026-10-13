@@ -1,0 +1,47 @@
+# Example Prometheus configuration for the Noema rules (docs/operations/observability.md "Deploy"). Checked by
+# `make observability-check` (promtool check config, with the rule files mounted at /etc/prometheus/rules).
+# The rules need, on every Noema target: `pod` (pod name), `job` = noema-api | noema-jobs | noema-media-worker, and
+# one target per process: an api pod with WEB_CONCURRENCY=2 serves /metrics on NOEMA_METRICS_PORT and the next
+# port (spec-05 §5), so both container ports must be declared and scraped.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 1m
+
+rule_files:
+  - /etc/prometheus/rules/noema-*.rules.yml
+
+scrape_configs:
+  - job_name: noema
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      # Noema pods carry app.kubernetes.io/part-of=noema and app.kubernetes.io/component=api|jobs|media-worker.
+      - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_part_of]
+        regex: noema
+        action: keep
+      # Only the metrics ports (named metrics, metrics-2, ...), never the API port.
+      - source_labels: [__meta_kubernetes_pod_container_port_name]
+        regex: metrics(-\d+)?
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_component]
+        target_label: job
+        replacement: noema-$1
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+
+  # Pod CPU (noema:pod_cpu_cores:rate5m): the kubelet's cAdvisor endpoint.
+  - job_name: kubelet-cadvisor
+    scheme: https
+    metrics_path: /metrics/cadvisor
+    authorization:
+      credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    kubernetes_sd_configs:
+      - role: node
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: container_cpu_usage_seconds_total
+        action: keep

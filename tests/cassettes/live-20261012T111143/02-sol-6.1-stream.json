@@ -1,0 +1,45 @@
+{
+  "alias": "sol-6.1",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "generation",
+  "cancelled": "CancelledError",
+  "counts": {},
+  "e2e_ms": 549,
+  "effort": "low",
+  "estimated_input_tokens": 140,
+  "estimated_input_tokens_chars4": 148,
+  "events": [],
+  "input_chars": 589,
+  "max_tokens": 512,
+  "model_id": "us.openai.gpt-6.1-sol",
+  "n": 2,
+  "op": "stream",
+  "test": "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race",
+  "test_call": 2,
+  "wire": {
+    "decoder": {
+      "botocore_errors": 0,
+      "botocore_extra": 0,
+      "bytes": 0,
+      "chunks": 0,
+      "equal": 0,
+      "fallback": false,
+      "messages": 0
+    },
+    "error": null,
+    "events": [],
+    "response": [],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": false,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date"
+      ]
+    }
+  }
+}

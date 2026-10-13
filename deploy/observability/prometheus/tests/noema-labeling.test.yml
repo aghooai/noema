@@ -1,0 +1,34 @@
+# promtool test rules: the labeler consensus drop (own file: a 7-day window needs a coarse evaluation interval to
+# stay under promtool's per-query sample limit).
+rule_files:
+  - ../rules/noema-recording.rules.yml
+  - ../rules/noema-alerts-decisions.rules.yml
+evaluation_interval: 30m
+
+tests:
+  # Consensus 0.90 for 200 h, then 0.75: more than 10 points below the previous week's average.
+  - interval: 30m
+    input_series:
+      - series: 'aghoo_label_consensus_ratio{profile="router-default",question="department",class="billing"}'
+        values: '0.9x400 0.75x10'
+      - series: 'aghoo_label_consensus_ratio{profile="router-default",question="department",class="shipping"}'
+        values: '0.9x400 0.85x10'
+    alert_rule_test:
+      - eval_time: 199h
+        alertname: noema-label-consensus-drop
+        exp_alerts: []
+      - eval_time: 202h
+        alertname: noema-label-consensus-drop
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              profile: router-default
+              question: department
+              class: billing
+            exp_annotations:
+              summary: "Labeler consensus dropped more than 10 points (department / billing)"
+              description: >-
+                Consensus for profile router-default, question department, class billing is 75%, more than 10
+                points below its average over the previous week (design 08 §7). Ambiguous class definition, labeler
+                drift or poisoning.
+              runbook_url: docs/operations/runbooks.md#noema-label-consensus-drop

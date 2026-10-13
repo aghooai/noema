@@ -1,0 +1,85 @@
+{
+  "expected": {
+    "api": "ConverseStream",
+    "body": {
+      "inferenceConfig": {
+        "maxTokens": 4096
+      },
+      "messages": [
+        {
+          "content": [
+            {
+              "text": "[doc-1]"
+            },
+            {
+              "document": {
+                "format": "pdf",
+                "name": "doc-1",
+                "source": {
+                  "bytes": {
+                    "$bytes_b64": "JVBERi0xLjcKJWdvbGRlbgo="
+                  }
+                }
+              }
+            },
+            {
+              "text": "Summarize doc-1."
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "modelId": "us.anthropic.claude-opus-5-5",
+      "outputConfig": {
+        "effort": "medium"
+      },
+      "system": [
+        {
+          "text": "You are an assistant served through the Noema platform."
+        },
+        {
+          "text": "Answer briefly."
+        }
+      ]
+    }
+  },
+  "model_alias": "opus-5.5",
+  "name": "opus_document_block",
+  "op": "converse-stream",
+  "request": {
+    "call_kind": "generation",
+    "effort": "medium",
+    "logprobs": false,
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "[doc-1]"
+          },
+          {
+            "document": {
+              "$bytes_b64": "JVBERi0xLjcKJWdvbGRlbgo=",
+              "format": "pdf",
+              "name": "doc-1",
+              "pages": 1
+            }
+          },
+          {
+            "text": "Summarize doc-1."
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model_alias": "opus-5.5",
+    "retry": "default",
+    "stop": [],
+    "system": [
+      "You are an assistant served through the Noema platform.",
+      "Answer briefly."
+    ],
+    "temperature": null,
+    "top_logprobs": null
+  }
+}

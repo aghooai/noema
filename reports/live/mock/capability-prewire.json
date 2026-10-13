@@ -1,0 +1,106 @@
+{
+  "calls": 0,
+  "models": {
+    "deepseek-3.2": {
+      "config_effort": [],
+      "config_temperature": true,
+      "model_id": "deepseek.v3.2",
+      "refused_pre_wire": [
+        "effort=none",
+        "effort=low",
+        "effort=medium",
+        "effort=high",
+        "effort=xhigh",
+        "effort=max"
+      ]
+    },
+    "glm-5.3": {
+      "config_effort": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "config_temperature": true,
+      "model_id": "us.zai.glm-5.3",
+      "refused_pre_wire": [
+        "effort=none"
+      ]
+    },
+    "haiku-5.5": {
+      "config_effort": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "config_temperature": false,
+      "model_id": "us.anthropic.claude-haiku-5-5",
+      "refused_pre_wire": [
+        "effort=none",
+        "effort=xhigh",
+        "temperature"
+      ]
+    },
+    "luna-6": {
+      "config_effort": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "config_temperature": false,
+      "model_id": "us.openai.gpt-6-luna",
+      "refused_pre_wire": [
+        "temperature"
+      ]
+    },
+    "opus-5.5": {
+      "config_effort": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "config_temperature": false,
+      "model_id": "us.anthropic.claude-opus-5-5",
+      "refused_pre_wire": [
+        "effort=none",
+        "effort=xhigh",
+        "temperature"
+      ]
+    },
+    "sol-6.1": {
+      "config_effort": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "config_temperature": false,
+      "model_id": "us.openai.gpt-6.1-sol",
+      "refused_pre_wire": [
+        "effort=none",
+        "effort=xhigh",
+        "temperature"
+      ]
+    },
+    "sonnet-5.5": {
+      "config_effort": [],
+      "config_temperature": false,
+      "model_id": "us.anthropic.claude-sonnet-5-5",
+      "refused_pre_wire": [
+        "effort=none",
+        "effort=low",
+        "effort=medium",
+        "effort=high",
+        "effort=xhigh",
+        "effort=max",
+        "temperature"
+      ]
+    }
+  }
+}

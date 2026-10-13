@@ -1,0 +1,19 @@
+createDecision: 71 calls: 200 x2, 400/schema_violation x36, 401/invalid_api_key x14, 403/profile_not_allowed x1, 404/session_not_found x15, 422/unsupported_parameter x3
+createSession: 70 calls: 201 x40, 400/schema_violation x10, 401/invalid_api_key x1, 422/feature_not_available x19
+createTurn: 99 calls: 200 x3, 400/schema_violation x12, 401/invalid_api_key x3, 404/not_found x47, 404/session_not_found x29, 409/file_rejected x5
+deleteFile: 136 calls: 401/invalid_api_key x29, 404/not_found x107
+deleteSession: 104 calls: 202 x8, 401/invalid_api_key x17, 404/session_not_found x79
+getDecision: 2 calls: 401/invalid_api_key x2
+getFile: 8 calls: 200 x6, 401/invalid_api_key x2
+getSession: 151 calls: 200 x15, 401/invalid_api_key x9, 404/session_not_found x127
+getTurn: 128 calls: 401/invalid_api_key x14, 404/not_found x114
+listCalibrators: 6 calls: 200 x1, 400/schema_violation x3, 401/invalid_api_key x2
+listLabelingDropped: 47 calls: 200 x6, 400/schema_violation x31, 401/invalid_api_key x10
+listLabelingRuns: 170 calls: 200 x54, 400/schema_violation x97, 401/invalid_api_key x19
+listProfiles: 101 calls: 200 x89, 400/schema_violation x9, 401/invalid_api_key x3
+listSessionTurns: 19 calls: 200 x8, 400/schema_violation x6, 401/invalid_api_key x5
+listSessions: 77 calls: 200 x42, 400/schema_violation x32, 401/invalid_api_key x3
+resumeTurnEvents: 91 calls: 401/invalid_api_key x17, 404/not_found x74
+updateSession: 140 calls: 200 x14, 400/schema_violation x7, 401/invalid_api_key x1, 404/session_not_found x108, 422/feature_not_available x10
+uploadFile: 71 calls: 202 x19, 400/schema_violation x13, 415/unsupported_media_type x39
+watchFile: 173 calls: 401/invalid_api_key x11, 404/not_found x162

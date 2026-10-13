@@ -1,0 +1,56 @@
+{
+  "alias": "deepseek-3.2",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "decision_member",
+  "e2e_ms": 399,
+  "effort": null,
+  "estimated_input_tokens": 195,
+  "latency_ms": 398,
+  "logprob_tokens": 2,
+  "max_tokens": 8,
+  "model_id": "deepseek.v3.2",
+  "n": 22,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification",
+  "test_call": 6,
+  "text_chars": 1,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 208,
+    "output_tokens": 2,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "choices[].finish_reason:str",
+      "choices[].index:int",
+      "choices[].logprobs.content[].bytes[]:int",
+      "choices[].logprobs.content[].logprob:float",
+      "choices[].logprobs.content[].token:str",
+      "choices[].logprobs.content[].top_logprobs[].bytes[]:int",
+      "choices[].logprobs.content[].top_logprobs[].logprob:float",
+      "choices[].logprobs.content[].top_logprobs[].token:str",
+      "choices[].logprobs.refusal:NoneType",
+      "choices[].message.content:str",
+      "choices[].message.refusal:NoneType",
+      "choices[].message.role:str",
+      "created:int",
+      "id:str",
+      "model:str",
+      "object:str",
+      "service_tier:str",
+      "usage.completion_tokens:int",
+      "usage.prompt_tokens:int",
+      "usage.total_tokens:int"
+    ]
+  }
+}

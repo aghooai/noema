@@ -1,0 +1,17 @@
+{
+  "status": 422,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "error": {
+      "type": "capability_error",
+      "code": "feature_not_available",
+      "message": "strategy hedge is not available in this phase",
+      "param": "strategy",
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": false
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "alias": "deepseek-3.2",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "decision_member",
+  "cancelled": true,
+  "e2e_ms": 44,
+  "effort": null,
+  "estimated_input_tokens": 185,
+  "max_tokens": 8,
+  "model_id": "deepseek.v3.2",
+  "n": 20,
+  "op": "complete",
+  "test": "tests/live/test_api_live.py::test_l6_router_default_one_question",
+  "test_call": 2,
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": []
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "model": "aghoo/lightweight-model-decide@1",
+  "answers": {
+    "department": {
+      "type": "choice",
+      "choice": "other",
+      "probabilities": {
+        "billing": 0.48,
+        "technical": 0.02,
+        "shipping": 0.48,
+        "other": 0.02
+      },
+      "confidence": 0.31
+    },
+    "urgency": {
+      "type": "score",
+      "score": 1.08,
+      "legend": {
+        "0": "Can wait days",
+        "1": "Within a day",
+        "2": "Blocking now"
+      },
+      "probabilities": {
+        "0": 0.02,
+        "1": 0.88,
+        "2": 0.1
+      },
+      "confidence": 0.82
+    },
+    "needs_human": {
+      "type": "noul",
+      "noul": 0.01
+    }
+  },
+  "usage": {
+    "input_tokens": 330,
+    "output_tokens": 69
+  },
+  "decision_id": "dec_01J9ZS1L6E"
+}

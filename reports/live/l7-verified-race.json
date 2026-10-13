@@ -1,0 +1,182 @@
+{
+  "calls": 7,
+  "events": {
+    "decision.completed": 1,
+    "generation.cancelled": 1,
+    "generation.committed": 1,
+    "generation.completed": 1,
+    "generation.delta": 305,
+    "generation.started": 2,
+    "preflight.completed": 1,
+    "route.confirmed": 1,
+    "route.selected": 1,
+    "turn.completed": 1,
+    "turn.created": 1,
+    "turn.verified": 1
+  },
+  "marks": {
+    "e2e": 3420,
+    "first_delta": 575
+  },
+  "race": {
+    "cancelled": [
+      {
+        "attempt_id": "att_01M4QWZMT8WR19SFNFGEDQ1T20",
+        "reason": "lost_race",
+        "type": "generation.cancelled"
+      }
+    ],
+    "generation": [
+      {
+        "alias": "sol-6.1",
+        "cancelled": "CancelledError",
+        "e2e_ms": 549,
+        "effort": "low",
+        "error": null,
+        "max_tokens": 512,
+        "stop": null,
+        "text_chars": null,
+        "usage": null
+      },
+      {
+        "alias": "glm-5.3",
+        "cancelled": null,
+        "e2e_ms": 1379,
+        "effort": "low",
+        "error": null,
+        "max_tokens": 512,
+        "stop": "end_turn",
+        "text_chars": 1371,
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 154,
+          "output_tokens": 335,
+          "reasoning_tokens": 32,
+          "tokens_estimated": false
+        }
+      }
+    ],
+    "started": [
+      "us.openai.gpt-6.1-sol",
+      "us.zai.glm-5.3"
+    ]
+  },
+  "verification": {
+    "answers": {
+      "answers_question": {
+        "members": [
+          [
+            "us.anthropic.claude-haiku-5-5",
+            "ok"
+          ],
+          [
+            "us.openai.gpt-6-luna",
+            "ok"
+          ]
+        ],
+        "quorum": {
+          "refused": 0,
+          "required": 2,
+          "responded": 2,
+          "total": 2
+        },
+        "status": null
+      },
+      "unsupported_claims": {
+        "members": [
+          [
+            "us.anthropic.claude-haiku-5-5",
+            "ok"
+          ],
+          [
+            "us.openai.gpt-6-luna",
+            "ok"
+          ]
+        ],
+        "quorum": {
+          "refused": 0,
+          "required": 2,
+          "responded": 2,
+          "total": 2
+        },
+        "status": null
+      }
+    },
+    "members": [
+      {
+        "alias": "luna-6",
+        "cancelled": null,
+        "e2e_ms": 427,
+        "effort": "none",
+        "error": null,
+        "max_tokens": 88,
+        "stop": "end_turn",
+        "text_chars": 13,
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 512,
+          "output_tokens": 13,
+          "reasoning_tokens": 0,
+          "tokens_estimated": false
+        }
+      },
+      {
+        "alias": "luna-6",
+        "cancelled": null,
+        "e2e_ms": 726,
+        "effort": "none",
+        "error": null,
+        "max_tokens": 88,
+        "stop": "end_turn",
+        "text_chars": 19,
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 518,
+          "output_tokens": 17,
+          "reasoning_tokens": 0,
+          "tokens_estimated": false
+        }
+      },
+      {
+        "alias": "haiku-5.5",
+        "cancelled": null,
+        "e2e_ms": 1120,
+        "effort": "low",
+        "error": null,
+        "max_tokens": 600,
+        "stop": "end_turn",
+        "text_chars": 20,
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 742,
+          "output_tokens": 85,
+          "reasoning_tokens": 80,
+          "tokens_estimated": false
+        }
+      },
+      {
+        "alias": "haiku-5.5",
+        "cancelled": null,
+        "e2e_ms": 1994,
+        "effort": "low",
+        "error": null,
+        "max_tokens": 600,
+        "stop": "end_turn",
+        "text_chars": 20,
+        "usage": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 0,
+          "input_tokens": 750,
+          "output_tokens": 270,
+          "reasoning_tokens": 265,
+          "tokens_estimated": false
+        }
+      }
+    ],
+    "status": "completed"
+  }
+}

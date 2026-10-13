@@ -1,0 +1,44 @@
+{
+  "alias": "luna-6",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "decision_member",
+  "e2e_ms": 2,
+  "effort": "none",
+  "error": {
+    "kind": "invalid_request",
+    "message": "provider rejected the request",
+    "provider_code": "ValidationException"
+  },
+  "estimated_input_tokens": 16,
+  "estimated_input_tokens_chars4": 16,
+  "input_chars": 59,
+  "max_tokens": 64,
+  "model_id": "arn:aws:bedrock:us-east-1:123456789012:inference-profile/us.openai.gpt-6-luna",
+  "n": 3,
+  "op": "complete",
+  "test": "tests/live/test_adapters_live.py::test_colon_model_id_through_lean_sigv4",
+  "test_call": 1,
+  "wire": {
+    "error": {
+      "code": "ValidationException",
+      "exception": "ClientError",
+      "http_status": 400,
+      "message": "The provided model identifier is invalid."
+    },
+    "events": [],
+    "response": [],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": true,
+      "session_token": true,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date",
+        "x-amz-security-token"
+      ]
+    }
+  }
+}

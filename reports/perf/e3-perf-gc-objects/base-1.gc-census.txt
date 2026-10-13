@@ -1,0 +1,53 @@
+== step 0: streams/pod 100 n 4310 tps 14.37 | TTFT ovh p50 10.54 [10.48, 10.62] p95 18.03 [17.52, 18.94] p99 49.5 | e2e p50/p95 17.9/30.6 | lag p99/p99.9/max 5.6/13.9/94 | cpu 0.681 cores = 47.4 ms/turn | valid True (mock lag 0.948, hb 1.0) | load 3.78 | rss 595.7 | errors {}
+   api-0: gen2 n=19 every 15.79 s p50 44.1 p99 56.2 max 56.7 ms; gen1 n=764 p50 1.34 ms; gen0 n=8398; GC 1.3% of wall
+   api-1: gen2 n=34 every 8.82 s p50 66.8 p99 87.7 max 90.2 ms; gen1 n=1357 p50 1.66 ms; gen0 n=14925; GC 2.8% of wall
+   pod: gen2 p50 63.7 p99 86.3 max 90.2 ms (n=53)
+   census tracked per process at step end: [80136, 108085]
+== step 1: streams/pod 200 n 12961 tps 28.80 | TTFT ovh p50 16.82 [16.63, 16.99] p95 61.08 [58.13, 63.42] p99 144.1 | e2e p50/p95 30.6/109.3 | lag p99/p99.9/max 8.8/133.7/218 | cpu 1.334 cores = 46.3 ms/turn | valid True (mock lag 1.2, hb 0.99985) | load 5.02 | rss 843.6 | errors {}
+   api-0: gen2 n=73 every 6.16 s p50 119.6 p99 157.5 max 173.3 ms; gen1 n=2960 p50 2.80 ms; gen0 n=32555; GC 6.0% of wall
+   api-1: gen2 n=77 every 5.84 s p50 140.1 p99 185.0 max 208.3 ms; gen1 n=3164 p50 3.08 ms; gen0 n=34794; GC 7.1% of wall
+   pod: gen2 p50 126.9 p99 177.1 max 208.3 ms (n=150)
+   census tracked per process at step end: [172158, 191041]
+tracked objects per live turn (steps 0->1, 50 more live turns per process): [1840, 1659]
+
+live tracked over the pod: 167838 -> 342470 (garbage at the census 20383 -> 20729); per live turn 1746
+   154.8  list
+   130.2  tuple
+   113.5  coroutine
+   103.6  Event
+   101.8  dict
+    93.5  cell
+    90.5  deque
+    88.3  set
+    67.9  method
+    44.9  Context
+    44.3  _TurnLog
+    43.7  SseFrame
+    43.3  _SealedFrames
+    43.0  FinishedTurn
+    35.9  ReferenceType
+    35.6  TextBlock
+    35.2  function
+    30.2  CancelScope
+    24.2  OptionSpec
+    17.3  builtin_function_or_method
+    16.4  Message
+    16.0  Slot
+    15.7  TaskState
+    15.6  Future
+    15.5  Task
+    15.2  FutureIter
+    15.0  CallRec
+    14.6  UsageRecord
+    14.6  Cost
+    14.4  TaskHandle
+     9.1  generator
+     8.7  TaskGroup
+     8.5  HistoryTurn
+     8.3  TimerHandle
+     8.0  UVTimer
+     7.1  AnswerSummary
+     7.0  CompiledQuestion
+     6.4  hamt_bitmap_node
+     6.4  hamt
+     5.4  CIMultiDict

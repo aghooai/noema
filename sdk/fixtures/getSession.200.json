@@ -1,0 +1,21 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "id": "ses_1",
+    "created_at": 1791633601,
+    "last_seq": 4,
+    "data_class": "internal",
+    "retention": {
+      "policy": "default",
+      "expires_at": null
+    },
+    "metadata": {
+      "app": "support"
+    },
+    "owner": "prn_01JA"
+  }
+}

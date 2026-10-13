@@ -1,0 +1,458 @@
+{
+ "steps": [
+  {
+   "streams": 200,
+   "hold_s": 300.0,
+   "t_from": 8783395518955726,
+   "t_to": 8783695518955726,
+   "window_s": 300.0,
+   "turns_sent": 40989,
+   "turns_timed": 3088,
+   "turns_per_s": 10.29,
+   "skipped": {
+    "error:429:rpm_exceeded": 37883,
+    "error:429:queue_timeout": 18
+   },
+   "ttft_overhead_ms": {
+    "n": 3088,
+    "mean": 30.506,
+    "max": 2019.958,
+    "p50": [
+     10.274,
+     10.14,
+     10.397
+    ],
+    "p95": [
+     25.625,
+     23.979,
+     28.239
+    ],
+    "p99": [
+     418.727,
+     100.125,
+     1691.151
+    ]
+   },
+   "e2e_overhead_ms": {
+    "n": 3088,
+    "mean": 39.724,
+    "max": 2034.849,
+    "p50": [
+     18.157,
+     17.912,
+     18.402
+    ],
+    "p95": [
+     45.889,
+     42.202,
+     49.749
+    ],
+    "p99": [
+     429.045,
+     115.804,
+     1702.461
+    ]
+   },
+   "ttft_overhead_nominal_ms": {
+    "n": 3088,
+    "mean": 30.988,
+    "max": 2019.25,
+    "p50": 10.387,
+    "p95": 28.393,
+    "p99": 418.284
+   },
+   "e2e_overhead_nominal_ms": {
+    "n": 3088,
+    "mean": 40.429,
+    "max": 2035.343,
+    "p50": 18.535,
+    "p95": 48.866,
+    "p99": 429.602
+   },
+   "ingress_ms": {
+    "n": 3088,
+    "mean": 28.706,
+    "max": 2017.222,
+    "p50": 8.903,
+    "p95": 21.902,
+    "p99": 415.918
+   },
+   "egress_first_ms": {
+    "n": 3088,
+    "mean": 1.802,
+    "max": 93.747,
+    "p50": 0.721,
+    "p95": 6.938,
+    "p99": 10.494
+   },
+   "egress_max_other_ms": {
+    "n": 3088,
+    "mean": 19.713,
+    "max": 97.006,
+    "p50": 10.215,
+    "p95": 55.092,
+    "p99": 73.253
+   },
+   "client_ttft_ms": {
+    "n": 3088,
+    "mean": 330.988,
+    "max": 2319.25,
+    "p50": 310.387,
+    "p95": 328.393,
+    "p99": 718.284
+   },
+   "client_e2e_ms": {
+    "n": 3088,
+    "mean": 6940.429,
+    "max": 8935.343,
+    "p50": 6918.535,
+    "p95": 6948.866,
+    "p99": 7329.602
+   },
+   "decision_ms": {
+    "n": 3088,
+    "mean": 63.711,
+    "max": 190.0,
+    "p50": [
+     61.0,
+     61.0,
+     61.0
+    ],
+    "p95": [
+     75.0,
+     74.0,
+     77.0
+    ],
+    "p99": [
+     123.13,
+     109.0,
+     132.0
+    ]
+   },
+   "decision_lead_ms": {
+    "n": 3088,
+    "mean": 241.509,
+    "max": 370.0,
+    "p50": 243.0,
+    "p95": 247.0,
+    "p99": 260.0
+   },
+   "validity": {
+    "valid": true,
+    "checks": {
+     "holdback_zero_and_spec_agrees": true,
+     "driver_lag_p99": true,
+     "mock_lag_p99": true
+    },
+    "holdback_zero_share": 1.0,
+    "holdback_zero_and_spec_agrees_share": 1.0,
+    "holdback_nonzero_ms": {},
+    "worst_process_lag_p99_ms": {
+     "drivers": 0.965,
+     "mock": 1.139
+    },
+    "committed_reasons": {
+     "spec_agrees": 3088
+    },
+    "decision_calls_per_turn": {
+     "15": 3088
+    }
+   },
+   "mock_lateness_ms": {
+    "stream_first_text": {
+     "n": 3088,
+     "mean": 0.482,
+     "max": 127.267,
+     "p50": 0.062,
+     "p95": 1.006,
+     "p99": 5.338
+    },
+    "decision_answer": {
+     "n": 46320,
+     "mean": 0.494,
+     "max": 123.762,
+     "p50": 0.236,
+     "p95": 1.032,
+     "p99": 1.423
+    }
+   },
+   "lag_ms": {
+    "api": {
+     "n": 58497,
+     "p50": 0.063,
+     "p99": 5.238,
+     "p99.9": 15.933,
+     "max": 84.365
+    },
+    "mock": {
+     "n": 59100,
+     "p50": 0.082,
+     "p99": 1.022,
+     "p99.9": 7.653,
+     "max": 132.986
+    },
+    "drivers": {
+     "n": 118995,
+     "p50": 0.078,
+     "p99": 0.963,
+     "p99.9": 1.215,
+     "max": 21.049
+    }
+   },
+   "resources": {
+    "samples": 60,
+    "api_cpu_cores": 0.873,
+    "driver_cpu_cores": 0.308,
+    "mock_cpu_cores": [
+     0.101,
+     0.022
+    ],
+    "rss_mib": {
+     "first": 450.8,
+     "last": 556.4,
+     "max": 556.4
+    },
+    "fds_max": 561,
+    "threads_max": 18,
+    "loadavg_1m": {
+     "min": 3.06,
+     "max": 5.3,
+     "mean": 4.4
+    }
+   },
+   "errors": {
+    "429:rpm_exceeded": 37883,
+    "429:queue_timeout": 18
+   },
+   "side": {}
+  }
+ ],
+ "memory": [
+  {
+   "t_ns": 8783335540633423,
+   "loadavg": [
+    3.57,
+    4.32,
+    4.32
+   ],
+   "api": {
+    "cpu_s": 2.9699999999999998,
+    "VmHWM": 325964,
+    "VmRSS": 325964,
+    "Threads": 18,
+    "fds": 48
+   },
+   "api_procs": 2,
+   "mock_cpu_s": [
+    0.25,
+    0.22
+   ],
+   "driver_cpu_s": 0.01,
+   "drivers": 4
+  },
+  {
+   "t_ns": 8783395566557754,
+   "loadavg": [
+    5.24,
+    4.51,
+    4.37
+   ],
+   "api": {
+    "cpu_s": 50.42,
+    "VmHWM": 461640,
+    "VmRSS": 461640,
+    "Threads": 18,
+    "fds": 548
+   },
+   "api_procs": 2,
+   "mock_cpu_s": [
+    7.75,
+    1.98
+   ],
+   "driver_cpu_s": 15.47,
+   "drivers": 4
+  },
+  {
+   "t_ns": 8783455589706993,
+   "loadavg": [
+    4.58,
+    4.42,
+    4.35
+   ],
+   "api": {
+    "cpu_s": 104.34,
+    "VmHWM": 486428,
+    "VmRSS": 486428,
+    "Threads": 18,
+    "fds": 462
+   },
+   "api_procs": 2,
+   "mock_cpu_s": [
+    14.51,
+    3.5
+   ],
+   "driver_cpu_s": 34.47,
+   "drivers": 4
+  },
+  {
+   "t_ns": 8783515612017608,
+   "loadavg": [
+    4.8,
+    4.52,
+    4.39
+   ],
+   "api": {
+    "cpu_s": 156.82,
+    "VmHWM": 510080,
+    "VmRSS": 510080,
+    "Threads": 18,
+    "fds": 457
+   },
+   "api_procs": 2,
+   "mock_cpu_s": [
+    20.53,
+    4.83
+   ],
+   "driver_cpu_s": 52.78,
+   "drivers": 4
+  },
+  {
+   "t_ns": 8783575634797676,
+   "loadavg": [
+    4.56,
+    4.46,
+    4.37
+   ],
+   "api": {
+    "cpu_s": 208.56,
+    "VmHWM": 534104,
+    "VmRSS": 534104,
+    "Threads": 18,
+    "fds": 454
+   },
+   "api_procs": 2,
+   "mock_cpu_s": [
+    26.45,
+    6.13
+   ],
+   "driver_cpu_s": 71.05,
+   "drivers": 4
+  },
+  {
+   "t_ns": 8783635657882351,
+   "loadavg": [
+    4.72,
+    4.48,
+    4.38
+   ],
+   "api": {
+    "cpu_s": 260.67,
+    "VmHWM": 557824,
+    "VmRSS": 557824,
+    "Threads": 18,
+    "fds": 453
+   },
+   "api_procs": 2,
+   "mock_cpu_s": [
+    32.21,
+    7.44
+   ],
+   "driver_cpu_s": 89.37,
+   "drivers": 4
+  },
+  {
+   "t_ns": 8783696024635571,
+   "loadavg": [
+    2.97,
+    4.04,
+    4.24
+   ],
+   "api": {
+    "cpu_s": 312.43,
+    "VmHWM": 569792,
+    "VmRSS": 569792,
+    "Threads": 18,
+    "fds": 449
+   },
+   "api_procs": 2,
+   "mock_cpu_s": [
+    38.14,
+    8.71
+   ],
+   "driver_cpu_s": 107.96000000000001,
+   "drivers": 4
+  }
+ ],
+ "provenance": {
+  "code": {
+   "git_head": "b85f318080595c9cc73eca6232f1999fcf16fc7b",
+   "paths": [
+    "src",
+    "tests",
+    "tools",
+    "deploy",
+    "pyproject.toml",
+    "uv.lock"
+   ],
+   "changed_paths": 355,
+   "worktree_digest": "sha256:def3d8500c0028cb9a4db89a3ae67f75e6ebb1accff9594e4551233b9ecce441"
+  },
+  "config": {
+   "version": 4,
+   "digest": "sha256:b9504747ff52a10919ecedd1bf9d93c82ae890a13f5d16dc039c917a93681cc4"
+  },
+  "scenario_sha256": "65cd42ce9ac19879c8cb2c653b0f03d4ccff14b720e7a9609dc4d004afb2115c",
+  "api": {
+   "image": null,
+   "python": "3.12.12",
+   "executable": "/codes/aghooai/noema/.venv/bin/python3"
+  },
+  "placement": {
+   "api": "46-47",
+   "api_procs": 2,
+   "mocks": [
+    "16-17",
+    "40-41"
+   ],
+   "drivers": "4-15,28-39",
+   "stack": {
+    "noema-qalead-perf-postgres-1": "44-45",
+    "noema-qalead-perf-valkey-1": "44-45"
+   }
+  },
+  "dispatch_yields": null,
+  "loadavg_at_start": [
+   3.57,
+   4.32,
+   4.32
+  ]
+ },
+ "config": {
+  "out": "/tmp/noema-qalead/runs/e5-c1",
+  "results": "/codes/aghooai/noema/reports/qa/load/e5-c1.json",
+  "plan": "200:300",
+  "warmup_s": "60.0",
+  "settle_s": "30.0",
+  "turns_per_session": "10",
+  "scenario": "/codes/aghooai/noema/tests/load/scenarios/overhead.yaml",
+  "api_port": "30190",
+  "mock_port": "30181",
+  "api_cpus": "46-47",
+  "api_procs": "2",
+  "api_env": "[]",
+  "stack_cpus": "44-45",
+  "mock_cpus": "16-17,40-41",
+  "driver_cpus": "4-15,28-39",
+  "api_image": "None",
+  "dispatch_yields": "None",
+  "profile": "None",
+  "profile_step": "0",
+  "census": "False",
+  "trace": "False",
+  "gc_threshold": "None",
+  "sides": "[]",
+  "mock_quotas": "[{\"model\": \"us.openai.gpt-6.1-sol\", \"rpm\": 600}]",
+  "sse_probe": "False",
+  "analyze_only": "False"
+ }
+}

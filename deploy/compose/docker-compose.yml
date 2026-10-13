@@ -1,0 +1,289 @@
+# Base local services for development and the integration tests (Wave B1). Start them with
+#   make up            (docker compose -p noema-dev -f deploy/compose/docker-compose.yml up -d --wait)
+# Host ports bind to 127.0.0.1 only and default to non-standard values (override them in .env; see .env.example).
+# Tests isolate themselves inside these shared services: one Postgres database clone, one Redis key namespace and one
+# set of moto resources per pytest session (spec-10 §1.1). The infra role extends this file with further services.
+name: noema-dev
+
+# Shared settings of the app containers (profile app; the noema-api/noema-worker images). Connection settings are the
+# composition.process_settings variables: NOEMA_REDIS_URL, NOEMA_S3_BUCKET, NOEMA_DB_DSN_REF (the platform secret
+# noema/db-dsn in moto, spec-09 §4, seeded by tools/bootstrap_dev.py with the in-network postgres host) and
+# NOEMA_POD_ID. Fault runs (spec-10 §4) reach valkey and moto through toxiproxy: NOEMA_STACK_REDIS_URL=
+# redis://toxiproxy:16379/0, NOEMA_STACK_MOTO_URL=http://toxiproxy:15000 and bootstrap --db-host toxiproxy:15432.
+# NOEMA_STACK_ENV (default dev) gives every process the shared Redis namespace and real metrics; test-env processes
+# use per-process Redis namespaces and serve no /metrics (single-process runs only, never this two-replica profile).
+# Start the profile with `make e2e-up` (its own project, bootstrapped). Fake AWS keys only reach moto and the mock.
+x-noema-app: &noema-app
+  image: ${NOEMA_API_IMAGE:-noema-api:dev}
+  profiles: [app]
+  init: true
+  user: "10001:10002"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  tmpfs:
+    - /tmp:size=256m
+  environment: &noema-app-env
+    NOEMA_ENV: ${NOEMA_STACK_ENV:-dev}
+    NOEMA_AWS_ENDPOINT_OVERRIDES: '{"sts": "${NOEMA_STACK_MOTO_URL:-http://moto:5000}", "secretsmanager": "${NOEMA_STACK_MOTO_URL:-http://moto:5000}", "s3": "${NOEMA_STACK_MOTO_URL:-http://moto:5000}", "bedrock-runtime": "http://mockbedrock:8080", "mantle": "http://mockbedrock:8080/v1"}'
+    NOEMA_EXPECTED_PODS: "2"
+    NOEMA_METRICS_PORT: "9464"
+    NOEMA_REDIS_URL: ${NOEMA_STACK_REDIS_URL:-redis://valkey:6379/0}
+    NOEMA_S3_BUCKET: noema-${NOEMA_STACK_ENV:-dev}
+    NOEMA_DB_DSN_REF: noema/db-dsn
+    NOEMA_DRAIN_DELAY_S: "5" # SIGTERM: /readyz 503 for 5 s before uvicorn stops accepting (spec-11 §7)
+    NOEMA_CONTRACT_VALIDATE: # passed through from the caller's environment (`1` or unset, IMPL-041)
+    # `off` (make e2e-up's default) disarms the breakers' p95-TTFT rule: the mock's latencies change 30x between tests
+    NOEMA_BREAKER_TTFT_RULE: ${NOEMA_STACK_BREAKER_TTFT_RULE:-on}
+    AWS_REGION: us-east-1
+    AWS_DEFAULT_REGION: us-east-1
+    AWS_ACCESS_KEY_ID: noema-compose-fake
+    AWS_SECRET_ACCESS_KEY: noema-compose-fake
+    AWS_EC2_METADATA_DISABLED: "true"
+  depends_on: &noema-app-deps
+    postgres: { condition: service_healthy }
+    valkey: { condition: service_healthy }
+    moto: { condition: service_healthy }
+    mockbedrock: { condition: service_healthy }
+    toxiproxy: { condition: service_healthy }
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${NOEMA_PG_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${NOEMA_PG_SUPERUSER_PASSWORD:-noema-dev-only}
+      POSTGRES_DB: postgres
+    # Dev/test tuning: many concurrent agents and per-session database clones (max_connections ~1000, PLAN);
+    # durability is off because this instance only holds disposable test data.
+    command:
+      - postgres
+      - -c
+      - max_connections=1000
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - fsync=off
+      - -c
+      - synchronous_commit=off
+      - -c
+      - full_page_writes=off
+    ports:
+      - "127.0.0.1:${NOEMA_PG_PORT:-25432}:5432"
+    volumes:
+      - noema-pg:/var/lib/postgresql/data
+    shm_size: 512mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  valkey:
+    image: valkey/valkey:7.2-alpine
+    command: ["valkey-server", "--save", "", "--appendonly", "no", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "127.0.0.1:${NOEMA_VALKEY_PORT:-26379}:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  moto:
+    # S3 + STS + Secrets Manager (+ IAM for trust-policy fixtures) in server mode; MinIO is not available here.
+    image: motoserver/moto:latest
+    environment:
+      MOTO_PORT: "5000"
+    ports:
+      - "127.0.0.1:${NOEMA_MOTO_PORT:-25000}:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5000/moto-api/data.json"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  # --- Wave B2 extensions (infra; the integrator completes the app services in Wave D) --------------------------------
+  # Every service below has a profile, so `make services-up` (no profile) still starts only the three base services.
+  #   toxiproxy  toxiproxy-host: host-network toxiproxy for host-run integration tests (per-test dynamic proxies)
+  #   media      media-sandbox: sandboxd + nsjail in a network-less container (ADR-002), used by make test-media
+  #   app        the full stack (api-1, api-2, jobs, media-worker, media-sandbox, mockbedrock) for e2e/security/load
+  #   fault      toxiproxy on the compose network with fixed proxies to postgres/valkey/moto (use with app)
+  # Isolated projects (spec-10 §1.1: -p noema-<layer>-<RUN>) set every NOEMA_*_PORT to 0 for ephemeral host ports and
+  # read them back with `docker compose -p <project> port <service> <container port>`. See docs/modules/infra.md.
+
+  toxiproxy-host:
+    # Shared by every agent on this host: create proxies named after your noema_run_id with listen 127.0.0.1:0
+    # (toxiproxy returns the bound port) and delete them afterwards; never add toxics to another run's proxy.
+    image: ghcr.io/shopify/toxiproxy:2.9.0
+    profiles: [toxiproxy]
+    network_mode: host
+    command: ["-host=127.0.0.1", "-port=${NOEMA_TOXIPROXY_PORT:-28474}"]
+    healthcheck:
+      test: ["CMD", "/toxiproxy-cli", "-h", "http://127.0.0.1:${NOEMA_TOXIPROXY_PORT:-28474}", "list"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  toxiproxy:
+    # Fault layer (spec-10 §4, F10/F11): app containers reach postgres/valkey/moto through toxiproxy:15432/16379/15000
+    # when they are configured to; QA toggles the proxies through the API (published on an ephemeral port by default).
+    image: ghcr.io/shopify/toxiproxy:2.9.0
+    profiles: [app, fault]
+    command: ["-host=0.0.0.0", "-port=8474", "-config=/etc/toxiproxy/proxies.json"]
+    volumes:
+      - ./toxiproxy.json:/etc/toxiproxy/proxies.json:ro
+    ports:
+      - "127.0.0.1:${NOEMA_FAULT_TOXIPROXY_PORT:-0}:8474"
+      - "127.0.0.1:${NOEMA_FAULT_PG_PORT:-0}:15432"
+      - "127.0.0.1:${NOEMA_FAULT_VALKEY_PORT:-0}:16379"
+      - "127.0.0.1:${NOEMA_FAULT_MOTO_PORT:-0}:15000"
+    depends_on:
+      postgres: { condition: service_healthy }
+      valkey: { condition: service_healthy }
+      moto: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "/toxiproxy-cli", "-h", "http://127.0.0.1:8474", "list"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  media-sandbox:
+    # Z3 (ADR-002 §1-§2): no network, no credentials, read-only root; sandboxd spawns one nsjail per job.
+    # The outer seccomp profile is Docker's default plus pivot_root for CAP_SYS_ADMIN (deploy/sandbox/PRIVILEGES.md).
+    image: ${NOEMA_MEDIA_IMAGE:-noema-media:dev}
+    profiles: [media, app]
+    network_mode: none
+    cap_drop: [ALL]
+    cap_add: [SYS_ADMIN, SETUID, SETGID, CHOWN, DAC_OVERRIDE, FOWNER, KILL]
+    security_opt:
+      - seccomp=../sandbox/docker-seccomp.json
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=1g,mode=1777
+    volumes:
+      - media-spool:/spool
+    environment:
+      NOEMA_ENV: ${NOEMA_STACK_ENV:-dev}
+    mem_limit: 6g
+    cpus: 2
+    pids_limit: 1024
+    healthcheck:
+      # sandboxd listens on the spool UDS (ADR-002 §6)
+      test: ["CMD", "python", "-I", "-c", "import os, stat, sys; sys.exit(not stat.S_ISSOCK(os.stat('/spool/sandboxd.sock').st_mode))"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  api-1: &noema-api
+    # spec-01 §4: uvicorn noema.api.app:create_app --loop uvloop (the image CMD); two API pods (spec-10 §1).
+    # One pod = 2 vCPU running WEB_CONCURRENCY uvicorn worker processes (default 2, E sprint B: one Python process
+    # is CPU-bound at ~100 streams of the L1 workload, reports/perf/e-sprint-b.md), sharing port 8000. The hostname
+    # is the pod id (NOEMA_POD_ID default); with several workers each one appends its pid (idempotency and turn
+    # owners, the outbox consumer) and serves its metrics on the first free port of 9464.. (one scrape target per
+    # worker). NOEMA_MAX_TURNS_PER_PROCESS (default 120) sheds createTurn with 429 queue_timeout above it.
+    # Images built before E sprint B bind 9464 in both workers and crash-loop (Errno 98): rebuild them (make e2e-up
+    # does) or run them with NOEMA_STACK_API_WORKERS=1.
+    <<: *noema-app
+    hostname: api-1
+    environment:
+      <<: *noema-app-env
+      WEB_CONCURRENCY: ${NOEMA_STACK_API_WORKERS:-2}
+      NOEMA_MAX_TURNS_PER_PROCESS: ${NOEMA_STACK_MAX_TURNS:-120}
+    cpus: ${NOEMA_STACK_API_CPUS:-2}
+    ports:
+      - "127.0.0.1:${NOEMA_API1_PORT:-0}:8000"
+      - "127.0.0.1:${NOEMA_API1_METRICS_PORT:-0}:9464"
+      - "127.0.0.1:${NOEMA_API1_METRICS2_PORT:-0}:9465" # the second worker's metrics
+    healthcheck:
+      test: ["CMD", "python", "-I", "-c", "import sys, urllib.request; sys.exit(urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=2).status != 200)"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+    stop_grace_period: 45s # spec-11 §7: running turns get 30 s, then the outbox flush (10 s)
+
+  api-2:
+    <<: *noema-api
+    hostname: api-2
+    ports:
+      - "127.0.0.1:${NOEMA_API2_PORT:-0}:8000"
+      - "127.0.0.1:${NOEMA_API2_METRICS_PORT:-0}:9464"
+      - "127.0.0.1:${NOEMA_API2_METRICS2_PORT:-0}:9465"
+
+  jobs:
+    <<: *noema-app
+    image: ${NOEMA_WORKER_IMAGE:-noema-worker:dev}
+    hostname: jobs
+    command: ["python", "-m", "noema.entrypoints.jobs", "--kinds", "labeling.*,session.delete,retention.sweep"]
+    healthcheck: &noema-worker-health
+      # liveness: the process serves /metrics on NOEMA_METRICS_PORT once composition.start ran (spec-11 §7)
+      test: ["CMD", "python", "-I", "-c", "import sys, urllib.request; sys.exit(urllib.request.urlopen('http://127.0.0.1:9464/metrics', timeout=2).status != 200)"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+    # spec-11 §7: running handlers get 10 s, the outbox flush up to 10 s, then a cancelled worker gives stragglers
+    # another 10 s before they are left to the reaper
+    stop_grace_period: 35s
+
+  media-worker:
+    # Z2 spooler (ADR-002 §1-§2): no parser libraries, uid 10001 (sandboxd checks SO_PEERCRED), /spool shared.
+    <<: *noema-app
+    image: ${NOEMA_WORKER_IMAGE:-noema-worker:dev}
+    hostname: media-worker
+    command: ["python", "-m", "noema.entrypoints.media_worker", "--kinds", "media.process,file.purge"]
+    volumes:
+      - media-spool:/spool
+    mem_limit: 1g
+    pids_limit: 256
+    depends_on:
+      <<: *noema-app-deps
+      media-sandbox: { condition: service_healthy }
+    healthcheck: *noema-worker-health
+    stop_grace_period: 35s
+
+  mockbedrock:
+    # The qa-tools wire mock (tools/mockbedrock, spec-10 §2) from the repo checkout, on the api image's interpreter.
+    # It loads scenarios with tests/fakes/scenario.py (+ scenario.schema.json), so tests/fakes is mounted as well
+    # (namespace package `tests`; the api image ships only src/).
+    <<: *noema-app
+    working_dir: /opt/noema-tools
+    # The stack starts with deploy/compose/mockbedrock/default.yaml (router, verification and generation answers);
+    # tests load their own scenario with POST /_mock/scenario (and /_mock/reset forgets it).
+    volumes:
+      - ../../tools:/opt/noema-tools/tools:ro
+      - ../../tests/fakes:/opt/noema-tools/tests/fakes:ro
+      - ./mockbedrock:/opt/noema-tools/scenarios:ro
+    environment:
+      NOEMA_ENV: ${NOEMA_STACK_ENV:-dev}
+      PYTHONDONTWRITEBYTECODE: "1"
+      NOEMA_MOCK_CPUS: ${NOEMA_STACK_MOCK_CPUS:-} # pin the mock to these CPUs (make qa-gates); empty = unpinned
+    command: ["python", "-m", "tools.mockbedrock", "--host", "0.0.0.0", "--port", "8080",
+              "--scenario", "/opt/noema-tools/scenarios/${NOEMA_MOCK_SCENARIO:-default.yaml}"]
+    ports:
+      - "127.0.0.1:${NOEMA_MOCKBEDROCK_PORT:-0}:8080"
+    depends_on: {}
+    healthcheck:
+      # ?limit=0 is O(1): the unpaged dump serializes the whole record ring on the mock's event loop (spec-10 §5 lag)
+      test: ["CMD", "python", "-I", "-c", "import sys, urllib.request; sys.exit(urllib.request.urlopen('http://127.0.0.1:8080/_mock/requests?limit=0', timeout=2).status != 200)"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  noema-pg:
+  media-spool:
+    # ADR-002 §1: the only channel between media-worker and media-sandbox (tmpfs, 4 GiB, owned by the worker uid).
+    # Deferred until the host kernel is >= 6.6 (tmpfs usrquota; the host runs 6.1): add `usrquota` and a 512 MiB
+    # block quota per slot uid (100000 + slot), so a compromised jail cannot fill the shared spool within its wall_s.
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "size=4g,uid=10001,gid=10002,mode=0711"

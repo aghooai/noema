@@ -1,0 +1,35 @@
+# Load scenario L4 (spec-10 §3 L4: decision quorum p95 <= 1,000 ms, quorum met >= 99%): scenarios/overhead.yaml with
+# the decision members on the mock's probe latency distributions (spec-10 §2.2; since Wave E2 the live cassettes:
+# DeepSeek 300-560 ms with a 2% 4-12 s tail, Luna 350-610 ms, Haiku 640-950 ms) instead of a fixed 50 ms, so S1
+# waits for the real commit-critical quorum; the generation stream is L1's.
+scenario: load-decision-l4
+seed: 11
+mantle_auth: bearer_short_term
+defaults:
+  latency: probe
+rules:
+  - match: { op: converse-stream }
+    stream:
+      first_event_ms: 200
+      first_text_ms: 300
+      reasoning: { deltas: 0 }
+      tokens: 400
+      chunk_tokens: 4
+      tokens_per_s: 60
+      stop: end_turn
+      stamp: true
+  - match: { op: chat-stream }
+    stream:
+      first_event_ms: 200
+      first_text_ms: 300
+      tokens: 400
+      chunk_tokens: 4
+      tokens_per_s: 60
+      stop: end_turn
+      stamp: true
+  - match: { prompt_contains: "primary intent" }
+    answer: { dist: { factual_qa: 0.9, chitchat: 0.05, coding: 0.05 } }
+  - match: { prompt_contains: "How hard" }
+    answer: { dist: { trivial: 0.1, moderate: 0.8, hard: 0.1 } }
+  - match: {}
+    answer: { dist: { "true": 0.05, "false": 0.95 } }

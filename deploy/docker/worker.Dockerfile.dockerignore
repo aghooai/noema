@@ -1,0 +1,2 @@
+# Allowlist for the worker build context (repo root): nothing is copied (the image derives from noema-api).
+*

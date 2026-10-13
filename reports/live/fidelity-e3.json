@@ -1,0 +1,175 @@
+{
+  "distinct_differences": {
+    "glm-5.3 stream events": [
+      "{\"live\":[\"MessageStart\",\"ReasoningDelta\",\"TextDelta\",\"Stop\",\"UsageEvent\"],\"mock\":[\"MessageStart\",\"TextDelta\",\"Stop\",\"UsageEvent\"]}"
+    ],
+    "glm-5.3 stream usage_nonzero": [
+      "{\"live\":[\"input_tokens\",\"output_tokens\",\"reasoning_tokens\"],\"mock\":[\"input_tokens\",\"output_tokens\"]}"
+    ],
+    "glm-5.3 stream wire_events": [
+      "{\"live_only\":[\"messageStart.p|messageStart.role\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p\",\"contentBlockStop.contentBlockIndex|contentBlockStop.p\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.reasoningContent.text|contentBlockDelta.p\",\"contentBlockStop.contentBlockIndex|contentBlockStop.p\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p\",\"contentBlockStop.contentBlockIndex|contentBlockStop.p\",\"messageStop.p|messageStop.stopReason\"],\"mock_only\":[\"messageStart.role\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text\",\"contentBlockStop.contentBlockIndex\",\"messageStop.stopReason\"]}"
+    ],
+    "luna-6 complete error": [
+      "{\"live\":null,\"mock\":[\"invalid_request\",\"ValidationException\"]}"
+    ],
+    "luna-6 complete raw_error": [
+      "{\"live\":null,\"mock\":[\"ValidationException\",400,\"The provided model identifier is invalid.\"]}"
+    ],
+    "luna-6 complete stop": [
+      "{\"live\":\"end_turn\",\"mock\":null}"
+    ],
+    "luna-6 complete usage_nonzero": [
+      "{\"live\":[\"input_tokens\",\"output_tokens\"],\"mock\":[]}"
+    ],
+    "luna-6 complete wire_response": [
+      "{\"live_only\":[\"metrics.latencyMs:int\",\"output.message.content[].text:str\",\"output.message.role:str\",\"stopReason:str\",\"usage.cacheReadInputTokens:int\",\"usage.cacheWriteInputTokens:int\",\"usage.inputTokens:int\",\"usage.outputTokens:int\",\"usage.totalTokens:int\"],\"mock_only\":[]}"
+    ],
+    "opus-5.5 stream wire_events": [
+      "{\"live_only\":[\"messageStart.p|messageStart.role\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p\",\"contentBlockStop.contentBlockIndex|contentBlockStop.p\",\"messageStop.p|messageStop.stopReason\"],\"mock_only\":[\"messageStart.role\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text\",\"contentBlockStop.contentBlockIndex\",\"messageStop.stopReason\"]}"
+    ],
+    "sol-6.1 stream wire_events": [
+      "{\"live_only\":[\"messageStart.p|messageStart.role\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p\",\"contentBlockStop.contentBlockIndex|contentBlockStop.p\",\"messageStop.p|messageStop.stopReason\"],\"mock_only\":[\"messageStart.role\",\"contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text\",\"contentBlockStop.contentBlockIndex\",\"messageStop.stopReason\"]}"
+    ]
+  },
+  "identical": 4,
+  "live_only_calls": [
+    "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race | glm-5.3 | stream | generation"
+  ],
+  "live_runs": [
+    "live-20261012T111104",
+    "live-20261012T111143"
+  ],
+  "mock_only_calls": [
+    "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race | sol-6.1 | stream | generation"
+  ],
+  "mock_runs": [
+    "mock-20261012T110809"
+  ],
+  "pairs": {
+    "tests/live/test_adapters_live.py::test_colon_model_id_through_lean_sigv4 | luna-6 | complete | decision_member": {
+      "error": {
+        "live": null,
+        "mock": [
+          "invalid_request",
+          "ValidationException"
+        ]
+      },
+      "raw_error": {
+        "live": null,
+        "mock": [
+          "ValidationException",
+          400,
+          "The provided model identifier is invalid."
+        ]
+      },
+      "stop": {
+        "live": "end_turn",
+        "mock": null
+      },
+      "usage_nonzero": {
+        "live": [
+          "input_tokens",
+          "output_tokens"
+        ],
+        "mock": []
+      },
+      "wire_response": {
+        "live_only": [
+          "metrics.latencyMs:int",
+          "output.message.content[].text:str",
+          "output.message.role:str",
+          "stopReason:str",
+          "usage.cacheReadInputTokens:int",
+          "usage.cacheWriteInputTokens:int",
+          "usage.inputTokens:int",
+          "usage.outputTokens:int",
+          "usage.totalTokens:int"
+        ],
+        "mock_only": []
+      }
+    },
+    "tests/live/test_adapters_live.py::test_l2_converse_stream[glm-5.3-low] | glm-5.3 | stream | generation": {
+      "events": {
+        "live": [
+          "MessageStart",
+          "ReasoningDelta",
+          "TextDelta",
+          "Stop",
+          "UsageEvent"
+        ],
+        "mock": [
+          "MessageStart",
+          "TextDelta",
+          "Stop",
+          "UsageEvent"
+        ]
+      },
+      "usage_nonzero": {
+        "live": [
+          "input_tokens",
+          "output_tokens",
+          "reasoning_tokens"
+        ],
+        "mock": [
+          "input_tokens",
+          "output_tokens"
+        ]
+      },
+      "wire_events": {
+        "live_only": [
+          "messageStart.p|messageStart.role",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p",
+          "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.reasoningContent.text|contentBlockDelta.p",
+          "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p",
+          "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+          "messageStop.p|messageStop.stopReason"
+        ],
+        "mock_only": [
+          "messageStart.role",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text",
+          "contentBlockStop.contentBlockIndex",
+          "messageStop.stopReason"
+        ]
+      }
+    },
+    "tests/live/test_adapters_live.py::test_l2_converse_stream[opus-5.5-low] | opus-5.5 | stream | generation": {
+      "wire_events": {
+        "live_only": [
+          "messageStart.p|messageStart.role",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p",
+          "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+          "messageStop.p|messageStop.stopReason"
+        ],
+        "mock_only": [
+          "messageStart.role",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text",
+          "contentBlockStop.contentBlockIndex",
+          "messageStop.stopReason"
+        ]
+      }
+    },
+    "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race | haiku-5.5 | complete | verification_member": "identical",
+    "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race | luna-6 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race | luna-6 | complete | verification_member": "identical",
+    "tests/live/test_api_live.py::test_l8_pinned_turns | luna-6 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l8_pinned_turns | sol-6.1 | stream | generation": {
+      "wire_events": {
+        "live_only": [
+          "messageStart.p|messageStart.role",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p",
+          "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+          "messageStop.p|messageStop.stopReason"
+        ],
+        "mock_only": [
+          "messageStart.role",
+          "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text",
+          "contentBlockStop.contentBlockIndex",
+          "messageStop.stopReason"
+        ]
+      }
+    }
+  },
+  "pairs_compared": 8
+}

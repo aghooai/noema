@@ -1,0 +1,12 @@
+{
+  "image": {
+    "accepted": true,
+    "digits_found": true,
+    "stop": "end_turn"
+  },
+  "pdf": {
+    "accepted": true,
+    "digits_found": true,
+    "stop": "end_turn"
+  }
+}

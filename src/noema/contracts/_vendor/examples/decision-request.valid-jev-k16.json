@@ -1,0 +1,119 @@
+{
+  "profile": "router-default@1",
+  "output_format": "jev",
+  "questions": [
+    {
+      "type": "choice",
+      "name": "product_area",
+      "instructions": "Which product area does the bug report concern?",
+      "choices": [
+        {
+          "value": "accounts"
+        },
+        {
+          "value": "billing"
+        },
+        {
+          "value": "checkout"
+        },
+        {
+          "value": "catalog"
+        },
+        {
+          "value": "search"
+        },
+        {
+          "value": "recommendations"
+        },
+        {
+          "value": "notifications"
+        },
+        {
+          "value": "mobile_app"
+        },
+        {
+          "value": "web_app"
+        },
+        {
+          "value": "api"
+        },
+        {
+          "value": "integrations"
+        },
+        {
+          "value": "reporting"
+        },
+        {
+          "value": "exports"
+        },
+        {
+          "value": "permissions"
+        },
+        {
+          "value": "security"
+        },
+        {
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "type": "score",
+      "name": "checklist_items",
+      "instructions": "How many of the 15 bug-report checklist items does the report satisfy?",
+      "levels": [
+        {
+          "label": "0 of 15",
+          "description": "No checklist item"
+        },
+        {
+          "label": "1 of 15"
+        },
+        {
+          "label": "2 of 15"
+        },
+        {
+          "label": "3 of 15"
+        },
+        {
+          "label": "4 of 15"
+        },
+        {
+          "label": "5 of 15"
+        },
+        {
+          "label": "6 of 15"
+        },
+        {
+          "label": "7 of 15"
+        },
+        {
+          "label": "8 of 15"
+        },
+        {
+          "label": "9 of 15"
+        },
+        {
+          "label": "10 of 15"
+        },
+        {
+          "label": "11 of 15"
+        },
+        {
+          "label": "12 of 15"
+        },
+        {
+          "label": "13 of 15"
+        },
+        {
+          "label": "14 of 15"
+        },
+        {
+          "label": "15 of 15",
+          "description": "Every checklist item"
+        }
+      ]
+    }
+  ],
+  "input": "The weekly revenue report exports an empty CSV since Monday; the dashboard itself shows the numbers. Steps attached."
+}

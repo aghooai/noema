@@ -1,0 +1,27 @@
+# Prometheus for the compose stack (`make e2e-up`; docs/operations/observability.md "Compose stack"). Run it on the
+# stack's network, so the service names resolve, with the rule files mounted at /etc/prometheus/rules. The compose
+# file publishes no jobs or media-worker metrics port: scrape them on the network. There is no cAdvisor, so
+# noema:pod_cpu_cores:rate5m and noema-pod-cpu-high stay empty on this stack.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 1m
+
+rule_files:
+  - /etc/prometheus/rules/noema-*.rules.yml
+
+scrape_configs:
+  # Each api container is one 2-process "pod" (WEB_CONCURRENCY=2): both worker ports, pod = the service name.
+  - job_name: noema-api
+    static_configs:
+      - targets: [api-1:9464, api-1:9465]
+        labels: { pod: api-1 }
+      - targets: [api-2:9464, api-2:9465]
+        labels: { pod: api-2 }
+  - job_name: noema-jobs
+    static_configs:
+      - targets: [jobs:9464]
+        labels: { pod: jobs }
+  - job_name: noema-media-worker
+    static_configs:
+      - targets: [media-worker:9464]
+        labels: { pod: media-worker }

@@ -1,0 +1,5 @@
+[
+  {"name": "postgres", "listen": "0.0.0.0:15432", "upstream": "postgres:5432", "enabled": true},
+  {"name": "valkey", "listen": "0.0.0.0:16379", "upstream": "valkey:6379", "enabled": true},
+  {"name": "moto", "listen": "0.0.0.0:15000", "upstream": "moto:5000", "enabled": true}
+]

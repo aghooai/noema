@@ -1,0 +1,12 @@
+{
+  "status": 202,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "id": "ses_1",
+    "deleted": true,
+    "deletion_job_id": "job_01JA"
+  }
+}

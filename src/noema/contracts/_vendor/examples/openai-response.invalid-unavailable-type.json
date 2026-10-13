@@ -1,0 +1,22 @@
+{
+  "model": "aghoo/router-default@1",
+  "answers": [
+    {
+      "type": "unavailable",
+      "name": null,
+      "reason": "no_quorum"
+    }
+  ],
+  "usage": {
+    "input_tokens": 410,
+    "input_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0
+    },
+    "output_tokens": 132,
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "total_tokens": 542
+  }
+}

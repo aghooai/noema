@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:noema:prices.schema.json",
+  "title": "Noema price catalog (prices.yaml)",
+  "description": "A versioned price catalog (IMPL-019, spec-05 §2). `noema-admin prices import` stores a valid file as the next platform.price_catalog version; a config pins it with platform.cost.prices_ref: db:<version>.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "entries"],
+  "properties": {
+    "version": { "const": 1, "description": "File format version." },
+    "entries": { "type": "array", "items": { "$ref": "#/$defs/Entry" } }
+  },
+  "$defs": {
+    "Price": {
+      "type": "string",
+      "pattern": "^(TBD|(0|[1-9][0-9]{0,8})(\\.[0-9]{1,12})?)$",
+      "description": "USD per million tokens as a decimal string, or TBD (prices at 0 with cost_estimated)."
+    },
+    "Entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "region", "effective_from", "usd_per_mtok"],
+      "properties": {
+        "model": { "type": "string", "minLength": 1, "description": "Bedrock model id, or a models.<alias>.price_ref value." },
+        "region": { "type": "string", "pattern": "^[a-z]{2}-[a-z]+-[0-9]$" },
+        "tier": { "const": "on_demand", "default": "on_demand", "description": "Phase 1: on_demand only." },
+        "effective_from": { "type": "string", "format": "date" },
+        "usd_per_mtok": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input", "output"],
+          "properties": {
+            "input": { "$ref": "#/$defs/Price" },
+            "output": { "$ref": "#/$defs/Price" },
+            "cache_read": { "$ref": "#/$defs/Price" },
+            "cache_write_5m": { "$ref": "#/$defs/Price" },
+            "cache_write_1h": { "$ref": "#/$defs/Price" }
+          }
+        }
+      }
+    }
+  }
+}

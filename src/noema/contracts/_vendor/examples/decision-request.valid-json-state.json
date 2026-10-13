@@ -1,0 +1,45 @@
+{
+  "profile": "router-default",
+  "input": {
+    "order_id": "A-17",
+    "events": [
+      "delivered",
+      "charged",
+      "charged"
+    ]
+  },
+  "questions": [
+    {
+      "type": "choice",
+      "name": "department",
+      "instructions": "Which team should handle this message?",
+      "choices": [
+        {
+          "value": "billing",
+          "description": "Payments, refunds, invoices"
+        },
+        {
+          "value": "technical",
+          "description": "Bugs and errors"
+        },
+        {
+          "value": "shipping",
+          "description": "Delivery problems"
+        },
+        {
+          "value": "other",
+          "description": null
+        }
+      ]
+    },
+    {
+      "type": "predicate",
+      "name": "needs_human",
+      "instructions": "The customer explicitly asks to speak with a human.",
+      "criteria": {
+        "true": "Asks for a person, agent or call back",
+        "false": "No such request"
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "alias": "luna-6",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "verification_member",
+  "e2e_ms": 726,
+  "effort": "none",
+  "estimated_input_tokens": 575,
+  "estimated_input_tokens_chars4": 572,
+  "input_chars": 2285,
+  "latency_ms": 726,
+  "logprob_tokens": null,
+  "max_tokens": 88,
+  "model_id": "us.openai.gpt-6-luna",
+  "n": 5,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race",
+  "test_call": 5,
+  "text_chars": 19,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 518,
+    "output_tokens": 17,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "metrics.latencyMs:int",
+      "output.message.content[].text:str",
+      "output.message.role:str",
+      "stopReason:str",
+      "usage.cacheReadInputTokens:int",
+      "usage.cacheWriteInputTokens:int",
+      "usage.inputTokens:int",
+      "usage.outputTokens:int",
+      "usage.totalTokens:int"
+    ],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": false,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date"
+      ]
+    }
+  }
+}

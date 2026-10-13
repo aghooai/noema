@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "id": "ses_3",
+        "created_at": 1791633603,
+        "last_seq": 0,
+        "data_class": "internal",
+        "retention": {
+          "policy": "default",
+          "expires_at": null
+        },
+        "metadata": {
+          "app": "support"
+        }
+      },
+      {
+        "id": "ses_2",
+        "created_at": 1791633602,
+        "last_seq": 0,
+        "data_class": "internal",
+        "retention": {
+          "policy": "default",
+          "expires_at": null
+        },
+        "metadata": {
+          "app": "support"
+        }
+      }
+    ],
+    "has_more": true,
+    "next_cursor": "c2"
+  }
+}

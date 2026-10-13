@@ -1,0 +1,66 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "text/event-stream",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "frames": [
+    {
+      "id": "1",
+      "event": "file.updated",
+      "data": {
+        "id": "file_1",
+        "filename": "invoice.pdf",
+        "media_type": "application/pdf",
+        "bytes": 48213,
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "status": "quarantined",
+        "derivatives": []
+      }
+    },
+    {
+      "id": "2",
+      "event": "file.updated",
+      "data": {
+        "id": "file_1",
+        "filename": "invoice.pdf",
+        "media_type": "application/pdf",
+        "bytes": 48213,
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "status": "processing",
+        "derivatives": [
+          {
+            "kind": "markdown",
+            "id": "der_1",
+            "status": "pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3",
+      "event": "file.updated",
+      "data": {
+        "id": "file_1",
+        "filename": "invoice.pdf",
+        "media_type": "application/pdf",
+        "bytes": 48213,
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "status": "ready",
+        "derivatives": [
+          {
+            "kind": "markdown",
+            "id": "der_1",
+            "status": "ready"
+          },
+          {
+            "kind": "page_images",
+            "id": "der_2",
+            "status": "ready",
+            "pages": 2
+          }
+        ]
+      }
+    }
+  ]
+}

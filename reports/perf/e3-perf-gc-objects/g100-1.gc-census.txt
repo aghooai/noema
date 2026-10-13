@@ -1,0 +1,53 @@
+== step 0: streams/pod 100 n 4310 tps 14.37 | TTFT ovh p50 9.57 [9.52, 9.61] p95 14.49 [14.07, 14.73] p99 22.4 | e2e p50/p95 16.2/24.7 | lag p99/p99.9/max 4.6/6.6/61 | cpu 0.634 cores = 44.1 ms/turn | valid True (mock lag 0.965, hb 1.0) | load 5.41 | rss 567.6 | errors {}
+   api-0: gen2 n=7 every 42.86 s p50 23.9 p99 30.4 max 30.5 ms; gen1 n=719 p50 1.55 ms; gen0 n=7901; GC 1.1% of wall
+   api-1: gen2 n=7 every 42.86 s p50 25.6 p99 30.4 max 30.6 ms; gen1 n=721 p50 1.57 ms; gen0 n=7931; GC 1.2% of wall
+   pod: gen2 p50 25.3 p99 30.6 max 30.6 ms (n=14)
+   census tracked per process at step end: [67871, 64559]
+== step 1: streams/pod 200 n 12989 tps 28.86 | TTFT ovh p50 12.72 [12.65, 12.80] p95 23.67 [23.26, 24.26] p99 48.8 | e2e p50/p95 22.8/47.0 | lag p99/p99.9/max 6.9/11.3/95 | cpu 1.217 cores = 42.2 ms/turn | valid True (mock lag 1.212, hb 1.0) | load 5.67 | rss 812.9 | errors {}
+   api-0: gen2 n=22 every 20.45 s p50 62.9 p99 76.5 max 77.0 ms; gen1 n=2229 p50 2.69 ms; gen0 n=24519; GC 3.6% of wall
+   api-1: gen2 n=20 every 22.50 s p50 60.4 p99 83.6 max 86.3 ms; gen1 n=2036 p50 2.96 ms; gen0 n=22391; GC 3.5% of wall
+   pod: gen2 p50 62.0 p99 82.5 max 86.3 ms (n=42)
+   census tracked per process at step end: [137738, 124147]
+tracked objects per live turn (steps 0->1, 50 more live turns per process): [1397, 1192]
+
+live tracked over the pod: 122791 -> 252243 (garbage at the census 9639 -> 9642); per live turn 1295
+   115.8  list
+   104.3  dict
+    98.0  tuple
+    93.0  coroutine
+    87.4  cell
+    64.3  set
+    61.8  method
+    49.0  _TurnLog
+    49.0  Event
+    39.3  deque
+    39.3  TextBlock
+    36.9  Context
+    32.3  function
+    28.7  ReferenceType
+    26.9  CancelScope
+    24.2  OptionSpec
+    17.2  Message
+    14.2  builtin_function_or_method
+    12.3  Future
+    12.2  TaskState
+    12.2  Task
+    12.2  FutureIter
+    11.2  TaskHandle
+     9.9  generator
+     8.8  HistoryTurn
+     8.2  TaskGroup
+     7.0  UVTimer
+     7.0  TimerHandle
+     7.0  CompiledQuestion
+     7.0  hamt_bitmap_node
+     7.0  hamt
+     6.8  AnswerSummary
+     5.8  UsageRecord
+     5.7  CIMultiDict
+     5.3  _AgnosticContextManager
+     4.6  _GeneratorContextManager
+     4.6  SpanHandle
+     4.6  Token
+     4.0  AsyncExitStack
+     4.0  Bucket

@@ -1,0 +1,22 @@
+{
+  "alias": "luna-6",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "decision_member",
+  "cancelled": true,
+  "e2e_ms": 990,
+  "effort": "none",
+  "estimated_input_tokens": 209,
+  "max_tokens": 100,
+  "model_id": "us.openai.gpt-6-luna",
+  "n": 6,
+  "op": "complete",
+  "test": "tests/live/test_api_live.py::test_l8_pinned_turns",
+  "test_call": 1,
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": []
+  }
+}

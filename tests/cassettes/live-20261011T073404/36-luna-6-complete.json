@@ -1,0 +1,22 @@
+{
+  "alias": "luna-6",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "verification_member",
+  "cancelled": true,
+  "e2e_ms": 1072,
+  "effort": "none",
+  "estimated_input_tokens": 388,
+  "max_tokens": 88,
+  "model_id": "us.openai.gpt-6-luna",
+  "n": 36,
+  "op": "complete",
+  "test": "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification",
+  "test_call": 20,
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": []
+  }
+}

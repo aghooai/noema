@@ -1,0 +1,43 @@
+# Load scenario L1 (spec-10 §5 "Overhead scenario"): fixed, deterministic latencies so that
+# overhead = client-observed - mock-injected is all Noema.
+# - decision members (router-default: 5 questions x 3 members = 15 calls per turn; DeepSeek on Mantle chat,
+#   Luna and Haiku on Converse): every answer after latency_ms 50, so S1 (the commit-critical quorum) is decided
+#   long before the first text and holdback_ms is 0;
+# - generation (Sol, ConverseStream): first event at 200 ms, first text at 300 ms, 400 filler tokens in 4-token
+#   chunks at 60 tokens/s (about 6.95 s per stream), every text chunk stamped «ts:<monotonic_ns>».
+# The answers mirror deploy/compose/mockbedrock/default.yaml (confident intent factual_qa, complexity moderate,
+# every predicate false 0.95), so no escalation, no verification and the decided spec equals spec0.
+scenario: load-overhead-l1
+seed: 11
+mantle_auth: bearer_short_term
+defaults:
+  latency: { fixed_ms: 0 }
+rules:
+  - match: { op: converse-stream }
+    stream:
+      first_event_ms: 200
+      first_text_ms: 300
+      reasoning: { deltas: 0 }
+      tokens: 400
+      chunk_tokens: 4
+      tokens_per_s: 60
+      stop: end_turn
+      stamp: true
+  - match: { op: chat-stream }
+    stream:
+      first_event_ms: 200
+      first_text_ms: 300
+      tokens: 400
+      chunk_tokens: 4
+      tokens_per_s: 60
+      stop: end_turn
+      stamp: true
+  - match: { prompt_contains: "primary intent" }
+    answer: { dist: { factual_qa: 0.9, chitchat: 0.05, coding: 0.05 } }
+    latency_ms: 50
+  - match: { prompt_contains: "How hard" }
+    answer: { dist: { trivial: 0.1, moderate: 0.8, hard: 0.1 } }
+    latency_ms: 50
+  - match: {}
+    answer: { dist: { "true": 0.05, "false": 0.95 } }
+    latency_ms: 50

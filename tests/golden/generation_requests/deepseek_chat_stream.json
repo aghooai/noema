@@ -1,0 +1,53 @@
+{
+  "expected": {
+    "api": "chat/completions",
+    "body": {
+      "max_tokens": 1024,
+      "messages": [
+        {
+          "content": "You are an assistant served through the Noema platform.Answer briefly.",
+          "role": "system"
+        },
+        {
+          "content": "What is the capital of France?",
+          "role": "user"
+        }
+      ],
+      "model": "deepseek.v3.2",
+      "stream": true,
+      "stream_options": {
+        "include_usage": true
+      },
+      "temperature": 0.3
+    },
+    "url": "https://bedrock-mantle.us-east-1.api.aws/v1/chat/completions"
+  },
+  "model_alias": "deepseek-3.2",
+  "name": "deepseek_chat_stream",
+  "op": "chat-stream",
+  "request": {
+    "call_kind": "generation",
+    "effort": null,
+    "logprobs": false,
+    "max_tokens": 1024,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "What is the capital of France?"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model_alias": "deepseek-3.2",
+    "retry": "default",
+    "stop": [],
+    "system": [
+      "You are an assistant served through the Noema platform.",
+      "Answer briefly."
+    ],
+    "temperature": 0.3,
+    "top_logprobs": null
+  }
+}

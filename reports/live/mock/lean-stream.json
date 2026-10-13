@@ -1,0 +1,86 @@
+{
+  "glm-5.3": {
+    "decoder": {
+      "botocore_errors": 0,
+      "botocore_extra": 0,
+      "bytes": 698,
+      "chunks": 2,
+      "equal": 5,
+      "fallback": false,
+      "messages": 5
+    },
+    "effort": "low",
+    "events": {
+      "MessageStart": 1,
+      "Stop": 1,
+      "TextDelta": 1,
+      "UsageEvent": 1
+    },
+    "marks": {
+      "e2e": 453,
+      "first_text": 453
+    },
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": true,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date",
+        "x-amz-security-token"
+      ]
+    },
+    "stop": "end_turn",
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "input_tokens": 15,
+      "output_tokens": 1,
+      "reasoning_tokens": 0,
+      "tokens_estimated": false
+    }
+  },
+  "opus-5.5": {
+    "decoder": {
+      "botocore_errors": 0,
+      "botocore_extra": 0,
+      "bytes": 699,
+      "chunks": 2,
+      "equal": 5,
+      "fallback": false,
+      "messages": 5
+    },
+    "effort": "low",
+    "events": {
+      "MessageStart": 1,
+      "Stop": 1,
+      "TextDelta": 1,
+      "UsageEvent": 1
+    },
+    "marks": {
+      "e2e": 2272,
+      "first_text": 2271
+    },
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": true,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date",
+        "x-amz-security-token"
+      ]
+    },
+    "stop": "end_turn",
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "input_tokens": 15,
+      "output_tokens": 1,
+      "reasoning_tokens": 0,
+      "tokens_estimated": false
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "alias": "luna-6",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "decision_member",
+  "e2e_ms": 998,
+  "effort": "none",
+  "error": {
+    "kind": "retryable",
+    "message": "provider timed out",
+    "provider_code": "timeout:deadline"
+  },
+  "estimated_input_tokens": 208,
+  "estimated_input_tokens_chars4": 207,
+  "input_chars": 819,
+  "max_tokens": 100,
+  "model_id": "us.openai.gpt-6-luna",
+  "n": 15,
+  "op": "complete",
+  "test": "tests/live/test_api_live.py::test_l8_pinned_turns",
+  "test_call": 8,
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": false,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date"
+      ]
+    }
+  }
+}

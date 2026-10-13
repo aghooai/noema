@@ -1,0 +1,47 @@
+# Load scenario C3 (spec-10 §3 C3, slow clients): scenarios/overhead.yaml (L1) plus one heavy stream for the turns
+# whose user text carries «c3» (tests/load/slow.py): 2,700 chunks of 4,000 characters at 30 chunks/s (90 s, ~126 KB/s
+# of SSE), the size tests/fault/test_c3_slow_clients.py uses: the server's kernel send buffer autotunes up to tcp_wmem
+# max (4 MiB on this host) before the writer's send() blocks, and only then does the 30 s too-slow timer start.
+scenario: load-slow-c3
+seed: 11
+mantle_auth: bearer_short_term
+defaults:
+  latency: { fixed_ms: 0 }
+rules:
+  - match: { op: converse-stream, prompt_contains: "«c3»" }
+    stream:
+      first_event_ms: 100
+      first_text_ms: 300
+      reasoning: { deltas: 0 }
+      tokens: 2700000
+      chunk_tokens: 1000
+      tokens_per_s: 30000
+      stop: end_turn
+  - match: { op: converse-stream }
+    stream:
+      first_event_ms: 200
+      first_text_ms: 300
+      reasoning: { deltas: 0 }
+      tokens: 400
+      chunk_tokens: 4
+      tokens_per_s: 60
+      stop: end_turn
+      stamp: true
+  - match: { op: chat-stream }
+    stream:
+      first_event_ms: 200
+      first_text_ms: 300
+      tokens: 400
+      chunk_tokens: 4
+      tokens_per_s: 60
+      stop: end_turn
+      stamp: true
+  - match: { prompt_contains: "primary intent" }
+    answer: { dist: { factual_qa: 0.9, chitchat: 0.05, coding: 0.05 } }
+    latency_ms: 50
+  - match: { prompt_contains: "How hard" }
+    answer: { dist: { trivial: 0.1, moderate: 0.8, hard: 0.1 } }
+    latency_ms: 50
+  - match: {}
+    answer: { dist: { "true": 0.05, "false": 0.95 } }
+    latency_ms: 50

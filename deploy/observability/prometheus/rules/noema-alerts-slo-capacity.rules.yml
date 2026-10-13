@@ -1,0 +1,116 @@
+# Noema alerts: SLO burn and capacity (docs/operations/observability.md). Alert names are kebab-case and double as
+# the runbook anchors in docs/operations/runbooks.md. Severity: critical = page, warning = ticket.
+groups:
+  - name: noema-slo.alerts
+    rules:
+      # Multiwindow, multi-burn-rate alerts on the 99.9% monthly availability SLO (design 08 §7): budget 0.001;
+      # 14.4x = 2% of the month's budget in 1 h, 6x = 5% in 6 h.
+      - alert: noema-availability-slo-fast-burn
+        expr: |
+          noema:availability_errors:ratio_rate1h > (14.4 * 0.001)
+          and noema:availability_errors:ratio_rate5m > (14.4 * 0.001)
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Turn API availability budget burning at 14.4x or more
+          description: >-
+            {{ $value | humanizePercentage }} of turn requests were shed with 429 queue_timeout over the last hour
+            (the last 5 minutes agree). At this rate the 99.9% monthly error budget is spent in about 2 days. The
+            api processes are at their turn cap: add pods.
+          runbook_url: docs/operations/runbooks.md#noema-availability-slo-fast-burn
+      - alert: noema-availability-slo-slow-burn
+        expr: |
+          noema:availability_errors:ratio_rate6h > (6 * 0.001)
+          and noema:availability_errors:ratio_rate30m > (6 * 0.001)
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Turn API availability budget burning at 6x or more
+          description: >-
+            {{ $value | humanizePercentage }} of turn requests were shed with 429 queue_timeout over the last 6 hours
+            (the last 30 minutes agree). At this rate the 99.9% monthly error budget is spent in about 5 days.
+          runbook_url: docs/operations/runbooks.md#noema-availability-slo-slow-burn
+      - alert: noema-proxy-overhead-high
+        expr: noema:proxy_overhead_seconds:mean5m > 0.025
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Gateway overhead above 25 ms for 10 minutes
+          description: >-
+            Mean TTFT minus mean model first text (holdback turns) is {{ $value | humanizeDuration }}, above the
+            25 ms p95 overhead SLO (design 08 §7). The proxy over-reads: it also counts the holdback wait for the
+            decision, spec restarts and failovers. Check event-loop lag, pod CPU, decision latency and fallbacks.
+          runbook_url: docs/operations/runbooks.md#noema-proxy-overhead-high
+      # A ticket, not a page, until a gateway-overhead histogram exists: the mean proxy includes the designed
+      # holdback wait (up to the router's 1,000 ms deadline) and spec-restart time, so it over-reads.
+      - alert: noema-overhead-slo-burn
+        expr: |
+          noema:proxy_overhead_seconds:mean1h > 0.025
+          and noema:proxy_overhead_seconds:mean5m > 0.025
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Gateway overhead above the 25 ms SLO for the last hour
+          description: >-
+            The 1-hour mean overhead proxy is {{ $value | humanizeDuration }} and the last 5 minutes agree: the
+            proxy-overhead SLO (p95 <= 25 ms, design 08 §7) may be missed for a sustained period. The proxy also
+            counts holdback waits and spec restarts, so rule out slow decisions first.
+          runbook_url: docs/operations/runbooks.md#noema-overhead-slo-burn
+
+  - name: noema-capacity.alerts
+    rules:
+      # Scale signals and alarms of reports/perf/sizing.md §5 (Wave F image: knee 125 streams per pod, planned 100).
+      - alert: noema-pod-streams-high
+        expr: noema:pod_turn_slots_held:sum > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.pod }} holds more than 100 concurrent streams"
+          description: >-
+            {{ $labels.pod }} holds {{ $value }} turn slots (both api processes). Pods are planned at 100 streams,
+            80% of the measured 125-stream knee (reports/perf/sizing.md §5); past the knee the TTFT overhead p50
+            exceeds 10 ms. Scale out.
+          runbook_url: docs/operations/runbooks.md#noema-pod-streams-high
+      - alert: noema-pod-cpu-high
+        expr: noema:pod_cpu_cores:rate5m > 0.62
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.pod }} uses more than 0.62 vCPU"
+          description: >-
+            {{ $labels.pod }} uses {{ $value | printf "%.2f" }} cores. 0.62 vCPU = 100 streams x ~6.2 millicores per
+            stream at the L1 workload (reports/perf/sizing.md §5); the ratio is workload-dependent. Scale out.
+          runbook_url: docs/operations/runbooks.md#noema-pod-cpu-high
+      - alert: noema-event-loop-lag-high
+        expr: noema:pod_event_loop_lag_seconds:p99_5m > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.pod }} event-loop lag p99 above 50 ms"
+          description: >-
+            The worst api process of {{ $labels.pod }} has an event-loop lag p99 of {{ $value | humanizeDuration }}
+            over 5 minutes (C2 bound 50 ms; 4.0-4.1 ms at the knee, reports/perf/sizing.md §6). Every stream on that
+            process is delayed: the pod is under-provisioned.
+          runbook_url: docs/operations/runbooks.md#noema-event-loop-lag-high
+      # A counter is exported only after its first add, and increase() cannot count the step from absent to that
+      # first value: the second clause fires while a series is younger than 5 minutes (the "any increase" alerts).
+      - alert: noema-turns-shed
+        expr: |
+          sum by (pod) (increase(aghoo_turns_shed_total[5m])) > 0
+          or sum by (pod) (aghoo_turns_shed_total unless increase(aghoo_turns_shed_total[1h] offset 5m)) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.pod }} is shedding requests at the per-process turn cap"
+          description: >-
+            {{ $labels.pod }} answered {{ $value | printf "%.0f" }} requests with 429 queue_timeout in 5 minutes
+            (NOEMA_MAX_TURNS_PER_PROCESS reached). Any shed means a process is at its cap: under-provisioned
+            (reports/perf/sizing.md §5), or one tenant is flooding.
+          runbook_url: docs/operations/runbooks.md#noema-turns-shed

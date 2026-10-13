@@ -1,0 +1,50 @@
+{
+  "model": "aghoo/router-default",
+  "safety_identifier": "user-7f3a",
+  "input": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "input_text",
+          "text": "What does this screenshot show?"
+        },
+        {
+          "type": "input_image",
+          "image_url": "https://example.com/shot.png"
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "type": "score",
+      "instructions": "How severe is this?",
+      "levels": [
+        {
+          "label": "Cosmetic"
+        },
+        {
+          "label": "Workaround available"
+        },
+        {
+          "label": "Fully blocked"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "name": "regression",
+      "instructions": "Is this a regression?",
+      "choices": [
+        {
+          "value": true,
+          "description": null
+        },
+        {
+          "value": false
+        }
+      ]
+    }
+  ]
+}

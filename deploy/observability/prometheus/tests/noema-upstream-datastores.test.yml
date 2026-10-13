@@ -1,0 +1,254 @@
+# promtool test rules: upstream, cost, attempt, outbox-backlog and datastore alerts, a firing and a non-firing case
+# each (make observability-check).
+rule_files:
+  - ../rules/noema-recording.rules.yml
+  - ../rules/noema-alerts-upstream-ops.rules.yml
+evaluation_interval: 1m
+
+tests:
+  # Throttling: t_acme is throttled 3 times a minute on Sol for 20 minutes; t_beta's counter is flat.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_bedrock_throttles_total{tenant="t_acme",model="gpt-6.1-sol"}'
+        values: '0+3x30'
+      - series: 'aghoo_bedrock_throttles_total{tenant="t_beta",model="gpt-6.1-sol"}'
+        values: '5x30'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: noema-bedrock-throttling
+        exp_alerts: []
+      - eval_time: 20m
+        alertname: noema-bedrock-throttling
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              tenant: t_acme
+              model: gpt-6.1-sol
+            exp_annotations:
+              summary: "Bedrock throttles tenant t_acme on gpt-6.1-sol"
+              description: >-
+                Bedrock returned 0.050 ThrottlingException/s for tenant t_acme on gpt-6.1-sol over 10 minutes.
+                Admission should throttle before Bedrock does (C1: 0 upstream throttles), so the configured model
+                quota is above the account's real quota.
+              runbook_url: docs/operations/runbooks.md#noema-bedrock-throttling
+
+  # Cost per turn: 5 + 1 USD of generation and decision lines per 100 turns = 0.06 USD; cache_savings is not spent.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_cost_usd_total{tenant="t_acme",line="generation"}'
+        values: '0+5x90'
+      - series: 'aghoo_cost_usd_total{tenant="t_acme",line="decision"}'
+        values: '0+1x90'
+      - series: 'aghoo_cost_usd_total{tenant="t_acme",line="cache_savings"}'
+        values: '0+50x90'
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+100x90'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: noema-cost-per-turn-high
+        exp_alerts: []
+      - eval_time: 80m
+        alertname: noema-cost-per-turn-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Recorded cost per turn above budget
+              description: >-
+                Turns cost 0.0600 USD on average over the last hour (decision, generation, verification and waste
+                lines), above the 0.05 USD budget set in this rule (design 08 §7).
+              runbook_url: docs/operations/runbooks.md#noema-cost-per-turn-high
+
+  # 0.04 USD per turn; the labeling line is not per turn.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_cost_usd_total{tenant="t_acme",line="generation"}'
+        values: '0+4x90'
+      - series: 'aghoo_cost_usd_total{tenant="t_acme",line="labeling"}'
+        values: '0+20x90'
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="sol-fast",model="sol",strategy="holdback"}'
+        values: '0+100x90'
+    alert_rule_test:
+      - eval_time: 80m
+        alertname: noema-cost-per-turn-high
+        exp_alerts: []
+
+  # Stuck attempts: api-a's first two (the counter appears with them, at 20m) fire; api-b's flat counter does not.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_stuck_attempts_total{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '_x20 2x5'
+      - series: 'aghoo_stuck_attempts_total{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '3x25'
+    alert_rule_test:
+      - eval_time: 18m
+        alertname: noema-stuck-attempts
+        exp_alerts: []
+      - eval_time: 22m
+        alertname: noema-stuck-attempts
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pod: api-a
+            exp_annotations:
+              summary: "api-a left generation attempts non-terminal"
+              description: >-
+                2 attempts on api-a were still running when their turn exited and were marked cancelled(deadline)
+                with estimated usage (spec-11 §6 watchdog; the C4 soak gate expects 0).
+              runbook_url: docs/operations/runbooks.md#noema-stuck-attempts
+
+  # Memory backlog: api-a holds 5 records for 10 minutes; api-b's deque drains to 0 every other minute.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_outbox_backlog{job="noema-api",pod="api-a",instance="10.0.0.1:9464",sink="memory"}'
+        values: '5x15'
+      - series: 'aghoo_outbox_backlog{job="noema-api",pod="api-b",instance="10.0.0.2:9464",sink="memory"}'
+        values: '0 3 0 3 0 3 0 3 0 3 0 3 0 3 0 3'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: noema-outbox-memory-backlog
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              pod: api-a
+            exp_annotations:
+              summary: "api-a holds outbox records in memory only"
+              description: >-
+                At least 5 records stayed in the in-process deque for 5 minutes: Postgres and Redis are both
+                unreachable from api-a (spec-11 §3). They are lost if the process stops.
+              runbook_url: docs/operations/runbooks.md#noema-outbox-memory-backlog
+
+  # Redis backlog: 20 records wait in the Redis streams for 20 minutes ...
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_outbox_backlog{job="noema-api",pod="api-a",instance="10.0.0.1:9464",sink="redis"}'
+        values: '20x30'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-outbox-redis-backlog
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Outbox records waiting in Redis for 15 minutes
+              description: >-
+                At least 20 records waited in the Redis outbox streams for 15 minutes: Postgres is down or rejects
+                them. A record dead-letters (ops.outbox_dead, ERROR log) after 10 deliveries.
+              runbook_url: docs/operations/runbooks.md#noema-outbox-redis-backlog
+
+  # ... a drainer that empties the streams every other minute does not fire (nor does the memory sink).
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_outbox_backlog{job="noema-api",pod="api-a",instance="10.0.0.1:9464",sink="redis"}'
+        values: '0 8 0 8 0 8 0 8 0 8 0 8 0 8 0 8 0 8 0 8 0'
+      - series: 'aghoo_outbox_backlog{job="noema-api",pod="api-a",instance="10.0.0.1:9464",sink="memory"}'
+        values: '9x20'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-outbox-redis-backlog
+        exp_alerts: []
+
+  # Postgres unit of work in (25, 50] ms: p95 48.75 ms ...
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_db_command_seconds_bucket{job="noema-api",pod="api-a",pool="app",le="0.025"}'
+        values: '0x30'
+      - series: 'aghoo_db_command_seconds_bucket{job="noema-api",pod="api-a",pool="app",le="0.05"}'
+        values: '0+16x30'
+      - series: 'aghoo_db_command_seconds_bucket{job="noema-api",pod="api-a",pool="app",le="+Inf"}'
+        values: '0+16x30'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: noema-postgres-latency-high
+        exp_alerts: []
+      - eval_time: 20m
+        alertname: noema-postgres-latency-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pool: app
+            exp_annotations:
+              summary: "Postgres unit of work p95 above 20 ms (app)"
+              description: >-
+                A unit of work (acquire to release) takes 48.75ms at p95 (design 08 §9 Postgres scale signal:
+                p95 > 20 ms; E3 mean 2.3-5.1 ms, reports/perf/sizing.md §3). It is on the ingress path.
+              runbook_url: docs/operations/runbooks.md#noema-postgres-latency-high
+
+  # ... in (5, 10] ms (p95 9.75 ms) it does not fire.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_db_command_seconds_bucket{job="noema-api",pod="api-a",pool="app",le="0.005"}'
+        values: '0x30'
+      - series: 'aghoo_db_command_seconds_bucket{job="noema-api",pod="api-a",pool="app",le="0.01"}'
+        values: '0+16x30'
+      - series: 'aghoo_db_command_seconds_bucket{job="noema-api",pod="api-a",pool="app",le="+Inf"}'
+        values: '0+16x30'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-postgres-latency-high
+        exp_alerts: []
+
+  # Redis pool: api-a has 240 of 256 connections checked out, api-b 7.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_redis_pool_in_use{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '240x15'
+      - series: 'aghoo_redis_pool_size{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '256x15'
+      - series: 'aghoo_redis_pool_in_use{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '7x15'
+      - series: 'aghoo_redis_pool_size{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '256x15'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: noema-redis-pool-saturated
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: noema-redis-pool-saturated
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pod: api-a
+            exp_annotations:
+              summary: "api-a Redis pool at 90% or more"
+              description: >-
+                A process of api-a had 93.75% of its bounded Redis pool checked out on average over 5 minutes (5-7
+                of 256 in use in E3, reports/perf/sizing.md §3).
+              runbook_url: docs/operations/runbooks.md#noema-redis-pool-saturated
+
+  # Redis commands in (50, 100] ms: p99 99.5 ms ...
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_redis_command_seconds_bucket{job="noema-api",pod="api-a",command="GET",le="0.05"}'
+        values: '0x30'
+      - series: 'aghoo_redis_command_seconds_bucket{job="noema-api",pod="api-a",command="GET",le="0.1"}'
+        values: '0+16x30'
+      - series: 'aghoo_redis_command_seconds_bucket{job="noema-api",pod="api-a",command="GET",le="+Inf"}'
+        values: '0+16x30'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: noema-redis-latency-high
+        exp_alerts: []
+      - eval_time: 20m
+        alertname: noema-redis-latency-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Redis command p99 above 50 ms
+              description: >-
+                Redis commands take 99.5ms at p99; at 50 ms admission treats Redis as down and falls back to the
+                local buckets (spec-11 §1.2). E3 mean 0.29-0.85 ms (reports/perf/sizing.md §3).
+              runbook_url: docs/operations/runbooks.md#noema-redis-latency-high
+
+  # ... within 5 ms they do not.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_redis_command_seconds_bucket{job="noema-api",pod="api-a",command="GET",le="0.005"}'
+        values: '0+16x30'
+      - series: 'aghoo_redis_command_seconds_bucket{job="noema-api",pod="api-a",command="GET",le="+Inf"}'
+        values: '0+16x30'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-redis-latency-high
+        exp_alerts: []

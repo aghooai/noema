@@ -1,0 +1,45 @@
+{
+  "alias": "haiku-5.5",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "decision_member",
+  "e2e_ms": 738,
+  "effort": "low",
+  "estimated_input_tokens": 288,
+  "latency_ms": 737,
+  "logprob_tokens": null,
+  "max_tokens": 256,
+  "model_id": "us.anthropic.claude-haiku-5-5",
+  "n": 22,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_api_live.py::test_l6_router_default_one_question",
+  "test_call": 4,
+  "text_chars": 32,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 212,
+    "output_tokens": 8,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "metrics.latencyMs:int",
+      "output.message.content[].text:str",
+      "output.message.role:str",
+      "stopReason:str",
+      "usage.cacheReadInputTokens:int",
+      "usage.cacheWriteInputTokens:int",
+      "usage.inputTokens:int",
+      "usage.outputTokens:int",
+      "usage.totalTokens:int"
+    ]
+  }
+}

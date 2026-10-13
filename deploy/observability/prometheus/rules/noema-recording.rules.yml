@@ -1,0 +1,92 @@
+# Noema recording rules (docs/operations/observability.md). Names follow level:metric:operation.
+# Scrape contract: one target per process (each api worker serves its own /metrics port, spec-05 §5), every target
+# labelled `pod` (the Kubernetes pod name) and `job` (noema-api | noema-jobs | noema-media-worker); one Noema
+# deployment per Prometheus. Every aghoo_* name is in src/noema/telemetry/registry.py
+# (tests/unit/observability/test_metric_refs.py).
+groups:
+  - name: noema-slo.rules
+    rules:
+      # Availability SLI (proxy, design 08 §7 SLO 99.9%): requests shed at the per-process cap (429 queue_timeout;
+      # createTurn, createDecision and the facade) over turns that ran plus sheds. 5xx and failed turns are not
+      # exported, so they are not counted (observability.md "Gaps").
+      - record: noema:availability_errors:ratio_rate5m
+        expr: |
+          (sum(rate(aghoo_turns_shed_total[5m])) or vector(0))
+          / ((sum(rate(aghoo_e2e_seconds_count[5m])) or vector(0)) + (sum(rate(aghoo_turns_shed_total[5m])) or vector(0)))
+      - record: noema:availability_errors:ratio_rate30m
+        expr: |
+          (sum(rate(aghoo_turns_shed_total[30m])) or vector(0))
+          / ((sum(rate(aghoo_e2e_seconds_count[30m])) or vector(0)) + (sum(rate(aghoo_turns_shed_total[30m])) or vector(0)))
+      - record: noema:availability_errors:ratio_rate1h
+        expr: |
+          (sum(rate(aghoo_turns_shed_total[1h])) or vector(0))
+          / ((sum(rate(aghoo_e2e_seconds_count[1h])) or vector(0)) + (sum(rate(aghoo_turns_shed_total[1h])) or vector(0)))
+      - record: noema:availability_errors:ratio_rate6h
+        expr: |
+          (sum(rate(aghoo_turns_shed_total[6h])) or vector(0))
+          / ((sum(rate(aghoo_e2e_seconds_count[6h])) or vector(0)) + (sum(rate(aghoo_turns_shed_total[6h])) or vector(0)))
+      # Proxy-overhead proxy (design 08 §7 SLO p95 <= 25 ms): mean TTFT (ingress -> first delta) minus mean model
+      # first text (attempt start -> first answer text), holdback turns only (a gate turn starts generating after
+      # its decision). A mean, not a p95; it also counts holdback and pre-commit failover time.
+      - record: noema:proxy_overhead_seconds:mean5m
+        expr: |
+          sum(rate(aghoo_ttft_seconds_sum{strategy="holdback"}[5m])) / sum(rate(aghoo_ttft_seconds_count{strategy="holdback"}[5m]))
+          - sum(rate(aghoo_first_answer_seconds_sum{strategy="holdback"}[5m])) / sum(rate(aghoo_first_answer_seconds_count{strategy="holdback"}[5m]))
+      - record: noema:proxy_overhead_seconds:mean1h
+        expr: |
+          sum(rate(aghoo_ttft_seconds_sum{strategy="holdback"}[1h])) / sum(rate(aghoo_ttft_seconds_count{strategy="holdback"}[1h]))
+          - sum(rate(aghoo_first_answer_seconds_sum{strategy="holdback"}[1h])) / sum(rate(aghoo_first_answer_seconds_count{strategy="holdback"}[1h]))
+
+  - name: noema-capacity.rules
+    rules:
+      # Concurrent streams per pod (reports/perf/sizing.md §5): the per-process TurnSlots.held gauge summed per pod.
+      - record: noema:pod_turn_slots_held:sum
+        expr: sum by (pod) (aghoo_turn_slots_held)
+      # Pod CPU in cores (cAdvisor), restricted to the pods that run Noema api processes.
+      - record: noema:pod_cpu_cores:rate5m
+        expr: |
+          sum by (pod) (rate(container_cpu_usage_seconds_total{container!="", container!="POD"}[5m]))
+          and on (pod) group by (pod) (aghoo_event_loop_lag_seconds{job="noema-api"})
+      # Event-loop lag p99 per pod: the 0.5 s sampler's gauge (composition.LOOP_LAG_EVERY_S) as scraped, worst process.
+      - record: noema:pod_event_loop_lag_seconds:p99_5m
+        expr: max by (pod) (quantile_over_time(0.99, aghoo_event_loop_lag_seconds{job="noema-api"}[5m]))
+
+  - name: noema-decisions.rules
+    rules:
+      # Time until quorum on every commit-critical question, per decision profile.
+      - record: noema:decision_quorum_seconds:p95_10m
+        expr: histogram_quantile(0.95, sum by (profile, le) (rate(aghoo_decision_quorum_reached_seconds_bucket[10m])))
+      # spec_changed restarts per turn.
+      - record: noema:spec_restart_ratio:rate1h
+        expr: sum(rate(aghoo_spec_restarts_total[1h])) / sum(rate(aghoo_e2e_seconds_count[1h]))
+      # Member parse errors per member result; `member` is the member's model alias on both counters.
+      - record: noema:member_parse_error_ratio:rate30m
+        expr: |
+          (sum by (member) (rate(aghoo_decision_parse_errors_total[30m])) or sum by (member) (rate(aghoo_decision_member_status_total[30m])) * 0)
+          / sum by (member) (rate(aghoo_decision_member_status_total[30m]))
+
+  - name: noema-cost.rules
+    rules:
+      # Recorded USD per turn: spent lines only (cache_savings is avoided cost; labeling is not per turn). Includes
+      # /v1/decisions decision lines.
+      - record: noema:cost_usd_per_turn:rate1h
+        expr: |
+          sum(rate(aghoo_cost_usd_total{line=~"decision|generation|verification|waste"}[1h]))
+          / sum(rate(aghoo_e2e_seconds_count[1h]))
+
+  - name: noema-datastores.rules
+    rules:
+      # Pool utilisation per process (gauges sampled every 1 s, composition.POOL_GAUGES_EVERY_S).
+      - record: noema:db_pool_utilization:avg5m
+        expr: avg_over_time(aghoo_db_pool_in_use[5m]) / avg_over_time(aghoo_db_pool_size[5m])
+      - record: noema:redis_pool_utilization:avg5m
+        expr: avg_over_time(aghoo_redis_pool_in_use[5m]) / avg_over_time(aghoo_redis_pool_size[5m])
+      # Latency (histograms sampled 1 in 16: quantiles hold, rates are 1/16 of the real counts).
+      - record: noema:db_command_seconds:p95_5m
+        expr: histogram_quantile(0.95, sum by (pool, le) (rate(aghoo_db_command_seconds_bucket[5m])))
+      - record: noema:db_pool_acquire_seconds:p95_5m
+        expr: histogram_quantile(0.95, sum by (pool, le) (rate(aghoo_db_pool_acquire_seconds_bucket[5m])))
+      - record: noema:redis_command_seconds:p99_5m
+        expr: histogram_quantile(0.99, sum by (le) (rate(aghoo_redis_command_seconds_bucket[5m])))
+      - record: noema:redis_pool_acquire_seconds:p95_5m
+        expr: histogram_quantile(0.95, sum by (le) (rate(aghoo_redis_pool_acquire_seconds_bucket[5m])))

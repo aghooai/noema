@@ -1,0 +1,9 @@
+{
+  "id": "T-COND-1",
+  "spec": "spec-04 §5.2, §13 (IMPL-014)",
+  "template": "decision-conditioning@1",
+  "answer_mode": "cover_top2_and_clarify",
+  "summary": "intent shipping≈45% vs billing≈35%, low confidence; cover both + clarify",
+  "block": "<decision_context origin=\"platform\" v=\"1\">\nintent: \"shipping\" (≈45%) or \"billing\" (≈35%) — uncalibrated, confidence low\nguidance: The request is ambiguous between the top two options listed above. Address both briefly, then ask one clarifying question.\n</decision_context>",
+  "signature": "sha256:9b13327508ce4d1a709da46970c46bb838c8a981dc0c4c0c7555e8693144cb60"
+}

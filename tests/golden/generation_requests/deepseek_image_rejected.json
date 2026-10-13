@@ -1,0 +1,44 @@
+{
+  "expected": {
+    "error": "invalid_request"
+  },
+  "model_alias": "deepseek-3.2",
+  "name": "deepseek_image_rejected",
+  "op": "chat-stream",
+  "request": {
+    "call_kind": "generation",
+    "effort": null,
+    "logprobs": false,
+    "max_tokens": 1024,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "[image-1]"
+          },
+          {
+            "image": {
+              "$bytes_b64": "iVBORw0KGgoAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhc=",
+              "format": "jpeg",
+              "height": 600,
+              "width": 800
+            }
+          },
+          {
+            "text": "Describe image-1."
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model_alias": "deepseek-3.2",
+    "retry": "default",
+    "stop": [],
+    "system": [
+      "You are an assistant served through the Noema platform.",
+      "Answer briefly."
+    ],
+    "temperature": null,
+    "top_logprobs": null
+  }
+}

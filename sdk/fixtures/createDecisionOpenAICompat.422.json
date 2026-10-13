@@ -1,0 +1,21 @@
+{
+  "status": 422,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "error": {
+      "type": "capability_error",
+      "code": "unsupported_parameter",
+      "message": "this format cannot carry unresolved mass",
+      "param": "questions[0].choices",
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": false,
+      "details": {
+        "max_choices": 16,
+        "method": "hierarchical"
+      }
+    }
+  }
+}

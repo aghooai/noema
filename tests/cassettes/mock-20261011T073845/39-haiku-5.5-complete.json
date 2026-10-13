@@ -1,0 +1,22 @@
+{
+  "alias": "haiku-5.5",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "decision_member",
+  "cancelled": true,
+  "e2e_ms": 990,
+  "effort": "low",
+  "estimated_input_tokens": 225,
+  "max_tokens": 112,
+  "model_id": "us.anthropic.claude-haiku-5-5",
+  "n": 39,
+  "op": "complete",
+  "test": "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification",
+  "test_call": 17,
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": []
+  }
+}

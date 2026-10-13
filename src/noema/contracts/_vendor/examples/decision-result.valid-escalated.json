@@ -1,0 +1,214 @@
+{
+  "id": "dec_01J9ZR3T",
+  "object": "decision",
+  "created_at": 1791504300,
+  "status": "completed",
+  "answers": [
+    {
+      "type": "choice",
+      "name": "department",
+      "candidates": [
+        {
+          "value": "billing",
+          "probability": 0.6234,
+          "raw_score": 0.6233,
+          "votes": 3
+        },
+        {
+          "value": "shipping",
+          "probability": 0.2833,
+          "raw_score": 0.2833,
+          "votes": 0
+        },
+        {
+          "value": "other",
+          "probability": 0.06,
+          "raw_score": 0.06,
+          "votes": 0
+        },
+        {
+          "value": "technical",
+          "probability": 0.0333,
+          "raw_score": 0.0333,
+          "votes": 0
+        }
+      ],
+      "calibration": {
+        "status": "uncalibrated",
+        "source": "mixed",
+        "member_subset": [
+          "m1",
+          "m2",
+          "m3"
+        ]
+      },
+      "confidence": {
+        "kind": "heuristic",
+        "value": 0.4978,
+        "method": "normalized_max",
+        "band": "medium",
+        "margin": 0.34,
+        "normalized_entropy": 0.6738,
+        "agreement": 1.0,
+        "member_divergence": 0.0048
+      },
+      "quorum": {
+        "required": 3,
+        "responded": 3,
+        "refused": 0,
+        "total": 3
+      },
+      "members": [
+        {
+          "member_id": "m1",
+          "provider": "bedrock-mantle-chat",
+          "model": "deepseek.v3.2",
+          "region": "us-east-1",
+          "elicitation": "token_logprobs",
+          "input_view": "ocr_text",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 488,
+          "distribution": {
+            "billing": 0.55,
+            "technical": 0.05,
+            "shipping": 0.3,
+            "other": 0.1
+          },
+          "usage": {
+            "input_tokens": 60,
+            "output_tokens": 2,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m2",
+          "provider": "bedrock-converse",
+          "model": "us.openai.gpt-6-luna",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 883,
+          "distribution": {
+            "billing": 0.7,
+            "technical": 0.02,
+            "shipping": 0.25,
+            "other": 0.03
+          },
+          "usage": {
+            "input_tokens": 120,
+            "output_tokens": 29,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        },
+        {
+          "member_id": "m3",
+          "provider": "bedrock-converse",
+          "model": "us.anthropic.claude-haiku-5-5",
+          "region": "us-east-1",
+          "elicitation": "verbalized",
+          "input_view": "native",
+          "status": "ok",
+          "weight": 0.3333,
+          "latency_ms": 938,
+          "distribution": {
+            "billing": 0.62,
+            "technical": 0.03,
+            "shipping": 0.3,
+            "other": 0.05
+          },
+          "usage": {
+            "input_tokens": 130,
+            "output_tokens": 35,
+            "cached_input_tokens": 0,
+            "cache_write_input_tokens": 0,
+            "reasoning_tokens": 0,
+            "cost_usd": 2e-05,
+            "cost_estimated": true,
+            "tokens_estimated": false
+          }
+        }
+      ],
+      "choice": "billing"
+    }
+  ],
+  "provenance": {
+    "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+    "profile_id": "router-default",
+    "profile_version": "1",
+    "question_signature": "sha256:796f1853a9874a2e94bdc3a65f676c89cfda186e11512023914020da9f3092e2",
+    "input_digest": "hmac-sha256:6342ada01b44e302f088d50254a46043ae823d8cca430da9fd8c98ffacb54abc",
+    "input_view_signature": "sha256:268f6ae486af21c55cd50a98df6c1ca6af6d3f1f7ebbbee75ee6da268bfb9b68",
+    "option_order_seed": 1791504300,
+    "prompt_templates": {
+      "m1": "logprob-codes@2",
+      "m2": "verbalized-dist@1",
+      "m3": "verbalized-dist@1"
+    },
+    "aggregation": {
+      "method": "linear_pool"
+    },
+    "deadline_ms": 1000,
+    "quorum": {
+      "required": 3,
+      "responded": 3,
+      "refused": 0,
+      "total": 3
+    },
+    "cache": {
+      "hit": false
+    },
+    "stages": [
+      {
+        "profile_id": "router-plus",
+        "profile_version": "1",
+        "triggered_by": [
+          "confidence_below"
+        ],
+        "questions": [
+          "department"
+        ],
+        "usage": {
+          "input_tokens": 520,
+          "output_tokens": 120,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost_usd": 9e-05,
+          "cost_estimated": true,
+          "tokens_estimated": false
+        },
+        "input_view_signature": "sha256:268f6ae486af21c55cd50a98df6c1ca6af6d3f1f7ebbbee75ee6da268bfb9b68",
+        "prompt_templates": {
+          "m1": "logprob-codes@2",
+          "m2": "verbalized-dist@1",
+          "m3": "verbalized-dist@1"
+        }
+      }
+    ],
+    "started_at": "2026-10-09T00:06:00.000Z",
+    "completed_at": "2026-10-09T00:06:03.410Z"
+  },
+  "usage": {
+    "input_tokens": 850,
+    "output_tokens": 186,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "reasoning_tokens": 0,
+    "cost_usd": 0.00015,
+    "cost_estimated": true,
+    "tokens_estimated": false
+  }
+}

@@ -1,0 +1,1969 @@
+openapi: 3.1.0
+info:
+  title: AghooAI Noema API
+  version: 0.3.0
+  summary: Noema, a concurrent decision + generation proxy over Amazon Bedrock (design proposal).
+  description: |
+    Proposal-stage contract (no implementation yet). Decision objects are defined in `decision.schema.json`;
+    the OpenAI Decisions-compatible facade in `openai-compat.schema.json`. All model calls run on Amazon Bedrock
+    inside the tenant's own AWS account (decisions D1, D2). See docs/noema/07-api-user-guide.md.
+
+    API versions (`Aghoo-Version`): current and default `2026-10-01`; supported: `2026-10-01`.
+    Every error uses the `Error` envelope. Its HTTP status, `error.type` and `error.retryable` are fixed per
+    `error.code` (03 §1); `x-noema-error-codes` lists the codes an operation may return.
+    Phase 1 serves every operation here except `resumeTurnEvents`, which answers 501 `not_implemented` until Phase 2.
+  license:
+    name: Proprietary (design draft)
+    identifier: LicenseRef-Proprietary
+servers:
+  - url: https://api.aghoo.example
+    description: Placeholder host
+security:
+  - bearerAuth: []
+tags:
+  - name: turns
+    description: Smart turns (decision + generation, SSE)
+  - name: decisions
+    description: Typed ensemble decisions (JEV-style; Decisions-API-shaped)
+  - name: compat
+    description: OpenAI-compatible facades
+  - name: profiles
+    description: Discover decision and generation profiles
+  - name: sessions
+    description: Stateful conversations
+  - name: files
+    description: Uploads, validation, derivatives
+  - name: usage
+    description: Usage and cost
+  - name: admin
+    description: Read-only calibration and labeling views (W4); the rest of the admin API is Phase 2
+  - name: health
+    description: Liveness and readiness
+
+paths:
+  /v1/turns:
+    post:
+      tags: [turns]
+      operationId: createTurn
+      summary: Create a turn (decision + generation run concurrently)
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/DeadlineMs'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TurnCreateParams' }
+      x-noema-error-codes: [schema_violation, unsupported_question_type, reserved_question_name, invalid_api_key, invalid_end_user_token,
+                            permission_denied, profile_not_allowed, session_forbidden, not_found, session_not_found, idempotency_key_reused,
+                            session_conflict, session_busy, file_not_ready, file_rejected, resume_window_expired, request_too_large,
+                            image_too_large, unsupported_media_type, no_route_satisfies_constraints, no_capable_member,
+                            unsupported_parameter, feature_not_available, rpm_exceeded, tpm_exceeded, queue_timeout, budget_exhausted,
+                            internal_error, all_routes_unavailable, tenant_access_misconfigured, deadline_exceeded]
+      responses:
+        '200':
+          description: |
+            Turn result (stream=false) or an SSE stream of TurnEvent (stream=true). Errors after the stream started arrive
+            as an `error` event, followed by `turn.completed`. 410 `resume_window_expired` answers an Idempotency-Key replay
+            of a streamed turn whose event log has expired (`details.turn_id`; read the turn with getTurn).
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+            x-ratelimit-limit-requests: { $ref: '#/components/headers/RateLimitLimitRequests' }
+            x-ratelimit-remaining-requests: { $ref: '#/components/headers/RateLimitRemainingRequests' }
+            x-ratelimit-reset-requests: { $ref: '#/components/headers/RateLimitResetRequests' }
+            x-ratelimit-limit-tokens: { $ref: '#/components/headers/RateLimitLimitTokens' }
+            x-ratelimit-remaining-tokens: { $ref: '#/components/headers/RateLimitRemainingTokens' }
+            x-ratelimit-reset-tokens: { $ref: '#/components/headers/RateLimitResetTokens' }
+            x-aghoo-idempotent-replay: { $ref: '#/components/headers/IdempotentReplay' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TurnObject' }
+            text/event-stream:
+              schema: { $ref: '#/components/schemas/TurnEvent' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '504': { $ref: '#/components/responses/GatewayTimeout' }
+  /v1/turns/{turn_id}:
+    get:
+      tags: [turns]
+      operationId: getTurn
+      summary: Retrieve a stored turn
+      x-noema-roles: [tenant_admin, developer, end_user, auditor]
+      parameters:
+        - $ref: '#/components/parameters/TurnId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, not_found, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: Stored turn
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TurnObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/turns/{turn_id}/cancel:
+    post:
+      tags: [turns]
+      operationId: cancelTurn
+      summary: Cancel a running turn (final; an explicit abort, unlike a dropped connection)
+      description: |
+        Idempotent. Stops the running attempts (committed partial text is kept) and ends the stream with `turn.completed`.
+        A dropped connection is not a cancel: the turn keeps running for the resume window so the client can reattach.
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/TurnId'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, not_found, idempotency_key_reused, feature_not_available, rpm_exceeded,
+                            internal_error]
+      responses:
+        '202':
+          description: Cancellation requested, in progress, or the turn had already finished
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+            x-aghoo-idempotent-replay: { $ref: '#/components/headers/IdempotentReplay' }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [turn_id, status]
+                properties:
+                  turn_id: { type: string }
+                  status: { type: string, enum: [cancelling, cancelled, completed] }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/turns/{turn_id}/events:
+    get:
+      tags: [turns]
+      operationId: resumeTurnEvents
+      summary: Resume a turn's event stream (within the resume window; Phase 2)
+      description: Phase 1 answers every request with 501 `not_implemented`; the 200, 404 and 410 behavior below starts in Phase 2.
+      x-noema-roles: [tenant_admin, developer, end_user, auditor]
+      parameters:
+        - $ref: '#/components/parameters/TurnId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+        - name: Last-Event-ID
+          in: header
+          required: false
+          schema: { type: string }
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, not_found, resume_window_expired, feature_not_available, rpm_exceeded,
+                            internal_error, not_implemented]
+      responses:
+        '200':
+          description: SSE stream of TurnEvent after Last-Event-ID (Phase 2)
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            text/event-stream:
+              schema: { $ref: '#/components/schemas/TurnEvent' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '501': { $ref: '#/components/responses/NotImplemented' }
+
+  /v1/decisions:
+    post:
+      tags: [decisions]
+      operationId: createDecision
+      summary: Typed decision (choice / score / predicate|noul) from a Bedrock decision profile
+      description: |
+        Default output is the native DecisionResult (candidates, calibration, confidence, provenance).
+        With `output_format: "jev"` the response is a Jev-shaped JevDecisionResponse (answers keyed by name,
+        noul = P(true), probability maps, score legend, 2-decimal values). `lightweight-model-decide` = gpt-6-luna alone;
+        `router-default` = ensemble (gpt-6-luna + Claude Haiku 5.5 + DeepSeek V3.2). Without `profile`, the tenant's
+        `defaults.decision_profile` answers (`lightweight-model-decide` unless the tenant configures another, D6).
+        A choice question with more options than the profile's flat limit is answered hierarchically
+        (`choice_method: "hierarchical"`, `groups`, `unresolved_mass`; 08 §3.4); set a longer `deadline_ms` for it. With
+        `output_format: "jev"` such a question is 422 `unsupported_parameter` (permanent: the Jev shape can't carry
+        unresolved mass). If every answer is unavailable the response is 200 with `status: "partial"`, unless every member
+        failed on tenant access (503 `tenant_access_misconfigured`, `details.decision_id`).
+        Once member calls have started, the response is 200 (answers that miss the deadline are `unavailable`);
+        504 `deadline_exceeded` means `Aghoo-Deadline-Ms` expired before any member call started.
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/DeadlineMs'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: './decision.schema.json#/$defs/DecisionCreateParams' }
+      x-noema-error-codes: [schema_violation, unsupported_question_type, invalid_api_key, invalid_end_user_token, permission_denied,
+                            profile_not_allowed, not_found, session_not_found, idempotency_key_reused, file_not_ready, file_rejected,
+                            request_too_large, image_too_large, unsupported_media_type, unsupported_parameter,
+                            feature_not_available, rpm_exceeded, tpm_exceeded, queue_timeout, budget_exhausted, internal_error,
+                            all_routes_unavailable, tenant_access_misconfigured, deadline_exceeded]
+      responses:
+        '200':
+          description: Decision result (native or Jev-shaped, per output_format)
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+            x-ratelimit-limit-requests: { $ref: '#/components/headers/RateLimitLimitRequests' }
+            x-ratelimit-remaining-requests: { $ref: '#/components/headers/RateLimitRemainingRequests' }
+            x-ratelimit-reset-requests: { $ref: '#/components/headers/RateLimitResetRequests' }
+            x-ratelimit-limit-tokens: { $ref: '#/components/headers/RateLimitLimitTokens' }
+            x-ratelimit-remaining-tokens: { $ref: '#/components/headers/RateLimitRemainingTokens' }
+            x-ratelimit-reset-tokens: { $ref: '#/components/headers/RateLimitResetTokens' }
+            x-aghoo-idempotent-replay: { $ref: '#/components/headers/IdempotentReplay' }
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - { $ref: './decision.schema.json#/$defs/DecisionResult' }
+                  - { $ref: './decision.schema.json#/$defs/JevDecisionResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '504': { $ref: '#/components/responses/GatewayTimeout' }
+  /v1/decisions/{decision_id}:
+    get:
+      tags: [decisions]
+      operationId: getDecision
+      summary: Retrieve a stored decision (including late member merges)
+      x-noema-roles: [tenant_admin, developer, reviewer, end_user, auditor]
+      parameters:
+        - name: decision_id
+          in: path
+          required: true
+          schema: { type: string, pattern: '^dec_' }
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, not_found, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: Decision result
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: './decision.schema.json#/$defs/DecisionResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /openai/v1/decisions:
+    post:
+      tags: [compat]
+      operationId: createDecisionOpenAICompat
+      summary: OpenAI Decisions-compatible facade (shapes only; answered by a Bedrock decision profile)
+      description: |
+        `model` is required (OpenAI shape): `aghoo/<profile>[@version]`. A `model` that is not of that form, or a version pin
+        that is not the profile's active version, is 400 `model_not_available` (`details.allowed`). An unknown or
+        non-allowlisted profile is 403 `profile_not_allowed` (`details.allowed` lists the caller's profiles; the two cases are
+        not distinguished). A choice question that needs the hierarchical method is 422 `unsupported_parameter` (permanent:
+        this format can't carry unresolved mass). If every answer is unavailable: 503 `all_routes_unavailable` (the decision
+        is stored; `details.decision_id`). Request rules
+        that JSON Schema can't express (unique explicit names, reserved `q<digits>`, true/"true" collisions, at most 20
+        images) are 400 `schema_violation` with `param`.
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/DeadlineMs'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+        - name: x-aghoo-include
+          in: header
+          required: false
+          schema: { type: string, enum: [ensemble] }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: './openai-compat.schema.json#/$defs/OADecisionCreateParams' }
+      x-noema-error-codes: [schema_violation, model_not_available, invalid_api_key, invalid_end_user_token, permission_denied,
+                            profile_not_allowed, idempotency_key_reused, file_not_ready, file_rejected, request_too_large,
+                            image_too_large, unsupported_media_type, unsupported_parameter, feature_not_available, rpm_exceeded,
+                            tpm_exceeded, queue_timeout, budget_exhausted, internal_error, all_routes_unavailable,
+                            tenant_access_misconfigured, deadline_exceeded]
+      responses:
+        '200':
+          description: OpenAI-shaped decision response
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+            x-ratelimit-limit-requests: { $ref: '#/components/headers/RateLimitLimitRequests' }
+            x-ratelimit-remaining-requests: { $ref: '#/components/headers/RateLimitRemainingRequests' }
+            x-ratelimit-reset-requests: { $ref: '#/components/headers/RateLimitResetRequests' }
+            x-ratelimit-limit-tokens: { $ref: '#/components/headers/RateLimitLimitTokens' }
+            x-ratelimit-remaining-tokens: { $ref: '#/components/headers/RateLimitRemainingTokens' }
+            x-ratelimit-reset-tokens: { $ref: '#/components/headers/RateLimitResetTokens' }
+            x-aghoo-idempotent-replay: { $ref: '#/components/headers/IdempotentReplay' }
+          content:
+            application/json:
+              schema: { $ref: './openai-compat.schema.json#/$defs/OADecisionResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '504': { $ref: '#/components/responses/GatewayTimeout' }
+
+  /v1/profiles:
+    get:
+      tags: [profiles]
+      operationId: listProfiles
+      summary: List the decision and generation profiles the caller may select
+      description: Phase 1 omits generation profiles whose mode it doesn't serve (`best_of_n`, `fuse`).
+      x-noema-roles: [tenant_admin, developer, reviewer, end_user, auditor]
+      parameters:
+        - name: kind
+          in: query
+          required: false
+          schema: { type: string, enum: [decision, generation] }
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: Profiles after tenant allowlists
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/ProfileInfo' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /v1/sessions:
+    post:
+      tags: [sessions]
+      operationId: createSession
+      summary: Create a session
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SessionCreate' }
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, permission_denied, idempotency_key_reused,
+                            request_too_large, unsupported_media_type, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '201':
+          description: Session
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+            x-aghoo-idempotent-replay: { $ref: '#/components/headers/IdempotentReplay' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    get:
+      tags: [sessions]
+      operationId: listSessions
+      summary: List the caller's sessions (newest first)
+      x-noema-roles: [tenant_admin, developer, end_user, auditor]
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: Page of sessions
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/sessions/{session_id}:
+    get:
+      tags: [sessions]
+      operationId: getSession
+      summary: Retrieve a session
+      x-noema-roles: [tenant_admin, developer, end_user, auditor]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, session_not_found, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: Session
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    patch:
+      tags: [sessions]
+      operationId: updateSession
+      summary: Update metadata, retention or data class
+      description: Present fields replace the stored value (`metadata` replaces the whole map). A new `data_class` applies to turns created afterwards; stored content is not re-processed.
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SessionUpdate' }
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, permission_denied, session_forbidden,
+                            session_not_found, request_too_large, unsupported_media_type, feature_not_available, rpm_exceeded,
+                            internal_error]
+      responses:
+        '200':
+          description: Session
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Session' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [sessions]
+      operationId: deleteSession
+      summary: Delete a session (cascading, asynchronous)
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, permission_denied, session_forbidden, session_not_found,
+                            feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '202':
+          description: Deletion job started
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [id, deleted, deletion_job_id]
+                properties:
+                  id: { type: string }
+                  deleted: { const: true }
+                  deletion_job_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/sessions/{session_id}/turns:
+    get:
+      tags: [sessions]
+      operationId: listSessionTurns
+      summary: Authorized history (paged, oldest first)
+      x-noema-roles: [tenant_admin, developer, end_user, auditor]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, session_not_found, feature_not_available,
+                            rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: Page of history messages (each committed turn yields its user message, then its assistant message)
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionTurnList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /v1/files:
+    post:
+      tags: [files]
+      operationId: uploadFile
+      summary: Upload a file (validated and extracted asynchronously)
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      requestBody:
+        required: true
+        description: |
+          The body is streamed, and `session_id` is authorized before any byte of the file is stored: send the `purpose`
+          and `session_id` parts before the `file` part. A `session_id` part after `file` is 400 `schema_violation`
+          (`param: session_id`).
+          The `file` part's Content-Type (parameters such as `; charset` ignored) must be one of the types listed in
+          its encoding, and its filename must have one of the accepted extensions (`.png`, `.jpg`, `.jpeg`, `.webp`,
+          `.gif`, `.heic`, `.heif`, `.pdf`, `.md`, `.markdown`); otherwise the upload is 415 `unsupported_media_type`
+          before any byte is stored. A generic type such as `application/octet-stream` is 415. Type, extension and
+          content are then checked against one another asynchronously (`rejected{type_mismatch}`).
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, purpose]
+              properties:
+                file: { type: string, format: binary, description: The file bytes; Content-Type and filename as described above. }
+                purpose: { type: string, enum: [input] }
+                session_id: { type: string }
+            encoding:
+              file:
+                contentType: image/png, image/jpeg, image/webp, image/gif, image/heic, image/heif, application/pdf, text/markdown, text/plain
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, permission_denied, session_not_found,
+                            idempotency_key_reused, request_too_large, file_too_large, unsupported_media_type, feature_not_available,
+                            rpm_exceeded, internal_error]
+      responses:
+        '202':
+          description: Accepted; poll or watch for status
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+            x-aghoo-idempotent-replay: { $ref: '#/components/headers/IdempotentReplay' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FileObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/files/{file_id}:
+    get:
+      tags: [files]
+      operationId: getFile
+      summary: File status and derivatives
+      x-noema-roles: [tenant_admin, developer, end_user, auditor]
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, not_found, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: File
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FileObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [files]
+      operationId: deleteFile
+      summary: Delete a file and its derivatives
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, permission_denied, not_found, feature_not_available, rpm_exceeded,
+                            internal_error]
+      responses:
+        '200':
+          description: Deleted
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [id, deleted]
+                properties:
+                  id: { type: string }
+                  deleted: { const: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/files/{file_id}/events:
+    get:
+      tags: [files]
+      operationId: watchFile
+      summary: SSE stream of file status changes until a terminal status
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [invalid_api_key, schema_violation, invalid_end_user_token, not_found, feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: |
+            SSE stream of FileObject snapshots. Each frame is `id: <n>` (1, 2, … per stream), `event: file.updated` and one
+            line of `data: <FileObject JSON>`. The first frame is the current snapshot; the server closes the stream after the
+            first snapshot whose status is `ready`, `rejected`, `failed` or `deleted`, or `partial` with no pending derivative
+            (a `partial` file with OCR pending keeps streaming until it is `ready`). A `: ping` comment is sent whenever no
+            frame was written for 15 s.
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            text/event-stream:
+              schema: { $ref: '#/components/schemas/FileObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/files/{file_id}/derivatives/{kind}:
+    get:
+      tags: [files]
+      operationId: getFileDerivative
+      summary: Download a derivative (e.g. markdown, OCR text, a page image)
+      x-noema-roles: [tenant_admin, developer, end_user]
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - name: kind
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/DerivativeKind' }
+        - name: page
+          in: query
+          required: false
+          description: 1-based page number. Required for `page_images` (at most the derivative's `pages`); 400 `schema_violation` for any other kind.
+          schema: { type: integer, minimum: 1, maximum: 600 }
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, not_found, file_not_ready, file_rejected,
+                            feature_not_available, rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: |
+            Derivative content: `markdown` → text/markdown; `text`, `ocr_text` → text/plain; `raster`, `thumbnail`,
+            `page_images` → image/png or image/jpeg (as re-encoded); `pdf_sanitized` → application/pdf. A kind the file
+            doesn't have is 404 `not_found`; a pending derivative is 409 `file_not_ready`.
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+            content-disposition: { $ref: '#/components/headers/ContentDisposition' }
+            x-content-type-options: { $ref: '#/components/headers/ContentTypeOptions' }
+          content:
+            text/markdown:
+              schema: { type: string }
+            text/plain:
+              schema: { type: string }
+            image/png:
+              schema: { type: string, contentMediaType: image/png }
+            image/jpeg:
+              schema: { type: string, contentMediaType: image/jpeg }
+            application/pdf:
+              schema: { type: string, contentMediaType: application/pdf }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /v1/usage:
+    get:
+      tags: [usage]
+      operationId: getUsage
+      summary: Usage and cost by project, session, model, day or line
+      description: |
+        One row per (key, line) over the inclusive UTC date range, ordered by key, then line. Rows cover what the caller
+        may see (its project; the whole tenant for `tenant_admin`). `to` defaults to today (UTC) and `from` to `to` minus
+        29 days; a range longer than 366 days is 400 `schema_violation`.
+      x-noema-roles: [tenant_admin, developer, auditor]
+      parameters:
+        - name: group_by
+          in: query
+          required: false
+          schema: { type: string, enum: [project, session, model, day, line], default: line }
+        - name: from
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, permission_denied, feature_not_available,
+                            rpm_exceeded, internal_error]
+      responses:
+        '200':
+          description: Usage rows
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsageReport' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /v1/admin/calibrators:
+    get:
+      tags: [admin]
+      operationId: listCalibrators
+      summary: Calibrator artifacts with holdout metrics and reliability bins (read-only, W4)
+      description: The tenant's calibrators plus the platform-default ones that can serve it, newest first. Roles tenant_admin, reviewer and auditor; any other role is 403 `permission_denied`.
+      x-noema-roles: [tenant_admin, reviewer, auditor]
+      parameters:
+        - name: profile_id
+          in: query
+          required: false
+          schema: { type: string }
+        - name: question_name
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { $ref: '#/components/schemas/CalibratorStatus' }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, permission_denied, feature_not_available, rpm_exceeded,
+                            internal_error]
+      responses:
+        '200':
+          description: Page of calibrators
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CalibratorList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/admin/labeling/runs:
+    get:
+      tags: [admin]
+      operationId: listLabelingRuns
+      summary: LLM-consensus labeling runs with consensus rates per class (read-only, W4)
+      description: Newest first. Roles tenant_admin, reviewer and auditor; any other role is 403 `permission_denied`.
+      x-noema-roles: [tenant_admin, reviewer, auditor]
+      parameters:
+        - name: profile_id
+          in: query
+          required: false
+          schema: { type: string }
+        - name: question_name
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [running, completed, failed, cancelled] }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, permission_denied, feature_not_available, rpm_exceeded,
+                            internal_error]
+      responses:
+        '200':
+          description: Page of labeling runs
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LabelingRunList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /v1/admin/labeling/dropped:
+    get:
+      tags: [admin]
+      operationId: listLabelingDropped
+      summary: Sampled items the labelers did not agree on, with both labelers' answers (read-only, W4)
+      description: Newest first. Roles tenant_admin and reviewer; any other role is 403 `permission_denied`. `content.excerpt` is null unless the item's data class and log policy allow stored content.
+      x-noema-roles: [tenant_admin, reviewer]
+      parameters:
+        - name: run_id
+          in: query
+          required: false
+          schema: { type: string, pattern: '^lrun_' }
+        - name: question_name
+          in: query
+          required: false
+          schema: { type: string }
+        - name: reason
+          in: query
+          required: false
+          schema: { type: string, enum: [disagreed, refused, parse_error, labeler_error] }
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/After'
+        - $ref: '#/components/parameters/AghooVersion'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/EndUser'
+      x-noema-error-codes: [schema_violation, invalid_api_key, invalid_end_user_token, permission_denied, feature_not_available, rpm_exceeded,
+                            internal_error]
+      responses:
+        '200':
+          description: Page of dropped items
+          headers:
+            x-request-id: { $ref: '#/components/headers/RequestId' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LabelingDroppedList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /healthz:
+    get:
+      tags: [health]
+      operationId: healthz
+      summary: Liveness
+      security: []
+      responses:
+        '200': { description: Alive }
+        '429': { description: Probe rate limited }
+  /readyz:
+    get:
+      tags: [health]
+      operationId: readyz
+      summary: Readiness (config snapshot loaded, not draining; no body)
+      security: []
+      responses:
+        '200': { description: Ready }
+        '429': { description: Probe rate limited }
+        '503': { description: Not ready }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key (ak_<env>_<id>.<secret>) or OIDC access token. Phase 1 accepts API keys only; any other token is 401 `invalid_api_key`.
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Unique per (project, method, path) for 24 h and bound to a fingerprint of the canonical request body (03 §1).
+      schema: { type: string, minLength: 1, maxLength: 128, pattern: '^[\x21-\x7E]+$' }
+    AghooVersion:
+      name: Aghoo-Version
+      in: header
+      required: false
+      description: Pins API behavior. The enum lists the supported versions; the default is the current one. Any other value is 400 `schema_violation` (`param` = `Aghoo-Version`).
+      schema: { type: string, enum: ['2026-10-01'], default: '2026-10-01' }
+    DeadlineMs:
+      name: Aghoo-Deadline-Ms
+      in: header
+      required: false
+      description: End-to-end budget in milliseconds from request receipt (default 120000). Decision deadline and holdback are derived from it.
+      schema: { type: integer, minimum: 100, maximum: 600000, default: 120000 }
+    RequestIdHeader:
+      name: x-request-id
+      in: header
+      required: false
+      description: Client request id. A value of 1-128 characters from [A-Za-z0-9._:-] is echoed in the `x-request-id` response header and in `error.request_id`; any other value is replaced by a server id (never rejected).
+      schema: { type: string }
+    Traceparent:
+      name: traceparent
+      in: header
+      required: false
+      description: W3C Trace Context parent; the server span joins this trace. An invalid value starts a new trace (never rejected).
+      schema: { type: string }
+    Tracestate:
+      name: tracestate
+      in: header
+      required: false
+      description: W3C Trace Context vendor state, propagated with `traceparent`.
+      schema: { type: string }
+    EndUser:
+      name: x-aghoo-end-user
+      in: header
+      required: false
+      description: |
+        Signed, audience-bound end-user JWT from the project's identity provider (04 §4.2); history and sessions are then
+        scoped to that end user. An invalid, expired or wrong-audience token is 401 `invalid_end_user_token`. On a project
+        without end-user verification configured, the header is 422 `feature_not_available`.
+      schema: { type: string }
+    TurnId:
+      name: turn_id
+      in: path
+      required: true
+      schema: { type: string }
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema: { type: string, pattern: '^ses_' }
+    FileId:
+      name: file_id
+      in: path
+      required: true
+      schema: { type: string, pattern: '^file_' }
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+    After:
+      name: after
+      in: query
+      required: false
+      description: Opaque cursor from `next_cursor`. An unknown or tampered cursor is 400 `schema_violation`.
+      schema: { type: string }
+
+  headers:
+    RequestId:
+      description: Echo of a valid client `x-request-id`, else a server id (`req_<ULID>`). Equals `error.request_id`.
+      required: true
+      schema: { type: string }
+    RateLimitLimitRequests:
+      description: Requests per minute allowed by the most constraining bucket (key, end user, project or the tenant's model quota).
+      schema: { type: integer, minimum: 0 }
+    RateLimitRemainingRequests:
+      description: Requests left in that bucket.
+      schema: { type: integer, minimum: 0 }
+    RateLimitResetRequests:
+      description: Seconds (rounded up) until that bucket is full again.
+      schema: { type: integer, minimum: 0 }
+    RateLimitLimitTokens:
+      description: Tokens per minute (input estimate + reserved max_output_tokens) allowed by the most constraining token bucket.
+      schema: { type: integer, minimum: 0 }
+    RateLimitRemainingTokens:
+      description: Tokens left in that bucket after this request's reservation.
+      schema: { type: integer, minimum: 0 }
+    RateLimitResetTokens:
+      description: Seconds (rounded up) until that bucket is full again.
+      schema: { type: integer, minimum: 0 }
+    RetryAfter:
+      description: Seconds to wait before retrying (integer, at least 1). Absent when a retry cannot help (`budget_exhausted`, `tenant_access_misconfigured`).
+      schema: { type: integer, minimum: 1 }
+    IdempotentReplay:
+      description: '`true` when the response comes from an earlier request with the same Idempotency-Key (its stored response, or attached to it while in flight): no new model calls and no new billing. Absent otherwise.'
+      schema: { type: string, enum: ['true'] }
+    WwwAuthenticate:
+      description: Bearer challenge.
+      schema: { type: string }
+    ContentDisposition:
+      description: '`attachment; filename="<file_id>-<kind>[-<page>].<ext>"`. The uploaded filename is never used.'
+      schema: { type: string }
+    ContentTypeOptions:
+      description: Always `nosniff`.
+      schema: { type: string, enum: [nosniff] }
+
+  responses:
+    BadRequest:
+      description: '400 `invalid_request_error`: schema_violation, unsupported_question_type, reserved_question_name, model_not_available.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: '401 `authentication_error`: invalid_api_key, invalid_end_user_token. The presented credential is never echoed.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+        www-authenticate: { $ref: '#/components/headers/WwwAuthenticate' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: '403 `permission_error`: permission_denied, profile_not_allowed, session_forbidden.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: '404 `not_found_error`: not_found, session_not_found (also for ids of other tenants, projects or end users).'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: '409 `conflict_error`: idempotency_key_reused, session_conflict, session_busy, file_not_ready, file_rejected.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Gone:
+      description: '410 `invalid_request_error`: resume_window_expired.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    PayloadTooLarge:
+      description: '413 `invalid_request_error`: request_too_large, file_too_large, image_too_large.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    UnsupportedMediaType:
+      description: '415 `invalid_request_error`: unsupported_media_type (the request Content-Type, or an upload type outside the phase allowlist).'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unprocessable:
+      description: '422 `capability_error`: no_route_satisfies_constraints (`details.unmet`), no_capable_member, unsupported_parameter, feature_not_available (`param` names the out-of-phase field or header).'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    RateLimited:
+      description: '429 `rate_limit_error`: rpm_exceeded, tpm_exceeded, queue_timeout, budget_exhausted.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+        retry-after: { $ref: '#/components/headers/RetryAfter' }
+        x-ratelimit-limit-requests: { $ref: '#/components/headers/RateLimitLimitRequests' }
+        x-ratelimit-remaining-requests: { $ref: '#/components/headers/RateLimitRemainingRequests' }
+        x-ratelimit-reset-requests: { $ref: '#/components/headers/RateLimitResetRequests' }
+        x-ratelimit-limit-tokens: { $ref: '#/components/headers/RateLimitLimitTokens' }
+        x-ratelimit-remaining-tokens: { $ref: '#/components/headers/RateLimitRemainingTokens' }
+        x-ratelimit-reset-tokens: { $ref: '#/components/headers/RateLimitResetTokens' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    InternalError:
+      description: '500 `server_error`: internal_error (an unexpected failure; retryable).'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotImplemented:
+      description: '501 `invalid_request_error`: not_implemented (the operation is not served in this phase).'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unavailable:
+      description: '503 `upstream_error`: all_routes_unavailable (retryable), tenant_access_misconfigured (not retryable).'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+        retry-after: { $ref: '#/components/headers/RetryAfter' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    GatewayTimeout:
+      description: '504 `upstream_error`: deadline_exceeded.'
+      headers:
+        x-request-id: { $ref: '#/components/headers/RequestId' }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [type, code, message, param, request_id, retryable]
+          properties:
+            type:
+              type: string
+              enum: [invalid_request_error, authentication_error, permission_error, not_found_error, conflict_error,
+                     capability_error, rate_limit_error, upstream_error, server_error]
+            code: { $ref: '#/components/schemas/ErrorCode' }
+            message: { type: string }
+            param: { type: [string, 'null'], description: 'Offending field as a path (e.g. `questions[1].choices`) or a header name; null when no single field is at fault.' }
+            request_id: { type: string }
+            retryable: { type: boolean }
+            details: { type: object }
+    ErrorCode:
+      type: string
+      description: 'Each code has one HTTP status, `error.type` and `retryable` value (03 §1). `upstream_stalled` and `client_too_slow` occur only as SSE `error` events.'
+      enum: [schema_violation, unsupported_question_type, reserved_question_name, unsupported_parameter, model_not_available, profile_not_allowed,
+             invalid_api_key, session_forbidden, session_not_found, idempotency_key_reused, file_not_ready, file_rejected,
+             file_too_large, image_too_large, unsupported_media_type, no_route_satisfies_constraints, no_capable_member,
+             rpm_exceeded, tpm_exceeded, budget_exhausted, queue_timeout, all_routes_unavailable, deadline_exceeded,
+             tenant_access_misconfigured, upstream_stalled, client_too_slow, resume_window_expired, session_conflict, session_busy,
+             not_found, permission_denied, invalid_end_user_token, request_too_large, feature_not_available, internal_error,
+             not_implemented]
+
+    Effort: { type: string, enum: [none, low, medium, high, xhigh, max] }
+    AnswerMode: { type: string, enum: [direct, cover_top2_and_clarify, clarify_first] }
+    Strategy: { type: string, enum: [gate, holdback, speculative, hedge] }
+
+    TurnCreateParams:
+      type: object
+      additionalProperties: false
+      required: [input]
+      properties:
+        session_id: { type: string, pattern: '^ses_' }
+        store: { type: boolean, default: true }
+        expected_seq:
+          type: integer
+          minimum: 0
+          description: Optimistic session ordering. The `seq` of the latest committed turn the client has seen; a different server value is 409 `session_conflict`. Without it, concurrent turns on one session are serialized (409 `session_busy` after the queue timeout).
+        stream: { type: boolean, default: true }
+        wait_for_files: { type: boolean, default: false }
+        allow_partial_files: { type: boolean, default: false }
+        retry_of: { type: string }
+        instructions: { type: string, maxLength: 100000 }
+        input:
+          type: array
+          minItems: 1
+          description: At most 64 media parts (`input_image` and `input_file`, inline or uploaded, over all items) per request; more is 400 `schema_violation` (`param` `input`, `details.max_media_parts` 64), checked before any file lookup.
+          items:
+            type: object
+            additionalProperties: false
+            required: [role, content]
+            properties:
+              role: { const: user }
+              content:
+                type: array
+                minItems: 1
+                items: { $ref: './decision.schema.json#/$defs/InputPart' }
+        decisions:
+          type: object
+          additionalProperties: false
+          properties:
+            profile: { type: string }
+            questions: { type: array, maxItems: 32, items: { $ref: './decision.schema.json#/$defs/Question' } }
+            blocking: { type: array, items: { type: string } }
+            deadline_ms: { type: integer, minimum: 100, maximum: 30000 }
+            min_quorum: { type: integer, minimum: 1 }
+            include: { type: array, items: { type: string, enum: [members, member_distributions, stages] } }
+        generation:
+          type: object
+          additionalProperties: false
+          properties:
+            profile: { type: string, description: '"auto" or a generation profile id from the allowlist. Phase 1: a `best_of_n` or `fuse` profile is 422 `feature_not_available`.' }
+            effort: { $ref: '#/components/schemas/Effort' }
+            max_output_tokens: { type: integer, minimum: 1 }
+            temperature: { type: number, minimum: 0, maximum: 2 }
+        strategy:
+          description: 'Phase 1 serves `auto`, `gate` and `holdback`; `speculative` and `hedge` are 422 `feature_not_available`.'
+          oneOf:
+            - { const: auto }
+            - { $ref: '#/components/schemas/Strategy' }
+        conditioning:
+          oneOf:
+            - { type: string, enum: [auto, 'off'] }
+            - { $ref: '#/components/schemas/AnswerMode' }
+        verify: { type: boolean }
+        history:
+          type: object
+          additionalProperties: false
+          required: [mode]
+          properties:
+            mode: { type: string, enum: [auto, none, last_n] }
+            max_tokens: { type: integer, minimum: 1 }
+            last_n: { type: integer, minimum: 1 }
+        metadata: { type: object, additionalProperties: { type: string } }
+
+    Conditioning:
+      type: object
+      additionalProperties: false
+      required: [answer_mode, signature, summary]
+      properties:
+        answer_mode: { $ref: '#/components/schemas/AnswerMode' }
+        signature: { type: string }
+        summary: { type: string }
+
+    RoutingDecision:
+      type: object
+      additionalProperties: false
+      required: [route_id, generation_profile, mode, selection, strategy, decision_id, policy_version, matched_bindings, basis, params, conditioning, served_spec_differs, reason, fallbacks]
+      properties:
+        route_id: { type: string }
+        generation_profile: { type: string }
+        mode: { type: string, enum: [single, fallback, race, best_of_n, fuse] }
+        selection: { type: string, enum: [rule, expected_utility, pinned, sticky, default, fallback] }
+        strategy: { $ref: '#/components/schemas/Strategy' }
+        decision_id: { type: [string, 'null'] }
+        policy_version: { type: string }
+        matched_bindings: { type: array, items: { type: string } }
+        basis:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [name, value, probability, margin, band, status]
+            properties:
+              name: { type: string }
+              value: { type: [string, boolean, number] }
+              probability: { type: number }
+              margin: { type: number }
+              band: { type: string, enum: [high, medium, low] }
+              status: { type: string, enum: [calibrated, provider_reported, uncalibrated] }
+        params:
+          type: object
+          additionalProperties: false
+          properties:
+            effort: { $ref: '#/components/schemas/Effort' }
+            max_output_tokens: { type: integer }
+        conditioning:
+          oneOf:
+            - { type: 'null' }
+            - { $ref: '#/components/schemas/Conditioning' }
+        served_spec_differs:
+          type: [boolean, 'null']
+          description: 'true when the served spec differs from the decided one: the answer committed on spec0 at the holdback deadline, or a pre-commit fallback to `routing.default_profile` served the turn; false when they are equal; null before a decision arrives.'
+        reason: { type: string }
+        fallbacks: { type: array, items: { type: string } }
+
+    Degradation:
+      type: object
+      additionalProperties: false
+      required: [from, to, reason]
+      properties:
+        file_id: { type: string }
+        part_index: { type: integer, minimum: 0 }
+        attempt_id: { type: string }
+        model: { type: string }
+        from: { type: string }
+        to: { type: string }
+        reason:
+          type: string
+          enum: [model_capability, size_limit, media_budget, policy, param_unsupported, active_content_removed, not_ready, extraction_failed, rejected]
+
+    TurnTimings:
+      type: object
+      additionalProperties: false
+      required: [ttft_ms, decision_ms, decision_lead_ms, holdback_ms, e2e_ms, spec_restarts, wasted_output_tokens]
+      properties:
+        ttft_ms: { type: [integer, 'null'] }
+        decision_ms: { type: [integer, 'null'] }
+        decision_lead_ms: { type: [integer, 'null'] }
+        holdback_ms: { type: [integer, 'null'] }
+        e2e_ms: { type: integer }
+        spec_restarts: { type: integer }
+        wasted_output_tokens: { type: integer }
+
+    TurnObject:
+      type: object
+      additionalProperties: false
+      required: [turn_id, session_id, seq, text, decision, routing, attempts, verification, degradations, usage, timings]
+      properties:
+        turn_id: { type: string }
+        session_id: { type: [string, 'null'] }
+        seq: { type: [integer, 'null'], description: Position in the session (null when store is false) }
+        text: { type: string }
+        decision:
+          oneOf:
+            - { type: 'null' }
+            - { $ref: './decision.schema.json#/$defs/DecisionResult' }
+        routing: { $ref: '#/components/schemas/RoutingDecision' }
+        attempts:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [attempt_id, route_id, model, outcome, usage]
+            properties:
+              attempt_id: { type: string }
+              route_id: { type: string }
+              model: { type: string }
+              outcome: { type: string, enum: [committed, cancelled, failed, not_selected] }
+              usage: { $ref: './decision.schema.json#/$defs/Usage' }
+        verification:
+          oneOf:
+            - { type: 'null' }
+            - { $ref: './decision.schema.json#/$defs/DecisionResult' }
+        degradations: { type: array, items: { $ref: '#/components/schemas/Degradation' } }
+        usage: { $ref: './decision.schema.json#/$defs/Usage' }
+        timings: { $ref: '#/components/schemas/TurnTimings' }
+
+    TurnEvent:
+      description: |
+        One SSE `data:` payload. Each frame is `id: <n>` (monotonic per turn), `event: <type>` and one line of
+        `data: <JSON>`. A `: ping` comment is sent whenever no frame was written for 15 s. Clients ignore unknown event types.
+      oneOf:
+        - { $ref: '#/components/schemas/TurnCreatedEvent' }
+        - { $ref: '#/components/schemas/PreflightCompletedEvent' }
+        - { $ref: '#/components/schemas/RouteSelectedEvent' }
+        - { $ref: '#/components/schemas/DecisionCompletedEvent' }
+        - { $ref: '#/components/schemas/DecisionUpdatedEvent' }
+        - { $ref: '#/components/schemas/RouteConfirmedEvent' }
+        - { $ref: '#/components/schemas/GenerationStartedEvent' }
+        - { $ref: '#/components/schemas/GenerationDeltaEvent' }
+        - { $ref: '#/components/schemas/GenerationCommittedEvent' }
+        - { $ref: '#/components/schemas/GenerationCancelledEvent' }
+        - { $ref: '#/components/schemas/GenerationReroutedEvent' }
+        - { $ref: '#/components/schemas/GenerationCompletedEvent' }
+        - { $ref: '#/components/schemas/TurnVerifiedEvent' }
+        - { $ref: '#/components/schemas/TurnCompletedEvent' }
+        - { $ref: '#/components/schemas/ErrorEvent' }
+      discriminator:
+        propertyName: type
+        mapping:
+          turn.created: '#/components/schemas/TurnCreatedEvent'
+          preflight.completed: '#/components/schemas/PreflightCompletedEvent'
+          route.selected: '#/components/schemas/RouteSelectedEvent'
+          decision.completed: '#/components/schemas/DecisionCompletedEvent'
+          decision.updated: '#/components/schemas/DecisionUpdatedEvent'
+          route.confirmed: '#/components/schemas/RouteConfirmedEvent'
+          generation.started: '#/components/schemas/GenerationStartedEvent'
+          generation.delta: '#/components/schemas/GenerationDeltaEvent'
+          generation.committed: '#/components/schemas/GenerationCommittedEvent'
+          generation.cancelled: '#/components/schemas/GenerationCancelledEvent'
+          generation.rerouted: '#/components/schemas/GenerationReroutedEvent'
+          generation.completed: '#/components/schemas/GenerationCompletedEvent'
+          turn.verified: '#/components/schemas/TurnVerifiedEvent'
+          turn.completed: '#/components/schemas/TurnCompletedEvent'
+          error: '#/components/schemas/ErrorEvent'
+    TurnCreatedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, turn_id, session_id, created_at]
+      properties:
+        type: { type: string, const: turn.created }
+        turn_id: { type: string }
+        session_id: { type: [string, 'null'] }
+        created_at: { type: integer }
+    PreflightCompletedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, modalities, est_input_tokens, degradations]
+      properties:
+        type: { type: string, const: preflight.completed }
+        modalities: { type: array, items: { type: string, enum: [text, image, audio, video, document] } }
+        est_input_tokens: { type: integer }
+        degradations: { type: array, items: { $ref: '#/components/schemas/Degradation' } }
+    RouteSelectedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, attempt_id, routing, speculative, degradations]
+      properties:
+        type: { type: string, const: route.selected }
+        attempt_id: { type: string }
+        routing: { $ref: '#/components/schemas/RoutingDecision' }
+        speculative: { type: boolean }
+        degradations: { type: array, items: { $ref: '#/components/schemas/Degradation' } }
+    DecisionCompletedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, decision, arrived]
+      properties:
+        type: { type: string, const: decision.completed }
+        decision: { $ref: './decision.schema.json#/$defs/DecisionResult' }
+        arrived: { type: string, enum: [before_generation, during_holdback, after_commit, after_completion] }
+    DecisionUpdatedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, decision, changed]
+      properties:
+        type: { type: string, const: decision.updated }
+        decision: { $ref: './decision.schema.json#/$defs/DecisionResult' }
+        changed: { type: array, items: { type: string } }
+    RouteConfirmedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, attempt_id, routing]
+      properties:
+        type: { type: string, const: route.confirmed }
+        attempt_id: { type: string }
+        routing: { $ref: '#/components/schemas/RoutingDecision' }
+    GenerationStartedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, attempt_id, route_id, model, speculative, degradations]
+      properties:
+        type: { type: string, const: generation.started }
+        attempt_id: { type: string }
+        route_id: { type: string }
+        model: { type: string }
+        speculative: { type: boolean }
+        degradations: { type: array, items: { $ref: '#/components/schemas/Degradation' } }
+    GenerationDeltaEvent:
+      type: object
+      additionalProperties: false
+      required: [type, attempt_id, seq, text]
+      properties:
+        type: { type: string, const: generation.delta }
+        attempt_id: { type: string }
+        seq: { type: integer }
+        text: { type: string }
+    GenerationCommittedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, attempt_id, reason]
+      properties:
+        type: { type: string, const: generation.committed }
+        attempt_id: { type: string }
+        reason: { type: string, enum: [spec_agrees, holdback_deadline, gate, speculative, selected] }
+    GenerationCancelledEvent:
+      type: object
+      additionalProperties: false
+      required: [type, attempt_id, reason]
+      properties:
+        type: { type: string, const: generation.cancelled }
+        attempt_id: { type: string }
+        reason: { type: string, enum: [spec_changed, lost_race, not_selected, client_abort, failed] }
+    GenerationReroutedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, from_attempt_id, to_attempt_id, reason, discard_from_seq]
+      properties:
+        type: { type: string, const: generation.rerouted }
+        from_attempt_id: { type: string }
+        to_attempt_id: { type: string }
+        reason: { type: string }
+        discard_from_seq: { type: [integer, 'null'] }
+    GenerationCompletedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, attempt_id, finish_reason, usage]
+      properties:
+        type: { type: string, const: generation.completed }
+        attempt_id: { type: string }
+        finish_reason: { type: string, enum: [stop, length, content_filter, cancelled] }
+        usage: { $ref: './decision.schema.json#/$defs/Usage' }
+    TurnVerifiedEvent:
+      type: object
+      additionalProperties: false
+      required: [type, verification]
+      properties:
+        type: { type: string, const: turn.verified }
+        verification: { $ref: './decision.schema.json#/$defs/DecisionResult' }
+    TurnCompletedEvent:
+      type: object
+      additionalProperties: false
+      description: Always the last event of a stream. Late decision members, verification and usage have settled before it; nothing follows (a later view is GET /v1/turns/{id}).
+      required: [type, turn_id, usage, timings]
+      properties:
+        type: { type: string, const: turn.completed }
+        turn_id: { type: string }
+        usage: { $ref: './decision.schema.json#/$defs/Usage' }
+        timings: { $ref: '#/components/schemas/TurnTimings' }
+    ErrorEvent:
+      type: object
+      additionalProperties: false
+      required: [type, code, message, retryable]
+      properties:
+        type: { type: string, const: error }
+        code: { $ref: '#/components/schemas/ErrorCode' }
+        message: { type: string }
+        retryable: { type: boolean }
+
+    SessionCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        metadata: { type: object, additionalProperties: { type: string } }
+        retention: { type: string, enum: [default, ephemeral, custom], description: 'Phase 1: `custom` is 422 `feature_not_available`.' }
+        data_class: { type: string, enum: [public, internal, confidential, restricted] }
+    SessionUpdate:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      description: Present fields replace the stored value; `metadata` replaces the whole map (`{}` clears it).
+      properties:
+        metadata: { type: object, additionalProperties: { type: string } }
+        retention: { type: string, enum: [default, ephemeral, custom], description: 'Phase 1: `custom` is 422 `feature_not_available`.' }
+        data_class: { type: string, enum: [public, internal, confidential, restricted] }
+    Session:
+      type: object
+      additionalProperties: false
+      required: [id, created_at, last_seq, data_class, retention, metadata]
+      properties:
+        id: { type: string }
+        created_at: { type: integer }
+        last_seq: { type: integer, minimum: 0, description: "`seq` of the latest committed turn (0 = none); the value to send as expected_seq" }
+        owner: { type: string }
+        data_class: { type: string, enum: [public, internal, confidential, restricted] }
+        retention:
+          type: object
+          additionalProperties: false
+          required: [policy, expires_at]
+          properties:
+            policy: { type: string, enum: [default, ephemeral, custom] }
+            expires_at: { type: [integer, 'null'] }
+        metadata: { type: object, additionalProperties: { type: string } }
+    SessionList:
+      type: object
+      additionalProperties: false
+      required: [data, has_more, next_cursor]
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/Session' } }
+        has_more: { type: boolean }
+        next_cursor: { type: [string, 'null'] }
+    SessionTurn:
+      type: object
+      additionalProperties: false
+      required: [turn_id, seq, role, text, created_at, redactions]
+      properties:
+        turn_id: { type: string }
+        seq: { type: integer, minimum: 1 }
+        role: { type: string, enum: [user, assistant] }
+        text: { type: string, description: 'Committed text; redacted spans read "[redacted]".' }
+        created_at: { type: integer }
+        redactions:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [start, end, reason]
+            properties:
+              start: { type: integer, minimum: 0, description: Offset in Unicode code points of `text` }
+              end: { type: integer, minimum: 0, description: Exclusive end offset in code points }
+              reason: { type: string, description: 'Redaction filter label (e.g. email, card_number)' }
+    SessionTurnList:
+      type: object
+      additionalProperties: false
+      required: [data, has_more, next_cursor]
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/SessionTurn' } }
+        has_more: { type: boolean }
+        next_cursor: { type: [string, 'null'] }
+
+    DerivativeKind:
+      type: string
+      enum: [text, markdown, page_images, pdf_sanitized, raster, thumbnail, ocr_text, transcript, keyframes, timeline, audio_normalized]
+    FileObject:
+      type: object
+      additionalProperties: false
+      required: [id, filename, media_type, bytes, sha256, status, derivatives]
+      properties:
+        id: { type: string }
+        filename: { type: string, description: Display only; never sent to models }
+        media_type: { type: string }
+        bytes: { type: integer }
+        sha256: { type: string }
+        status: { type: string, enum: [quarantined, processing, ready, partial, rejected, failed, deleted] }
+        derivatives:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [kind, id, status]
+            properties:
+              kind: { $ref: '#/components/schemas/DerivativeKind' }
+              id: { type: string }
+              status: { type: string, enum: [pending, ready, failed] }
+              pages: { type: integer, minimum: 1, description: 'page_images only: number of page images (download each with ?page=)' }
+        rejection:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [type_mismatch, not_allowlisted, file_too_large, too_many_pages, duration_exceeded, pixel_limit, encrypted_pdf,
+                     decompression_bomb, corrupt, unsupported_codec, empty_content, malware_detected]
+            message: { type: string }
+        failure:
+          type: object
+          additionalProperties: false
+          required: [code, message, retryable]
+          properties:
+            code: { type: string, enum: [extraction_failed, ocr_failed, transcription_failed, timeout] }
+            message: { type: string }
+            retryable: { const: true }
+
+    ProfileInfo:
+      type: object
+      additionalProperties: false
+      required: [id, version, kind, description, models, modalities]
+      properties:
+        id: { type: string }
+        version: { type: string, pattern: '^[0-9]+$', description: Same form as provenance.profile_version }
+        kind: { type: string, enum: [decision, generation] }
+        description: { type: string }
+        models: { type: array, items: { type: string } }
+        mode: { type: string, enum: [single, fallback, race, best_of_n, fuse] }
+        modalities: { type: array, items: { type: string, enum: [text, image, document] } }
+        streaming: { type: string, enum: [live, after_selection] }
+
+    UsageLine: { type: string, enum: [decision, generation, labeling, verification, waste, cache_savings] }
+    UsageRow:
+      type: object
+      additionalProperties: false
+      required: [key, line, usage]
+      properties:
+        key:
+          type: [string, 'null']
+          description: 'Value of the group_by dimension: project id, session id, Bedrock model id, UTC day (YYYY-MM-DD) or the line name. null when the dimension does not apply (e.g. session, for a decision made without a session).'
+        line: { $ref: '#/components/schemas/UsageLine' }
+        usage: { $ref: './decision.schema.json#/$defs/Usage' }
+    UsageReport:
+      type: object
+      additionalProperties: false
+      required: [group_by, from, to, data, has_more, next_cursor]
+      properties:
+        group_by: { type: string, enum: [project, session, model, day, line] }
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        data: { type: array, items: { $ref: '#/components/schemas/UsageRow' } }
+        has_more: { type: boolean }
+        next_cursor: { type: [string, 'null'] }
+
+    CalibratorStatus:
+      type: string
+      description: 'fitted: fitted, gate not yet evaluated. rejected: failed the acceptance gate. accepted: passed the gate, awaiting
+        two-person activation (approve by one operator, activate by another). active: applied to answers whose binding matches.
+        downgraded: drift detected (weekly ECE); never re-activated. retired: replaced, retired by hand, or its profile version left
+        the active config.'
+      enum: [fitted, rejected, accepted, active, downgraded, retired]
+    CalibratorInfo:
+      type: object
+      additionalProperties: false
+      required: [id, object, scope, question_name, status, method, parameters, binding, member_subset, holdout, acceptance,
+                 reliability, created_at, approved_by, activated_by, activated_at, downgraded_at, downgrade_reason, retired_at, retired_reason]
+      properties:
+        id: { type: string, pattern: '^cal_' }
+        object: { const: calibrator }
+        scope: { type: string, enum: [platform, tenant], description: 'platform: fitted on platform seed data; applies only to platform
+          question signatures, until a tenant artifact for the same binding is active' }
+        question_name: { type: string }
+        status: { $ref: '#/components/schemas/CalibratorStatus' }
+        method: { type: string, enum: [temperature, platt], description: The pooled transform (Phase 1 methods) }
+        parameters:
+          type: object
+          additionalProperties: false
+          required: [pooled, member_T, epsilon]
+          description: One artifact holds the per-member and pooled parts; they are only ever applied together (ADR-003 §1).
+          properties:
+            pooled: { type: object, additionalProperties: { type: number }, description: '{"temperature": T} or {"a": a, "b": b}' }
+            member_T: { type: object, additionalProperties: { type: number, exclusiveMinimum: 0 }, description: 'member_id -> T_m' }
+            epsilon: { type: number, exclusiveMinimum: 0 }
+        binding: { $ref: './decision.schema.json#/$defs/CalibrationBinding' }
+        member_subset: { type: array, minItems: 1, uniqueItems: true, items: { type: string } }
+        holdout:
+          oneOf:
+            - { type: 'null' }
+            - { $ref: './decision.schema.json#/$defs/HoldoutMetrics' }
+        acceptance:
+          type: object
+          additionalProperties: false
+          required: [passed, failed_rules]
+          properties:
+            passed: { type: boolean }
+            failed_rules:
+              type: array
+              uniqueItems: true
+              items: { type: string, enum: [ece_max, nll_not_worse, n_min, flagged_classes, class_consensus_min, family_overlap_lift,
+                                            label_source, member_subset_share] }
+        reliability:
+          type: object
+          additionalProperties: false
+          required: [bins, ci]
+          properties:
+            bins:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required: [lower, upper, n, mean_predicted, observed]
+                properties:
+                  lower: { type: number, minimum: 0, maximum: 1 }
+                  upper: { type: number, minimum: 0, maximum: 1 }
+                  n: { type: integer, minimum: 0 }
+                  mean_predicted: { type: [number, 'null'], minimum: 0, maximum: 1 }
+                  observed: { type: [number, 'null'], minimum: 0, maximum: 1 }
+            ci:
+              type: object
+              additionalProperties: false
+              description: Bootstrap 95% intervals [low, high] of the holdout metrics.
+              properties:
+                ece: { $ref: '#/components/schemas/Interval' }
+                brier: { $ref: '#/components/schemas/Interval' }
+                nll: { $ref: '#/components/schemas/Interval' }
+        created_at: { type: integer }
+        approved_by: { type: [string, 'null'], description: Operator who approved activation (first of two) }
+        activated_by: { type: array, maxItems: 2, uniqueItems: true, items: { type: string }, description: 'Both operator ids (approve, activate); empty until active' }
+        activated_at: { type: [integer, 'null'] }
+        downgraded_at: { type: [integer, 'null'] }
+        downgrade_reason: { oneOf: [ { type: 'null' }, { type: string, enum: [drift_ece, drift_ci] } ] }
+        retired_at: { type: [integer, 'null'] }
+        retired_reason: { oneOf: [ { type: 'null' }, { type: string, enum: [replaced, manual, profile_version_retired] } ] }
+    Interval:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+    CalibratorList:
+      type: object
+      additionalProperties: false
+      required: [data, has_more, next_cursor]
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/CalibratorInfo' } }
+        has_more: { type: boolean }
+        next_cursor: { type: [string, 'null'] }
+    LabelingRun:
+      type: object
+      additionalProperties: false
+      required: [id, object, status, profile_id, profile_version, question_name, question_signature, labelers, rule, counts, consensus_rate,
+                 consensus_rate_by_class, n_by_class, usage, started_at, completed_at]
+      properties:
+        id: { type: string, pattern: '^lrun_' }
+        object: { const: labeling_run }
+        status: { type: string, enum: [running, completed, failed, cancelled] }
+        profile_id: { type: string }
+        profile_version: { type: string, pattern: '^[0-9]+$' }
+        question_name: { type: string }
+        question_signature: { type: string, pattern: '^sha256:[0-9a-f]{64}$' }
+        labelers: { type: array, minItems: 2, uniqueItems: true, items: { type: string }, description: Bedrock model ids (D4) }
+        rule: { const: unanimous }
+        counts:
+          type: object
+          additionalProperties: false
+          description: Once the run has completed, kept plus the dropped counts equals sampled.
+          required: [sampled, sampled_uniform, sampled_uncertainty, kept, dropped_disagreed, dropped_refused, dropped_parse_error, dropped_labeler_error]
+          properties:
+            sampled: { type: integer, minimum: 0 }
+            sampled_uniform: { type: integer, minimum: 0 }
+            sampled_uncertainty: { type: integer, minimum: 0 }
+            kept: { type: integer, minimum: 0 }
+            dropped_disagreed: { type: integer, minimum: 0 }
+            dropped_refused: { type: integer, minimum: 0 }
+            dropped_parse_error: { type: integer, minimum: 0 }
+            dropped_labeler_error: { type: integer, minimum: 0 }
+        consensus_rate: { type: [number, 'null'], minimum: 0, maximum: 1, description: kept / sampled; null before any item has finished }
+        consensus_rate_by_class: { type: object, additionalProperties: { type: number, minimum: 0, maximum: 1 } }
+        n_by_class: { type: object, additionalProperties: { type: integer, minimum: 0 }, description: Kept labels per class }
+        usage: { $ref: './decision.schema.json#/$defs/Usage' }
+        started_at: { type: integer }
+        completed_at: { type: [integer, 'null'] }
+    LabelingRunList:
+      type: object
+      additionalProperties: false
+      required: [data, has_more, next_cursor]
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/LabelingRun' } }
+        has_more: { type: boolean }
+        next_cursor: { type: [string, 'null'] }
+    LabelingDroppedItem:
+      type: object
+      additionalProperties: false
+      required: [id, object, run_id, decision_id, question_name, question_signature, input_view_signature, reason, sample_reason,
+                 labeler_answers, ensemble, content, sampled_at]
+      properties:
+        id: { type: string, pattern: '^ldrop_' }
+        object: { const: labeling_dropped_item }
+        run_id: { type: string, pattern: '^lrun_' }
+        decision_id: { type: string, pattern: '^dec_' }
+        question_name: { type: string }
+        question_signature: { type: string, pattern: '^sha256:[0-9a-f]{64}$' }
+        input_view_signature: { type: string, pattern: '^sha256:[0-9a-f]{64}$' }
+        reason: { type: string, enum: [disagreed, refused, parse_error, labeler_error] }
+        sample_reason: { type: string, enum: [uniform, uncertainty] }
+        labeler_answers:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            additionalProperties: false
+            required: [model, status, value]
+            properties:
+              model: { type: string }
+              status: { type: string, enum: [ok, refused, parse_error, error] }
+              value: { type: [string, boolean, 'null'], description: "The labeler's answer (choice value, score label or predicate truth); null unless status is ok" }
+        ensemble:
+          type: object
+          additionalProperties: false
+          required: [value, probability, band, calibration_status]
+          properties:
+            value: { type: [string, boolean, 'null'] }
+            probability: { type: [number, 'null'], minimum: 0, maximum: 1 }
+            band:
+              oneOf:
+                - { type: 'null' }
+                - { type: string, enum: [high, medium, low] }
+            calibration_status: { type: string, enum: [calibrated, provider_reported, uncalibrated] }
+        content:
+          type: object
+          additionalProperties: false
+          required: [excerpt, redacted]
+          properties:
+            excerpt: { type: [string, 'null'], maxLength: 2000, description: 'Input excerpt after the redaction filter; null when the data class or log policy forbids stored content' }
+            redacted: { type: boolean }
+        sampled_at: { type: integer }
+    LabelingDroppedList:
+      type: object
+      additionalProperties: false
+      required: [data, has_more, next_cursor]
+      properties:
+        data: { type: array, items: { $ref: '#/components/schemas/LabelingDroppedItem' } }
+        has_more: { type: boolean }
+        next_cursor: { type: [string, 'null'] }

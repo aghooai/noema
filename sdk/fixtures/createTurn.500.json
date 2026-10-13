@@ -1,0 +1,17 @@
+{
+  "status": 500,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "error": {
+      "type": "server_error",
+      "code": "internal_error",
+      "message": "internal error",
+      "param": null,
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": true
+    }
+  }
+}

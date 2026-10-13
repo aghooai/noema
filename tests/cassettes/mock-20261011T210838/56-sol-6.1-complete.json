@@ -1,0 +1,45 @@
+{
+  "alias": "sol-6.1",
+  "blocks": {
+    "TextBlock": 4
+  },
+  "call_kind": "labeling",
+  "e2e_ms": 589,
+  "effort": "medium",
+  "estimated_input_tokens": 188,
+  "latency_ms": 589,
+  "logprob_tokens": null,
+  "max_tokens": 1040,
+  "model_id": "us.openai.gpt-6.1-sol",
+  "n": 56,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_labelers_live.py::test_both_labelers_answer_one_letter",
+  "test_call": 1,
+  "text_chars": 1,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 202,
+    "output_tokens": 1,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "metrics.latencyMs:int",
+      "output.message.content[].text:str",
+      "output.message.role:str",
+      "stopReason:str",
+      "usage.cacheReadInputTokens:int",
+      "usage.cacheWriteInputTokens:int",
+      "usage.inputTokens:int",
+      "usage.outputTokens:int",
+      "usage.totalTokens:int"
+    ]
+  }
+}

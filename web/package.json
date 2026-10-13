@@ -1,0 +1,19 @@
+{
+  "name": "@noema/web",
+  "version": "0.1.0",
+  "description": "Noema Web UI (Phase 1: W1 chat + inspector, W2 uploads, W4 calibration, W7 cost) and its dev cookie proxy. Talks to the Noema API only, through @aghoo/sdk; every model call behind it runs on Amazon Bedrock.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.node.json",
+    "test": "vitest run",
+    "build": "vite build",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "serve": "node server/main.ts",
+    "e2e": "playwright test"
+  }
+}

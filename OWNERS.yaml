@@ -1,0 +1,146 @@
+# Path ownership (.orchestration/context/02-interfaces-ownership.md plus the spec-01 overrides; the per-agent paths of
+# the Wave B and C1 workflows). Enforced by tools/check_ownership.py (make ownership; --role R per agent).
+#
+# Rules are ordered: the FIRST rule whose pattern matches a path decides its owners. Patterns are repo-relative globs:
+# `*` matches inside one path segment, `**` any number of segments, `{a,b}` alternatives; `<role>` matches a role name
+# and makes that role the owner. A path may have several owners (e.g. route stubs: written by api in Wave B, bodies
+# by the module owner in Wave C). Frozen roles: after the Wave B interface-freeze tag only the orchestrator edits their
+# paths (changes go through .orchestration/requests/<role>.md).
+version: 1
+
+# Added to the first-match owners of every matching path: platform seeded the empty package __init__.py files of every
+# spec-01 §1 package in Wave B1.
+co_owners:
+  - { pattern: "src/noema/**/__init__.py", owners: [platform] }
+
+roles:
+  platform: { wave: B1, frozen: true, description: "repo tooling, dependency lock, core, contracts, config" }
+  db-schema: { wave: B2, frozen: true, description: "alembic schema, roles, RLS, uow, system calls, db fixtures" }
+  db-repos: { wave: B2, frozen: true, description: "db/repos: the only SQL of the app (spec-02 §7.1)" }
+  api: { wave: B2, frozen: true, description: "api app, deps, middleware, SSE framing, 501 route stubs" }
+  fakes-telemetry: { wave: B2, frozen: true, description: "tests/fakes, conformance suites, golden fixtures, telemetry" }
+  infra: { wave: B2, description: "deploy/ images and compose extensions (then the integrator)" }
+  identity: { wave: C1 }
+  adapters: { wave: C1 }
+  qa-tools: { wave: C1, description: "the wire-level Bedrock mock, load and fault tooling" }
+  decision: { wave: C1 }
+  generation: { wave: C1, description: "generation and streaming" }
+  orchestrator: { wave: C1, description: "turns" }
+  media-pipeline: { wave: C1 }
+  media-negotiation: { wave: C1 }
+  ops-admission: { wave: C1 }
+  ops-ledger: { wave: C1 }
+  labeling: { wave: C1 }
+  sdk: { wave: C1 }
+  ui: { wave: C2 }
+  integrator: { wave: C2, description: "composition root, entrypoints, e2e" }
+  qa-security: { wave: E }
+  qa: { wave: E, description: "QA runs and reports" }
+  observability: { wave: F, description: "Prometheus rules, Grafana dashboards, their tests and observability docs" }
+  repo-docs: { wave: F, description: "as-built repo docs: CHANGELOG, CONTRIBUTING, SECURITY, architecture, operations, development" }
+  wave-a: { wave: A, frozen: true, description: "design-level docs of the implementation spec" }
+  orchestrator-control: { wave: all, description: "the orchestrator's own files" }
+
+rules:
+  # --- orchestration --------------------------------------------------------------------------------------------
+  - { pattern: ".orchestration/requests/<role>.md", owners: ["<role>"] }
+  - { pattern: ".orchestration/**", owners: [orchestrator-control] }
+  - { pattern: "tasks/**", owners: [orchestrator-control] }
+
+  # --- platform (B1) --------------------------------------------------------------------------------------------
+  - pattern: "{pyproject.toml,uv.lock,.python-version,.gitignore,.env.example,Makefile,.importlinter,OWNERS.yaml,conftest.py}"
+    owners: [platform]
+  - { pattern: "{package.json,package-lock.json}", owners: [platform] }
+  - { pattern: "make/{common,lint}.mk", owners: [platform] }
+  - { pattern: "tools/{check_ownership,sync_contracts}.py", owners: [platform] }
+  - { pattern: "src/noema/__init__.py", owners: [platform] }
+  - { pattern: "src/noema/{core,contracts,config}/**", owners: [platform] }
+  - { pattern: "tests/unit/{core,contracts,config,tools}/**", owners: [platform] }
+  - { pattern: "deploy/compose/docker-compose.yml", owners: [platform, infra, integrator] }
+
+  # --- foundation B2 --------------------------------------------------------------------------------------------
+  - { pattern: "src/noema/db/repos/**", owners: [db-repos] }
+  - { pattern: "tests/integration/db_repos/**", owners: [db-repos] }
+  - { pattern: "src/noema/db/**", owners: [db-schema] }
+  - { pattern: "{tests/integration/db/**,tests/fixtures/db.py,make/db.mk,tools/reap_test_dbs.py}", owners: [db-schema] }
+  - { pattern: "src/noema/api/routes/turns.py", owners: [orchestrator, api] }
+  - { pattern: "src/noema/api/routes/{decisions,openai_compat,profiles}.py", owners: [decision, api] }
+  - { pattern: "src/noema/api/routes/sessions.py", owners: [identity, api] }
+  - { pattern: "src/noema/api/routes/files.py", owners: [media-pipeline, api] }
+  - { pattern: "src/noema/api/routes/{usage,health}.py", owners: [ops-ledger, api] }
+  - { pattern: "src/noema/api/routes/admin_readonly.py", owners: [labeling, api] }
+  - { pattern: "src/noema/api/**", owners: [api] }
+  - { pattern: "{tests/unit/api/**,tests/integration/api/**,make/api.mk}", owners: [api] }
+  - { pattern: "src/noema/composition.py", owners: [integrator, fakes-telemetry] }
+  - { pattern: "src/noema/telemetry/**", owners: [fakes-telemetry] }
+  - { pattern: "tests/{fakes,contract_internal,golden}/**", owners: [fakes-telemetry] }
+  - { pattern: "tests/unit/telemetry/**", owners: [fakes-telemetry] }
+  # Wave F observability (before deploy/**, which would match first)
+  - pattern: "{deploy/observability/**,docs/operations/observability.md,tests/unit/observability/**,make/observability.mk}"
+    owners: [observability]
+  - { pattern: "{deploy/**,make/infra.mk,tests/integration/infra/**}", owners: [infra, integrator] }
+
+  # --- modules (C1) ---------------------------------------------------------------------------------------------
+  - { pattern: "src/noema/identity/**", owners: [identity] }
+  - { pattern: "tests/{unit,integration}/identity/**", owners: [identity] }
+  - { pattern: "src/noema/adapters/**", owners: [adapters] }
+  - { pattern: "{tests/unit/adapters/**,tests/integration/adapters/**,tests/live/**,tests/cassettes/**}", owners: [adapters] }
+  - { pattern: "{tools/mockbedrock/**,tests/unit/mockbedrock/**}", owners: [qa-tools] }
+  - { pattern: "{tests/load/**,tests/fault/**}", owners: [qa-tools, qa] }
+  - { pattern: "src/noema/decision/**", owners: [decision] }
+  - { pattern: "tests/{unit,integration}/decision/**", owners: [decision] }
+  - { pattern: "src/noema/{generation,streaming}/**", owners: [generation] }
+  - { pattern: "tests/{unit,integration}/{generation,streaming}/**", owners: [generation] }
+  - { pattern: "src/noema/turns/**", owners: [orchestrator] }
+  - { pattern: "tests/{unit,integration}/turns/**", owners: [orchestrator] }
+  - { pattern: "src/noema/media/{negotiation,budget,views}.py", owners: [media-negotiation] }
+  - { pattern: "tests/unit/media_negotiation/**", owners: [media-negotiation] }
+  - { pattern: "src/noema/media/**", owners: [media-pipeline] }
+  - { pattern: "tests/{unit,integration}/media_pipeline/**", owners: [media-pipeline] }
+  - { pattern: "src/noema/ops/__init__.py", owners: [ops-ledger, ops-admission] }
+  - { pattern: "src/noema/ops/admission/**", owners: [ops-admission] }
+  - { pattern: "tests/{unit,integration}/ops_admission/**", owners: [ops-admission] }
+  - { pattern: "src/noema/ops/**", owners: [ops-ledger] }
+  - { pattern: "tests/{unit,integration}/ops_ledger/**", owners: [ops-ledger] }
+  - { pattern: "src/noema/labeling/**", owners: [labeling] }
+  - { pattern: "tests/{unit,integration}/labeling/**", owners: [labeling] }
+  - { pattern: "{sdk/**,make/sdk.mk}", owners: [sdk] }
+  - { pattern: "{web/**,make/ui.mk}", owners: [ui] }
+
+  # --- integration and QA ---------------------------------------------------------------------------------------
+  - { pattern: "src/noema/entrypoints/**", owners: [integrator] }
+  - { pattern: "{tests/unit,tests/integration}/composition/**", owners: [integrator] }
+  - { pattern: "{tools/bootstrap*,make/e2e.mk}", owners: [integrator] }
+  - { pattern: "tests/e2e/**", owners: [integrator] }
+  - { pattern: "tests/security/**", owners: [qa-security] }
+  - { pattern: "tests/qa/**", owners: [qa] }
+  - { pattern: "make/qa-security.mk", owners: [qa-security, qa] }
+  - { pattern: "make/qa-*.mk", owners: [qa, qa-tools] }
+  - { pattern: "reports/**", owners: [qa] }
+  - { pattern: ".ipynb_checkpoints/**", owners: [orchestrator-control] }
+
+  # --- documentation --------------------------------------------------------------------------------------------
+  - { pattern: "docs/modules/identity.md", owners: [identity] }
+  - { pattern: "docs/modules/adapters.md", owners: [adapters] }
+  - { pattern: "docs/modules/{qa-tools,mockbedrock}.md", owners: [qa-tools] }
+  - { pattern: "docs/modules/decision.md", owners: [decision] }
+  - { pattern: "docs/modules/{generation,streaming}.md", owners: [generation] }
+  - { pattern: "docs/modules/{orchestrator,turns}.md", owners: [orchestrator] }
+  - { pattern: "docs/modules/media_pipeline.md", owners: [media-pipeline] }
+  - { pattern: "docs/modules/media_negotiation.md", owners: [media-negotiation] }
+  - { pattern: "docs/modules/{ops_admission,ops-admission}.md", owners: [ops-admission] }
+  - { pattern: "docs/modules/{ops-ledger,ops_ledger}.md", owners: [ops-ledger] }
+  - { pattern: "docs/modules/labeling.md", owners: [labeling] }
+  - { pattern: "docs/modules/sdk.md", owners: [sdk] }
+  - { pattern: "docs/modules/ui.md", owners: [ui] }
+  - { pattern: "docs/modules/{core,contracts,config,platform}.md", owners: [platform] }
+  - { pattern: "docs/modules/db.md", owners: [db-schema, db-repos] }
+  - { pattern: "docs/modules/api.md", owners: [api] }
+  - { pattern: "docs/modules/{telemetry,fakes}.md", owners: [fakes-telemetry] }
+  - { pattern: "docs/modules/{infra,deploy}.md", owners: [infra, integrator] }
+  - { pattern: "docs/modules/integration.md", owners: [integrator] }
+  - { pattern: "{docs/adr/**,docs/IMPL-DECISIONS.md,docs/impl-spec/**,docs/impl-decisions/**}", owners: [wave-a] }
+  - { pattern: "README.md", owners: [orchestrator-control] }
+  # Wave F as-built docs (docs/operations/observability.md matches the observability rule above first)
+  - pattern: "{CHANGELOG.md,CONTRIBUTING.md,SECURITY.md,docs/architecture.md,docs/development/**,docs/operations/**}"
+    owners: [repo-docs]

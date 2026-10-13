@@ -1,0 +1,9 @@
+c5-base-0 = the first launch of "c5-base-1" (05:49:21-06:01:44 UTC, snap-base); its raw run directory and results.json
+were overwritten at 06:22-06:34 by a duplicate launch of the same name (a nohup'd wrapper that had kept waiting),
+which is the c5-base-1 cited in the report. Kept from this session (computed at 06:02 with ratio.py and gc.py):
+  window 0: victim n 4310, client TTFT p95 317.9 [317.6, 318.4]; ttft_ovh p50 10.55 p95 17.70; api cpu 0.686; load mean 4.63
+  window 1: victim n 4282, client TTFT p95 416.1 [410.7, 422.5]; ttft_ovh p50 14.59 p95 115.5; api cpu 1.153; load mean 4.95
+  ratio p95 step1/step0 1.3087 [1.2925, 1.3233]; both windows valid; victim errors 2 x 429 queue_timeout
+  flood: 25,371 turns, 23,254 x 429 queue_timeout, 2,117 x 200, 0 violations
+  per process at the end of window 1: admission queue_timeout 8,527 / 6,217; aghoo_turns_shed_total 6,464 / 1,979
+  full GC window 1: api-0 every 7.3 s p50 135 ms max 185 ms; api-1 every 7.9 s p50 140 ms max 247 ms (window 0: 61 / 51 ms)

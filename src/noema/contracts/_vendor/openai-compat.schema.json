@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aghoo.example/schemas/openai-compat-decisions/v0.2",
+  "title": "OpenAI Decisions-compatible facade (POST /openai/v1/decisions)",
+  "description": "Mirrors the OpenAI Decisions API reference [OA-R] as of 2026-10-09: optional names, optional/nullable descriptions, string|boolean choice values, 2-255 choices, string-or-array message content, image detail, safety_identifier. Answers come from a Bedrock decision profile (D1, default lightweight-model-decide); Noema never calls OpenAI. Compatibility is of shapes only. At most 32 questions and 16 score levels; explicit names must be unique and not q<digits>; true and \"true\" can't both be choices of one question; at most 20 input_image parts per request (checked by check_examples.py). Images are data URLs only: remote URLs are never fetched (400 schema_violation).",
+  "$defs": {
+    "OADescription": { "type": ["string", "null"] },
+    "OAInputPart": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["type", "text"],
+          "properties": { "type": { "const": "input_text" }, "text": { "type": "string", "maxLength": 10485760 } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "image_url"],
+          "properties": { "type": { "const": "input_image" }, "image_url": { "type": "string", "pattern": "^data:image/(png|jpeg|webp|gif|heic|heif);base64," },
+                          "detail": { "enum": ["low", "high", "auto", "original", null] } } }
+      ]
+    },
+    "OAInputMessage": {
+      "type": "object", "additionalProperties": false, "required": ["role", "content"],
+      "properties": {
+        "role": { "const": "user" }, "type": { "const": "message" },
+        "content": { "oneOf": [{ "type": "string" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/OAInputPart" } }] }
+      }
+    },
+    "OAQuestion": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["type", "instructions"],
+          "properties": { "type": { "const": "predicate" }, "instructions": { "type": "string" }, "name": { "type": ["string", "null"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "instructions", "choices"],
+          "properties": { "type": { "const": "choice" }, "instructions": { "type": "string" }, "name": { "type": ["string", "null"] },
+            "choices": { "type": "array", "minItems": 2, "maxItems": 255, "items": {
+              "type": "object", "additionalProperties": false, "required": ["value"],
+              "properties": { "value": { "type": ["string", "boolean"] }, "description": { "$ref": "#/$defs/OADescription" } } } } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "instructions", "levels"],
+          "properties": { "type": { "const": "score" }, "instructions": { "type": "string" }, "name": { "type": ["string", "null"] },
+            "levels": { "type": "array", "minItems": 2, "maxItems": 16, "items": {
+              "type": "object", "additionalProperties": false, "required": ["label"],
+              "properties": { "label": { "type": "string" }, "description": { "$ref": "#/$defs/OADescription" } } } } } }
+      ]
+    },
+    "OADecisionCreateParams": {
+      "type": "object", "additionalProperties": false, "required": ["model", "input", "questions"],
+      "properties": {
+        "model": { "type": "string" },
+        "input": { "oneOf": [{ "type": "string" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/OAInputMessage" } }] },
+        "questions": { "type": "array", "minItems": 1, "maxItems": 32, "items": { "$ref": "#/$defs/OAQuestion" } },
+        "safety_identifier": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "OAAnswer": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["type", "name", "probability"],
+          "properties": { "type": { "const": "predicate" }, "name": { "type": ["string", "null"] }, "probability": { "type": "number", "minimum": 0, "maximum": 1 } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "name", "choice", "confidence", "probabilities"],
+          "properties": { "type": { "const": "choice" }, "name": { "type": ["string", "null"] }, "choice": { "type": ["string", "boolean"] },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "probabilities": { "type": "array", "minItems": 2, "items": { "type": "object", "additionalProperties": false, "required": ["value", "probability"],
+              "properties": { "value": { "type": ["string", "boolean"] }, "probability": { "type": "number", "minimum": 0, "maximum": 1 } } } } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "name", "score", "confidence", "probabilities"],
+          "properties": { "type": { "const": "score" }, "name": { "type": ["string", "null"] }, "score": { "type": "number", "minimum": 0 },
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "probabilities": { "type": "array", "minItems": 2, "items": { "type": "object", "additionalProperties": false, "required": ["value", "label", "probability"],
+              "properties": { "value": { "type": "integer", "minimum": 0 }, "label": { "type": "string" }, "probability": { "type": "number", "minimum": 0, "maximum": 1 } } } } } },
+        { "type": "object", "additionalProperties": false, "required": ["type", "name"],
+          "properties": { "type": { "const": "refusal" }, "name": { "type": ["string", "null"] } } }
+      ]
+    },
+    "OADecisionResponse": {
+      "type": "object", "additionalProperties": false, "required": ["model", "answers", "usage"],
+      "properties": {
+        "model": { "type": "string", "pattern": "^aghoo/[a-z0-9][a-z0-9._-]*@[0-9]+$" },
+        "answers": { "type": "array", "items": { "$ref": "#/$defs/OAAnswer" } },
+        "usage": { "type": "object", "additionalProperties": false,
+          "required": ["input_tokens", "input_tokens_details", "output_tokens", "output_tokens_details", "total_tokens"],
+          "properties": {
+            "input_tokens": { "type": "integer", "minimum": 0 },
+            "input_tokens_details": { "type": "object", "additionalProperties": false, "required": ["cached_tokens", "cache_write_tokens"],
+              "properties": { "cached_tokens": { "type": "integer", "minimum": 0 }, "cache_write_tokens": { "type": "integer", "minimum": 0 } } },
+            "output_tokens": { "type": "integer", "minimum": 0 },
+            "output_tokens_details": { "type": "object", "additionalProperties": false, "required": ["reasoning_tokens"],
+              "properties": { "reasoning_tokens": { "type": "integer", "minimum": 0 } } },
+            "total_tokens": { "type": "integer", "minimum": 0 } } },
+        "x_aghoo": {
+          "type": "object", "additionalProperties": false, "required": ["decision_id", "calibration"],
+          "description": "Only with request header x-aghoo-include: ensemble. Keys are the client-visible question names (the given name, or q{i} for unnamed questions); the stored native decision uses internal names (q{i} for names that are not valid native names). `calibration` lists exactly the non-refusal answers; `mapped_unavailable` lists the answers mapped to refusal from unavailable.",
+          "properties": {
+            "decision_id": { "type": "string", "pattern": "^dec_" },
+            "calibration": { "type": "object", "additionalProperties": { "enum": ["calibrated", "uncalibrated"] } },
+            "mapped_unavailable": { "type": "object", "additionalProperties": { "enum": ["deadline_exceeded", "no_quorum", "all_members_failed", "no_capable_member"] } } } }
+      }
+    }
+  }
+}

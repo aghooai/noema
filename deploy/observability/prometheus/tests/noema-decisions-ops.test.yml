@@ -1,0 +1,259 @@
+# promtool test rules: decision, upstream, outbox and datastore alerts (make observability-check).
+rule_files:
+  - ../rules/noema-recording.rules.yml
+  - ../rules/noema-alerts-decisions.rules.yml
+  - ../rules/noema-alerts-upstream-ops.rules.yml
+evaluation_interval: 1m
+
+tests:
+  # Parse errors: deepseek-3.2 2% of its answers, claude-haiku 0.5%, gpt-6-luna none (no parse-error series).
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_decision_member_status_total{member="deepseek-3.2",status="ok"}'
+        values: '0+100x60'
+      - series: 'aghoo_decision_parse_errors_total{member="deepseek-3.2",code="parse_error"}'
+        values: '0+2x60'
+      - series: 'aghoo_decision_member_status_total{member="claude-haiku",status="ok"}'
+        values: '0+200x60'
+      - series: 'aghoo_decision_parse_errors_total{member="claude-haiku",code="parse_error"}'
+        values: '0+1x60'
+      - series: 'aghoo_decision_member_status_total{member="gpt-6-luna",status="ok"}'
+        values: '0+100x60'
+    promql_expr_test:
+      - expr: noema:member_parse_error_ratio:rate30m
+        eval_time: 40m
+        exp_samples:
+          - labels: 'noema:member_parse_error_ratio:rate30m{member="deepseek-3.2"}'
+            value: 0.02
+          - labels: 'noema:member_parse_error_ratio:rate30m{member="claude-haiku"}'
+            value: 0.005
+          - labels: 'noema:member_parse_error_ratio:rate30m{member="gpt-6-luna"}'
+            value: 0
+    alert_rule_test:
+      - eval_time: 40m
+        alertname: noema-member-parse-errors-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              member: deepseek-3.2
+            exp_annotations:
+              summary: "Decision member deepseek-3.2 parse errors above 1%"
+              description: >-
+                2% of deepseek-3.2's answers did not parse over 30 minutes (design 08 §6 and §7: > 1%). Model or
+                template drift.
+              runbook_url: docs/operations/runbooks.md#noema-member-parse-errors-high
+
+  # Calibrator drift: the drift job's first downgrade on the jobs process (the counter appears with it, at 3m) fires;
+  # a rejected fit's ECE gauge (0.2) and a counter exported at 0 do not.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_calibrator_downgrades_total{job="noema-jobs",pod="jobs-0",instance="10.0.1.1:9464",reason="drift_ece"}'
+        values: '_x3 1x5'
+      - series: 'aghoo_calibrator_downgrades_total{job="noema-jobs",pod="jobs-0",instance="10.0.1.1:9464",reason="drift_ci"}'
+        values: '0x8'
+      - series: 'aghoo_calibration_ece{job="noema-jobs",pod="jobs-0",profile="router-default",signature="sig-a",view_signature="text"}'
+        values: '0.2x8'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: noema-calibrator-ece-drift
+        exp_alerts: []
+      - eval_time: 5m
+        alertname: noema-calibrator-ece-drift
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              reason: drift_ece
+            exp_annotations:
+              summary: "Calibrator downgraded by the drift job (drift_ece)"
+              description: >-
+                The weekly drift job downgraded 1 active calibrator(s) to uncalibrated in the last day, reason
+                drift_ece (drift_ece: ECE above ADR-003 drift_ece_max 0.08; drift_ci: the ECE lower bound above
+                ece_max). The answers they covered are served uncalibrated.
+              runbook_url: docs/operations/runbooks.md#noema-calibrator-ece-drift
+
+  # Breaker: open (2) fires after 1 minute; half-open (1) never does.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_circuit_state{model="gpt-6.1-sol",region="us-east-1",pod="api-a"}'
+        values: '0 0 2 2 2 2'
+      - series: 'aghoo_circuit_state{model="claude-opus",region="us-west-2",pod="api-a"}'
+        values: '1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: noema-circuit-open
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: noema-circuit-open
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              model: gpt-6.1-sol
+              region: us-east-1
+            exp_annotations:
+              summary: "Circuit breaker open for gpt-6.1-sol in us-east-1"
+              description: >-
+                The breaker for gpt-6.1-sol / us-east-1 is open (aghoo_circuit_state 2). Traffic shifts to fallback
+                members automatically (design 08 §6); it closes after the half-open probes pass.
+              runbook_url: docs/operations/runbooks.md#noema-circuit-open
+
+  # Outbox: dropped records page at once, including a process's first drop (the counter appears with it, at 8m);
+  # api-b's flat counter, after a failed scrape (stale) as well, does not.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_outbox_dropped_total{job="noema-api",pod="api-a",instance="10.0.0.1:9464"}'
+        values: '_x8 12x6'
+      - series: 'aghoo_outbox_dropped_total{job="noema-api",pod="api-b",instance="10.0.0.2:9464"}'
+        values: '5x5 stale 5x8'
+    alert_rule_test:
+      - eval_time: 7m
+        alertname: noema-outbox-records-dropped
+        exp_alerts: []
+      - eval_time: 11m
+        alertname: noema-outbox-records-dropped
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              pod: api-a
+            exp_annotations:
+              summary: "api-a dropped outbox records"
+              description: >-
+                12 write-behind records (usage lines, audit events, turn finalizes) were lost on api-a: the
+                in-process deque hit its bound with Redis down, or a flush timed out (spec-11 §3).
+              runbook_url: docs/operations/runbooks.md#noema-outbox-records-dropped
+
+  # Postgres pool: 19 of 20 connections checked out for 10 minutes on one process.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_db_pool_in_use{job="noema-api",pod="api-a",instance="10.0.0.1:9464",pool="app"}'
+        values: '19x15'
+      - series: 'aghoo_db_pool_size{job="noema-api",pod="api-a",instance="10.0.0.1:9464",pool="app"}'
+        values: '20x15'
+      - series: 'aghoo_db_pool_in_use{job="noema-api",pod="api-a",instance="10.0.0.1:9465",pool="app"}'
+        values: '1x15'
+      - series: 'aghoo_db_pool_size{job="noema-api",pod="api-a",instance="10.0.0.1:9465",pool="app"}'
+        values: '20x15'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: noema-postgres-pool-saturated
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              pod: api-a
+              pool: app
+            exp_annotations:
+              summary: "api-a Postgres pool at 90% or more"
+              description: >-
+                A process of api-a had 95% of its app pool (DB_POOL_MAX) checked out on average over 5 minutes; at
+                most 1 of 20 was in use up to 1,000 streams per pod in E3 (reports/perf/sizing.md §3).
+              runbook_url: docs/operations/runbooks.md#noema-postgres-pool-saturated
+
+  # Quorum p95 per profile: router-plus answers in (1.0, 1.5] s (p95 1.475 s), router-default in (0.25, 0.5] s.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-plus",le="0.5"}'
+        values: '0x30'
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-plus",le="1"}'
+        values: '0x30'
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-plus",le="1.5"}'
+        values: '0+10x30'
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-plus",le="+Inf"}'
+        values: '0+10x30'
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-default",le="0.25"}'
+        values: '0x30'
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-default",le="0.5"}'
+        values: '0+10x30'
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-default",le="1"}'
+        values: '0+10x30'
+      - series: 'aghoo_decision_quorum_reached_seconds_bucket{profile="router-default",le="+Inf"}'
+        values: '0+10x30'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: noema-decision-quorum-slow
+        exp_alerts: []
+      - eval_time: 25m
+        alertname: noema-decision-quorum-slow
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              profile: router-plus
+            exp_annotations:
+              summary: "Commit-critical quorum p95 above the 1,000 ms deadline (router-plus)"
+              description: >-
+                Decisions of profile router-plus reach quorum on every commit-critical question in 1.475s at p95,
+                above the default 1,000 ms decision deadline (design 08 §7, 06 §4 L4). Profiles with a longer
+                deadline (e.g. hierarchical ones) need their own threshold.
+              runbook_url: docs/operations/runbooks.md#noema-decision-quorum-slow
+
+  # Spec restarts: 15 per 100 turns is above 10% (the next case, 5 per 100, is not).
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_spec_restarts_total{profile="router-default"}'
+        values: '0+15x60'
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="router-default",model="sol",strategy="holdback"}'
+        values: '0+100x60'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: noema-spec-restart-rate-high
+        exp_alerts: []
+      - eval_time: 45m
+        alertname: noema-spec-restart-rate-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Spec restarts above 10% of turns
+              description: >-
+                15% of turns restarted generation because the decided spec changed (design 08 §6 and §7: > 10%).
+                Stickiness is ineffective or conditioning is too chatty.
+              runbook_url: docs/operations/runbooks.md#noema-spec-restart-rate-high
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_spec_restarts_total{profile="router-default"}'
+        values: '0+5x60'
+      - series: 'aghoo_e2e_seconds_count{job="noema-api",pod="api-a",profile="router-default",model="sol",strategy="holdback"}'
+        values: '0+100x60'
+    alert_rule_test:
+      - eval_time: 45m
+        alertname: noema-spec-restart-rate-high
+        exp_alerts: []
+
+  # DeepSeek p99: every DeepSeek answer in (1.5, 2.0] s (p99 1.995 s) fires ...
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_decision_seconds_bucket{profile="router-default",stage="all",member="deepseek-3.2",le="1.5"}'
+        values: '0x30'
+      - series: 'aghoo_decision_seconds_bucket{profile="router-default",stage="all",member="deepseek-3.2",le="2"}'
+        values: '0+10x30'
+      - series: 'aghoo_decision_seconds_bucket{profile="router-default",stage="all",member="deepseek-3.2",le="+Inf"}'
+        values: '0+10x30'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: noema-deepseek-p99-high
+        exp_alerts: []
+      - eval_time: 25m
+        alertname: noema-deepseek-p99-high
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: DeepSeek decision member p99 above 1.5 s
+              description: >-
+                The DeepSeek member's p99 latency is 1.995s (design 08 §6: > 1.5 s; L5 measured 929.5 ms with
+                backups, reports/qa/wave-e-summary.md). Check the backup-request rate and backup_after_ms.
+              runbook_url: docs/operations/runbooks.md#noema-deepseek-p99-high
+
+  # ... a fast DeepSeek (<= 0.5 s) does not, even when another member is slow.
+  - interval: 1m
+    input_series:
+      - series: 'aghoo_decision_seconds_bucket{profile="router-default",stage="all",member="deepseek-3.2",le="0.5"}'
+        values: '0+10x30'
+      - series: 'aghoo_decision_seconds_bucket{profile="router-default",stage="all",member="deepseek-3.2",le="+Inf"}'
+        values: '0+10x30'
+      - series: 'aghoo_decision_seconds_bucket{profile="router-default",stage="all",member="claude-haiku",le="1.5"}'
+        values: '0x30'
+      - series: 'aghoo_decision_seconds_bucket{profile="router-default",stage="all",member="claude-haiku",le="+Inf"}'
+        values: '0+10x30'
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: noema-deepseek-p99-high
+        exp_alerts: []

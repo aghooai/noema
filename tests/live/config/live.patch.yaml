@@ -1,0 +1,20 @@
+# Live-smoke config (spec-10 §6): the shipped example config deep-merged with this patch. `${AMBIENT_ACCOUNT}` is
+# replaced at run time by the caller account of `sts:GetCallerIdentity` (the AmbientBroker maps one tenant to it).
+# Labeling sampling is off, so no labeler call is ever made.
+labeling:
+  sample:
+    uniform_rate: 0
+    uncertainty_rate: 0
+tenants:
+  t_acme: null
+  t_dev:
+    aws_account_id: "${AMBIENT_ACCOUNT}"
+    invoke_role_arn: "arn:aws:iam::${AMBIENT_ACCOUNT}:role/AghooBedrockInvoke"
+    external_id_ref: "aws-sm://platform/tenants/t_dev/external-id"
+    home_region: us-east-1
+    defaults:
+      decision_profile: lightweight-model-decide
+      generation_profile: sol-fast
+    request_overrides:
+      decision_profiles: [router-default, lightweight-model-decide]
+      generation_profiles: [sol-fast]

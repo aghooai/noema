@@ -1,0 +1,46 @@
+{
+  "alias": "sonnet-5.5",
+  "blocks": {
+    "DocumentBlock": 1,
+    "TextBlock": 1
+  },
+  "call_kind": "labeling",
+  "e2e_ms": 901,
+  "effort": null,
+  "estimated_input_tokens": 1517,
+  "latency_ms": 900,
+  "logprob_tokens": null,
+  "max_tokens": 128,
+  "model_id": "us.anthropic.claude-sonnet-5-5",
+  "n": 7,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_adapters_live.py::test_l4_sonnet_media[pdf]",
+  "test_call": 1,
+  "text_chars": 4,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 1635,
+    "output_tokens": 4,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "metrics.latencyMs:int",
+      "output.message.content[].text:str",
+      "output.message.role:str",
+      "stopReason:str",
+      "usage.cacheReadInputTokens:int",
+      "usage.cacheWriteInputTokens:int",
+      "usage.inputTokens:int",
+      "usage.outputTokens:int",
+      "usage.totalTokens:int"
+    ]
+  }
+}

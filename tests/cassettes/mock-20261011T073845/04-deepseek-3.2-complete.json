@@ -1,0 +1,49 @@
+{
+  "alias": "deepseek-3.2",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "decision_member",
+  "e2e_ms": 507,
+  "effort": null,
+  "estimated_input_tokens": 16,
+  "latency_ms": 501,
+  "logprob_tokens": null,
+  "max_tokens": 128,
+  "model_id": "deepseek.v3.2",
+  "n": 4,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_adapters_live.py::test_l3_mantle_auth_probes",
+  "test_call": 1,
+  "text_chars": 3,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 15,
+    "output_tokens": 1,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "choices[].finish_reason:str",
+      "choices[].index:int",
+      "choices[].logprobs:NoneType",
+      "choices[].message.content:str",
+      "choices[].message.refusal:NoneType",
+      "choices[].message.role:str",
+      "created:int",
+      "id:str",
+      "model:str",
+      "object:str",
+      "usage.completion_tokens:int",
+      "usage.prompt_tokens:int",
+      "usage.total_tokens:int"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "alias": "deepseek-3.2",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "decision_member",
+  "e2e_ms": 2,
+  "effort": null,
+  "error": {
+    "kind": "tenant_access",
+    "message": "provider denied access",
+    "provider_code": "401"
+  },
+  "estimated_input_tokens": 22,
+  "max_tokens": 128,
+  "model_id": "deepseek.v3.2",
+  "n": 5,
+  "op": "complete",
+  "test": "tests/live/test_adapters_live.py::test_l3_mantle_auth_probes",
+  "test_call": 2,
+  "wire": {
+    "error": {
+      "code": 401,
+      "exception": "ProviderHttpError",
+      "http_status": 401,
+      "message": "HTTP 401"
+    },
+    "events": [],
+    "response": []
+  }
+}

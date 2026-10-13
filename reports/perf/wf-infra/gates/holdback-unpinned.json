@@ -1,0 +1,501 @@
+{
+  "L2 agree T_d=300 TTFA=2400": {
+    "bound_ms": 2450,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 327.0,
+      "n": 200,
+      "p50": 308.0,
+      "p95": 312.0,
+      "p99": 320.0
+    },
+    "driver_lag_p99_ms": 1.1,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.81,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 2421.6,
+      "n": 200,
+      "p50": 2407.0,
+      "p95": 2409.4,
+      "p99": 2412.8
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L2 agree T_d=300 TTFA=300": {
+    "bound_ms": 350,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 326.0,
+      "n": 200,
+      "p50": 309.0,
+      "p95": 315.0,
+      "p99": 319.0
+    },
+    "driver_lag_p99_ms": 1.08,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 25.58,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 330.3,
+      "n": 200,
+      "p50": 314.2,
+      "p95": 321.6,
+      "p99": 328.8
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L2 agree T_d=300 TTFA=720": {
+    "bound_ms": 770,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 327.0,
+      "n": 200,
+      "p50": 308.0,
+      "p95": 311.0,
+      "p99": 312.0
+    },
+    "driver_lag_p99_ms": 1.09,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.47,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 738.7,
+      "n": 200,
+      "p50": 727.1,
+      "p95": 729.9,
+      "p99": 730.9
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L2 agree T_d=900 TTFA=2400": {
+    "bound_ms": 2450,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 942.0,
+      "n": 200,
+      "p50": 910.0,
+      "p95": 914.0,
+      "p99": 915.0
+    },
+    "driver_lag_p99_ms": 1.1,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.26,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 2424.2,
+      "n": 200,
+      "p50": 2407.3,
+      "p95": 2411.2,
+      "p99": 2412.8
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L2 agree T_d=900 TTFA=300": {
+    "bound_ms": 950,
+    "committed_reason": {
+      "holdback_deadline": 200
+    },
+    "decision_ms": {
+      "max": 941.0,
+      "n": 200,
+      "p50": 910.0,
+      "p95": 915.0,
+      "p99": 927.0
+    },
+    "driver_lag_p99_ms": 1.08,
+    "holdback_deadline_share": 1.0,
+    "mock_lateness_p99_ms": 28.71,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "None": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 738.1,
+      "n": 200,
+      "p50": 707.7,
+      "p95": 711.3,
+      "p99": 713.7
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L2 agree T_d=900 TTFA=720": {
+    "bound_ms": 950,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 958.0,
+      "n": 200,
+      "p50": 910.0,
+      "p95": 915.0,
+      "p99": 939.0
+    },
+    "driver_lag_p99_ms": 1.08,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.54,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "0": 250
+    },
+    "ttft_ms": {
+      "max": 963.6,
+      "n": 200,
+      "p50": 915.9,
+      "p95": 920.7,
+      "p99": 944.5
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=300 TTFA=2400": {
+    "bound_ms": 2800,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 327.0,
+      "n": 200,
+      "p50": 307.0,
+      "p95": 312.0,
+      "p99": 314.0
+    },
+    "driver_lag_p99_ms": 1.11,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.23,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 2736.0,
+      "n": 200,
+      "p50": 2715.5,
+      "p95": 2720.4,
+      "p99": 2723.0
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=300 TTFA=300": {
+    "bound_ms": 700,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 337.0,
+      "n": 200,
+      "p50": 308.0,
+      "p95": 311.0,
+      "p99": 315.0
+    },
+    "driver_lag_p99_ms": 1.09,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.31,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 646.2,
+      "n": 200,
+      "p50": 616.3,
+      "p95": 621.5,
+      "p99": 638.6
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=300 TTFA=720": {
+    "bound_ms": 1120,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 340.0,
+      "n": 200,
+      "p50": 308.0,
+      "p95": 311.0,
+      "p99": 314.0
+    },
+    "driver_lag_p99_ms": 1.08,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.26,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 1068.8,
+      "n": 200,
+      "p50": 1035.8,
+      "p95": 1040.0,
+      "p99": 1059.8
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=900 TTFA=2400": {
+    "bound_ms": 3400,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 926.0,
+      "n": 200,
+      "p50": 911.0,
+      "p95": 915.0,
+      "p99": 917.0
+    },
+    "driver_lag_p99_ms": 1.12,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.97,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 3333.4,
+      "n": 200,
+      "p50": 3318.6,
+      "p95": 3323.0,
+      "p99": 3324.7
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "L3 disagree T_d=900 TTFA=300": {
+    "bound_ms": 1300,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 957.0,
+      "n": 200,
+      "p50": 910.0,
+      "p95": 915.0,
+      "p99": 919.0
+    },
+    "driver_lag_p99_ms": 1.09,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 2.13,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 1261.7,
+      "n": 200,
+      "p50": 1217.9,
+      "p95": 1222.7,
+      "p99": 1226.0
+    },
+    "valid": false,
+    "warmup": 50
+  },
+  "L3 disagree T_d=900 TTFA=720": {
+    "bound_ms": 1720,
+    "committed_reason": {
+      "spec_agrees": 200
+    },
+    "decision_ms": {
+      "max": 926.0,
+      "n": 200,
+      "p50": 909.0,
+      "p95": 915.0,
+      "p99": 919.0
+    },
+    "driver_lag_p99_ms": 1.11,
+    "holdback_deadline_share": 0.0,
+    "mock_lateness_p99_ms": 1.55,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "False": 200
+    },
+    "served": 250,
+    "spec_restarts": {
+      "1": 250
+    },
+    "ttft_ms": {
+      "max": 1683.2,
+      "n": 200,
+      "p50": 1637.5,
+      "p95": 1644.0,
+      "p99": 1650.1
+    },
+    "valid": true,
+    "warmup": 50
+  },
+  "Q8 late disagreement T_d=900 TTFA=300": {
+    "bound_ms": null,
+    "committed_reason": {
+      "holdback_deadline": 200
+    },
+    "decision_ms": {
+      "max": 949.0,
+      "n": 200,
+      "p50": 910.0,
+      "p95": 915.0,
+      "p99": 919.0
+    },
+    "driver_lag_p99_ms": 1.09,
+    "hold_cap_ms": 700,
+    "holdback_deadline_share": 1.0,
+    "mock_lateness_p99_ms": 1.8,
+    "n": 200,
+    "outcomes": {
+      "completed": 250
+    },
+    "premise_misses": [],
+    "premise_share": 1.0,
+    "route_confirmed_served_spec_differs": {
+      "None": 200
+    },
+    "served": 250,
+    "served_spec_differs_rate": 1.0,
+    "spec_restarts": {
+      "0": 250
+    },
+    "stored_served_spec_differs": {
+      "True": 200
+    },
+    "ttft_ms": {
+      "max": 731.0,
+      "n": 200,
+      "p50": 707.6,
+      "p95": 711.5,
+      "p99": 713.2
+    },
+    "valid": true,
+    "warmup": 50
+  }
+}

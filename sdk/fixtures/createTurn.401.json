@@ -1,0 +1,18 @@
+{
+  "status": 401,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000",
+    "www-authenticate": "Bearer"
+  },
+  "body": {
+    "error": {
+      "type": "authentication_error",
+      "code": "invalid_api_key",
+      "message": "invalid API key",
+      "param": null,
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": false
+    }
+  }
+}

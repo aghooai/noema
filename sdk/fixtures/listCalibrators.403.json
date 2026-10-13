@@ -1,0 +1,17 @@
+{
+  "status": 403,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "error": {
+      "type": "permission_error",
+      "code": "permission_denied",
+      "message": "role developer may not read calibrators",
+      "param": null,
+      "request_id": "req_01JA0000000000000000000000",
+      "retryable": false
+    }
+  }
+}

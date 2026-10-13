@@ -1,0 +1,129 @@
+{
+  "F12-rate0.25": {
+    "amplification": 1.211,
+    "amplification_per_attempted_turn": 1.211,
+    "amplification_per_upstream": {
+      "us.anthropic.claude-opus-5-5": 1.0,
+      "us.openai.gpt-6.1-sol": 1.055,
+      "us.zai.glm-5.3": 1.0
+    },
+    "attempts_per_turn": {
+      "1": 617,
+      "2": 108,
+      "3": 25
+    },
+    "fallback": {
+      "fallback_started": 133,
+      "fallback_started_served": 127,
+      "first_attempt_failed": 201,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 68
+      },
+      "served": 127
+    },
+    "faulted_requests": 232,
+    "first_sends_by_model": {
+      "us.anthropic.claude-opus-5-5": 250,
+      "us.openai.gpt-6.1-sol": 383,
+      "us.zai.glm-5.3": 250
+    },
+    "generation_amplification_per_upstream": {
+      "us.anthropic.claude-opus-5-5": 1.0,
+      "us.openai.gpt-6.1-sol": 1.065,
+      "us.zai.glm-5.3": 1.0
+    },
+    "generation_requests": 908,
+    "other_requests_by_model": {
+      "deepseek.v3.2": 3750,
+      "us.anthropic.claude-haiku-5-5": 3750,
+      "us.anthropic.claude-sonnet-5-5": 70,
+      "us.openai.gpt-6-luna": 3750,
+      "us.openai.gpt-6.1-sol": 70
+    },
+    "outcomes": {
+      "glm-reason": {
+        "completed": 245,
+        "error:all_routes_unavailable": 5
+      },
+      "opus-deep": {
+        "completed": 249,
+        "error:all_routes_unavailable": 1
+      },
+      "sol-fast": {
+        "completed": 182,
+        "error:all_routes_unavailable": 68
+      }
+    },
+    "rate_turns_per_s": 12.5,
+    "requests_by_model": {
+      "us.anthropic.claude-opus-5-5": 250,
+      "us.openai.gpt-6.1-sol": 408,
+      "us.zai.glm-5.3": 250
+    },
+    "turns": 750
+  },
+  "F12-rate0.5": {
+    "amplification": 0.237,
+    "amplification_per_attempted_turn": 1.179,
+    "amplification_per_upstream": {
+      "us.anthropic.claude-opus-5-5": 1.0,
+      "us.openai.gpt-6.1-sol": 1.059,
+      "us.zai.glm-5.3": 1.0
+    },
+    "attempts_per_turn": {
+      "0": 599,
+      "1": 132,
+      "2": 11,
+      "3": 8
+    },
+    "fallback": {
+      "fallback_started": 19,
+      "fallback_started_served": 13,
+      "first_attempt_failed": 83,
+      "not_started_outcomes": {
+        "error:all_routes_unavailable": 64
+      },
+      "served": 13
+    },
+    "faulted_requests": 97,
+    "first_sends_by_model": {
+      "us.anthropic.claude-opus-5-5": 73,
+      "us.openai.gpt-6.1-sol": 41,
+      "us.zai.glm-5.3": 56
+    },
+    "generation_amplification_per_upstream": {
+      "us.anthropic.claude-opus-5-5": 1.0,
+      "us.openai.gpt-6.1-sol": 1.195,
+      "us.zai.glm-5.3": 1.0
+    },
+    "generation_requests": 178,
+    "other_requests_by_model": {
+      "deepseek.v3.2": 3750,
+      "us.anthropic.claude-haiku-5-5": 3750,
+      "us.anthropic.claude-sonnet-5-5": 95,
+      "us.openai.gpt-6-luna": 3750,
+      "us.openai.gpt-6.1-sol": 95
+    },
+    "outcomes": {
+      "glm-reason": {
+        "completed": 32,
+        "error:all_routes_unavailable": 218
+      },
+      "opus-deep": {
+        "completed": 41,
+        "error:all_routes_unavailable": 209
+      },
+      "sol-fast": {
+        "completed": 8,
+        "error:all_routes_unavailable": 242
+      }
+    },
+    "rate_turns_per_s": 12.5,
+    "requests_by_model": {
+      "us.anthropic.claude-opus-5-5": 73,
+      "us.openai.gpt-6.1-sol": 49,
+      "us.zai.glm-5.3": 56
+    },
+    "turns": 750
+  }
+}

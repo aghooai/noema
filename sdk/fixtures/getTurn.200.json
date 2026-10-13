@@ -1,0 +1,69 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "turn_id": "turn_1",
+    "session_id": "ses_1",
+    "seq": 5,
+    "text": "Paris is the capital of France.",
+    "decision": null,
+    "routing": {
+      "route_id": "sol-fast",
+      "generation_profile": "sol-fast",
+      "mode": "single",
+      "selection": "default",
+      "strategy": "gate",
+      "decision_id": null,
+      "policy_version": "1",
+      "matched_bindings": [],
+      "basis": [],
+      "params": {},
+      "conditioning": null,
+      "served_spec_differs": null,
+      "reason": "default route",
+      "fallbacks": []
+    },
+    "attempts": [
+      {
+        "attempt_id": "att_1",
+        "route_id": "sol-fast",
+        "model": "us.openai.gpt-6.1-sol",
+        "outcome": "committed",
+        "usage": {
+          "input_tokens": 1200,
+          "output_tokens": 300,
+          "cached_input_tokens": 200,
+          "cache_write_input_tokens": 0,
+          "reasoning_tokens": 40,
+          "cost_usd": 0.0123,
+          "cost_estimated": true,
+          "tokens_estimated": false
+        }
+      }
+    ],
+    "verification": null,
+    "degradations": [],
+    "usage": {
+      "input_tokens": 1200,
+      "output_tokens": 300,
+      "cached_input_tokens": 200,
+      "cache_write_input_tokens": 0,
+      "reasoning_tokens": 40,
+      "cost_usd": 0.0123,
+      "cost_estimated": true,
+      "tokens_estimated": false
+    },
+    "timings": {
+      "ttft_ms": 420,
+      "decision_ms": null,
+      "decision_lead_ms": null,
+      "holdback_ms": null,
+      "e2e_ms": 900,
+      "spec_restarts": 0,
+      "wasted_output_tokens": 0
+    }
+  }
+}

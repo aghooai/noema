@@ -1,0 +1,26 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "id": "ses_1",
+        "created_at": 1791633601,
+        "last_seq": 0,
+        "data_class": "internal",
+        "retention": {
+          "policy": "default",
+          "expires_at": null
+        },
+        "metadata": {
+          "app": "support"
+        }
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null
+  }
+}

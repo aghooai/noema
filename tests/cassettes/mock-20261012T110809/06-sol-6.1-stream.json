@@ -1,0 +1,75 @@
+{
+  "alias": "sol-6.1",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "generation",
+  "counts": {
+    "MessageStart": 1,
+    "Stop": 1,
+    "TextDelta": 30,
+    "UsageEvent": 1
+  },
+  "e2e_ms": 2637,
+  "effort": "low",
+  "estimated_input_tokens": 140,
+  "estimated_input_tokens_chars4": 148,
+  "events": [
+    "MessageStart",
+    "TextDelta",
+    "Stop",
+    "UsageEvent"
+  ],
+  "input_chars": 589,
+  "max_tokens": 512,
+  "model_id": "us.openai.gpt-6.1-sol",
+  "n": 6,
+  "op": "stream",
+  "stop": "end_turn",
+  "t_first_MessageStart_ms": 203,
+  "t_first_Stop_ms": 2636,
+  "t_first_TextDelta_ms": 703,
+  "t_first_UsageEvent_ms": 2637,
+  "test": "tests/live/test_api_live.py::test_l7_verified_turn_on_the_glm_race",
+  "test_call": 3,
+  "text_chars": 480,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 148,
+    "output_tokens": 120,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "decoder": {
+      "botocore_errors": 0,
+      "botocore_extra": 0,
+      "bytes": 5414,
+      "chunks": 31,
+      "equal": 34,
+      "fallback": false,
+      "messages": 34
+    },
+    "error": null,
+    "events": [
+      "messageStart.role",
+      "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text*30",
+      "contentBlockStop.contentBlockIndex",
+      "messageStop.stopReason",
+      "metadata.metrics.latencyMs|metadata.usage.inputTokens|metadata.usage.outputTokens|metadata.usage.totalTokens"
+    ],
+    "response": [],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": true,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date",
+        "x-amz-security-token"
+      ]
+    }
+  }
+}

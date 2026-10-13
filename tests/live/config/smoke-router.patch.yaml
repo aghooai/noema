@@ -1,0 +1,27 @@
+# L8 only (spec-10 §6): a second activation whose router decides one commit-critical question with one member
+# (Luna), so each pinned turn costs exactly 2 calls (1 decision member + 1 generation). Routes and bindings that
+# name other router questions or choices are removed (null deletes a key; lists replace).
+decision_profiles:
+  smoke-router:
+    version: 1
+    deadline_ms: 1000
+    min_quorum: 1
+    aggregation: linear_pool
+    commit_critical: [intent]
+    questions:
+      - type: choice
+        name: intent
+        instructions: "What is the user's primary intent?"
+        choices: [{value: chitchat}, {value: factual_qa}, {value: other}]
+    members:
+      - {model: luna-6, elicitation: verbalized, template: verbalized-dist@1, weight: 1, effort: none}
+routing:
+  router_profile: smoke-router
+  intent_routes:
+    coding: null
+    math_reasoning: null
+    document_qa: null
+    image_understanding: null
+  bindings:
+    - when: {answer: intent, mode: rule, p_max_gte: 0.75, margin_gte: 0.3, eval_ref: rpt_phase0_routing_v1}
+      then: {generation_profile: "intent_routes[intent]", conditioning: direct}

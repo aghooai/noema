@@ -1,0 +1,58 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "id": "lrun_1",
+        "object": "labeling_run",
+        "status": "completed",
+        "profile_id": "router-default",
+        "profile_version": "1",
+        "question_name": "intent",
+        "question_signature": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "labelers": [
+          "us.openai.gpt-6.1-sol",
+          "us.anthropic.claude-sonnet-5-5"
+        ],
+        "rule": "unanimous",
+        "counts": {
+          "sampled": 10,
+          "sampled_uniform": 8,
+          "sampled_uncertainty": 2,
+          "kept": 7,
+          "dropped_disagreed": 2,
+          "dropped_refused": 1,
+          "dropped_parse_error": 0,
+          "dropped_labeler_error": 0
+        },
+        "consensus_rate": 0.7,
+        "consensus_rate_by_class": {
+          "billing": 0.8,
+          "other": 0.5
+        },
+        "n_by_class": {
+          "billing": 4,
+          "other": 3
+        },
+        "usage": {
+          "input_tokens": 1200,
+          "output_tokens": 300,
+          "cached_input_tokens": 200,
+          "cache_write_input_tokens": 0,
+          "reasoning_tokens": 40,
+          "cost_usd": 0.0123,
+          "cost_estimated": true,
+          "tokens_estimated": false
+        },
+        "started_at": 1791633600,
+        "completed_at": 1791637200
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null
+  }
+}

@@ -1,0 +1,647 @@
+{
+ "steps": [
+  {
+   "streams": 50,
+   "hold_s": 120.0,
+   "t_from": 8763173868407970,
+   "t_to": 8763293868407970,
+   "window_s": 120.0,
+   "turns_sent": 855,
+   "turns_timed": 855,
+   "turns_per_s": 7.12,
+   "skipped": {},
+   "ttft_overhead_ms": {
+    "n": 855,
+    "mean": 11.48,
+    "max": 48.76,
+    "p50": [
+     10.122,
+     10.03,
+     10.175
+    ],
+    "p95": [
+     17.22,
+     16.543,
+     18.46
+    ],
+    "p99": [
+     40.061,
+     37.722,
+     46.215
+    ]
+   },
+   "e2e_overhead_ms": {
+    "n": 855,
+    "mean": 17.909,
+    "max": 118.351,
+    "p50": [
+     16.82,
+     16.706,
+     16.93
+    ],
+    "p95": [
+     21.421,
+     20.203,
+     22.743
+    ],
+    "p99": [
+     45.567,
+     32.284,
+     66.972
+    ]
+   },
+   "ttft_overhead_nominal_ms": {
+    "n": 855,
+    "mean": 11.569,
+    "max": 49.084,
+    "p50": 10.235,
+    "p95": 17.514,
+    "p99": 39.975
+   },
+   "e2e_overhead_nominal_ms": {
+    "n": 855,
+    "mean": 18.222,
+    "max": 118.789,
+    "p50": 17.212,
+    "p95": 21.758,
+    "p99": 45.81
+   },
+   "ingress_ms": {
+    "n": 855,
+    "mean": 9.644,
+    "max": 42.377,
+    "p50": 9.229,
+    "p95": 11.17,
+    "p99": 24.944
+   },
+   "egress_first_ms": {
+    "n": 855,
+    "mean": 1.838,
+    "max": 40.537,
+    "p50": 0.604,
+    "p95": 7.349,
+    "p99": 27.298
+   },
+   "egress_max_other_ms": {
+    "n": 855,
+    "mean": 18.779,
+    "max": 123.122,
+    "p50": 15.884,
+    "p95": 37.446,
+    "p99": 47.481
+   },
+   "client_ttft_ms": {
+    "n": 855,
+    "mean": 311.569,
+    "max": 349.084,
+    "p50": 310.235,
+    "p95": 317.514,
+    "p99": 339.975
+   },
+   "client_e2e_ms": {
+    "n": 855,
+    "mean": 6918.222,
+    "max": 7018.789,
+    "p50": 6917.212,
+    "p95": 6921.758,
+    "p99": 6945.81
+   },
+   "decision_ms": {
+    "n": 855,
+    "mean": 59.807,
+    "max": 96.0,
+    "p50": [
+     59.0,
+     59.0,
+     59.0
+    ],
+    "p95": [
+     63.3,
+     62.3,
+     64.0
+    ],
+    "p99": [
+     73.92,
+     67.0,
+     91.0
+    ]
+   },
+   "decision_lead_ms": {
+    "n": 855,
+    "mean": 244.499,
+    "max": 279.0,
+    "p50": 244.0,
+    "p95": 250.0,
+    "p99": 268.46
+   },
+   "validity": {
+    "valid": true,
+    "checks": {
+     "holdback_zero_and_spec_agrees": true,
+     "driver_lag_p99": true,
+     "mock_lag_p99": true
+    },
+    "holdback_zero_share": 1.0,
+    "holdback_zero_and_spec_agrees_share": 1.0,
+    "holdback_nonzero_ms": {},
+    "worst_process_lag_p99_ms": {
+     "drivers": 0.928,
+     "mock": 0.899
+    },
+    "committed_reasons": {
+     "spec_agrees": 855
+    },
+    "decision_calls_per_turn": {
+     "15": 855
+    }
+   },
+   "mock_lateness_ms": {
+    "stream_first_text": {
+     "n": 855,
+     "mean": 0.088,
+     "max": 1.47,
+     "p50": 0.069,
+     "p95": 0.957,
+     "p99": 1.245
+    },
+    "decision_answer": {
+     "n": 12825,
+     "mean": 0.296,
+     "max": 2.73,
+     "p50": 0.284,
+     "p95": 1.005,
+     "p99": 1.185
+    }
+   },
+   "lag_ms": {
+    "api": {
+     "n": 11539,
+     "p50": 0.085,
+     "p99": 7.089,
+     "p99.9": 33.215,
+     "max": 46.225
+    },
+    "mock": {
+     "n": 47571,
+     "p50": 0.082,
+     "p99": 0.841,
+     "p99.9": 1.206,
+     "max": 20.073
+    },
+    "drivers": {
+     "n": 11930,
+     "p50": 0.077,
+     "p99": 0.928,
+     "p99.9": 1.03,
+     "max": 1.065
+    }
+   },
+   "resources": {
+    "samples": 24,
+    "api_cpu_cores": 0.355,
+    "driver_cpu_cores": 0.082,
+    "mock_cpu_cores": [
+     0.037,
+     0.007,
+     0.038,
+     0.013
+    ],
+    "rss_mib": {
+     "first": 202.9,
+     "last": 236.4,
+     "max": 236.4
+    },
+    "fds_max": 166,
+    "threads_max": 9,
+    "loadavg_1m": {
+     "min": 2.42,
+     "max": 3.4,
+     "mean": 2.89
+    }
+   },
+   "errors": {}
+  },
+  {
+   "streams": 100,
+   "hold_s": 120.0,
+   "t_from": 8763323868407970,
+   "t_to": 8763443868407970,
+   "window_s": 120.0,
+   "turns_sent": 1738,
+   "turns_timed": 1738,
+   "turns_per_s": 14.48,
+   "skipped": {},
+   "ttft_overhead_ms": {
+    "n": 1738,
+    "mean": 25.285,
+    "max": 161.14,
+    "p50": [
+     18.314,
+     17.72,
+     18.907
+    ],
+    "p95": [
+     67.79,
+     59.986,
+     75.403
+    ],
+    "p99": [
+     102.078,
+     96.364,
+     111.223
+    ]
+   },
+   "e2e_overhead_ms": {
+    "n": 1738,
+    "mean": 43.645,
+    "max": 253.346,
+    "p50": [
+     33.728,
+     32.35,
+     35.014
+    ],
+    "p95": [
+     101.82,
+     97.432,
+     107.788
+    ],
+    "p99": [
+     140.273,
+     133.045,
+     147.613
+    ]
+   },
+   "ttft_overhead_nominal_ms": {
+    "n": 1738,
+    "mean": 25.653,
+    "max": 161.773,
+    "p50": 18.392,
+    "p95": 68.97,
+    "p99": 101.96
+   },
+   "e2e_overhead_nominal_ms": {
+    "n": 1738,
+    "mean": 44.228,
+    "max": 253.156,
+    "p50": 34.107,
+    "p95": 102.959,
+    "p99": 140.269
+   },
+   "ingress_ms": {
+    "n": 1738,
+    "mean": 18.828,
+    "max": 149.627,
+    "p50": 13.468,
+    "p95": 43.812,
+    "p99": 92.272
+   },
+   "egress_first_ms": {
+    "n": 1738,
+    "mean": 6.458,
+    "max": 143.194,
+    "p50": 1.926,
+    "p95": 30.42,
+    "p99": 75.085
+   },
+   "egress_max_other_ms": {
+    "n": 1738,
+    "mean": 79.298,
+    "max": 163.596,
+    "p50": 77.685,
+    "p95": 116.259,
+    "p99": 154.169
+   },
+   "client_ttft_ms": {
+    "n": 1738,
+    "mean": 325.653,
+    "max": 461.773,
+    "p50": 318.392,
+    "p95": 368.97,
+    "p99": 401.96
+   },
+   "client_e2e_ms": {
+    "n": 1738,
+    "mean": 6944.228,
+    "max": 7153.156,
+    "p50": 6934.107,
+    "p95": 7002.959,
+    "p99": 7040.269
+   },
+   "decision_ms": {
+    "n": 1738,
+    "mean": 78.872,
+    "max": 250.0,
+    "p50": [
+     69.0,
+     68.0,
+     70.0
+    ],
+    "p95": [
+     139.0,
+     134.0,
+     144.15
+    ],
+    "p99": [
+     177.63,
+     162.0,
+     189.0
+    ]
+   },
+   "decision_lead_ms": {
+    "n": 1738,
+    "mean": 232.455,
+    "max": 367.0,
+    "p50": 238.0,
+    "p95": 261.15,
+    "p99": 300.63
+   },
+   "validity": {
+    "valid": true,
+    "checks": {
+     "holdback_zero_and_spec_agrees": true,
+     "driver_lag_p99": true,
+     "mock_lag_p99": true
+    },
+    "holdback_zero_share": 1.0,
+    "holdback_zero_and_spec_agrees_share": 1.0,
+    "holdback_nonzero_ms": {},
+    "worst_process_lag_p99_ms": {
+     "drivers": 0.937,
+     "mock": 1.052
+    },
+    "committed_reasons": {
+     "spec_agrees": 1738
+    },
+    "decision_calls_per_turn": {
+     "15": 1738
+    }
+   },
+   "mock_lateness_ms": {
+    "stream_first_text": {
+     "n": 1737,
+     "mean": 0.368,
+     "max": 74.11,
+     "p50": 0.068,
+     "p95": 0.991,
+     "p99": 4.565
+    },
+    "decision_answer": {
+     "n": 26055,
+     "mean": 0.435,
+     "max": 66.951,
+     "p50": 0.307,
+     "p95": 1.037,
+     "p99": 1.328
+    }
+   },
+   "lag_ms": {
+    "api": {
+     "n": 10571,
+     "p50": 0.171,
+     "p99": 12.557,
+     "p99.9": 81.398,
+     "max": 150.548
+    },
+    "mock": {
+     "n": 47391,
+     "p50": 0.081,
+     "p99": 0.985,
+     "p99.9": 3.968,
+     "max": 83.431
+    },
+    "drivers": {
+     "n": 23847,
+     "p50": 0.074,
+     "p99": 0.932,
+     "p99.9": 1.066,
+     "max": 17.796
+    }
+   },
+   "resources": {
+    "samples": 24,
+    "api_cpu_cores": 0.696,
+    "driver_cpu_cores": 0.177,
+    "mock_cpu_cores": [
+     0.079,
+     0.014,
+     0.076,
+     0.022
+    ],
+    "rss_mib": {
+     "first": 273.9,
+     "last": 341.2,
+     "max": 341.2
+    },
+    "fds_max": 292,
+    "threads_max": 9,
+    "loadavg_1m": {
+     "min": 2.28,
+     "max": 3.86,
+     "mean": 2.94
+    }
+   },
+   "errors": {}
+  }
+ ],
+ "memory": [
+  {
+   "t_ns": 8763113873789019,
+   "loadavg": [
+    3.06,
+    3.23,
+    4.28
+   ],
+   "api": {
+    "cpu_s": 1.48,
+    "VmHWM": 162856,
+    "VmRSS": 162856,
+    "Threads": 9,
+    "fds": 24
+   },
+   "mock_cpu_s": [
+    0.15,
+    0.16,
+    0.15,
+    0.16
+   ],
+   "driver_cpu_s": 0.0,
+   "drivers": 1
+  },
+  {
+   "t_ns": 8763173892385491,
+   "loadavg": [
+    2.99,
+    3.17,
+    4.19
+   ],
+   "api": {
+    "cpu_s": 21.99,
+    "VmHWM": 207772,
+    "VmRSS": 207772,
+    "Threads": 9,
+    "fds": 166
+   },
+   "mock_cpu_s": [
+    2.28,
+    0.57,
+    2.32,
+    0.91
+   ],
+   "driver_cpu_s": 4.99,
+   "drivers": 1
+  },
+  {
+   "t_ns": 8763233910447767,
+   "loadavg": [
+    2.64,
+    3.04,
+    4.08
+   ],
+   "api": {
+    "cpu_s": 43.1,
+    "VmHWM": 225168,
+    "VmRSS": 225168,
+    "Threads": 9,
+    "fds": 166
+   },
+   "mock_cpu_s": [
+    4.51,
+    0.97,
+    4.64,
+    1.68
+   ],
+   "driver_cpu_s": 9.9,
+   "drivers": 1
+  },
+  {
+   "t_ns": 8763294377273282,
+   "loadavg": [
+    2.56,
+    3.0,
+    4.0
+   ],
+   "api": {
+    "cpu_s": 64.72,
+    "VmHWM": 243952,
+    "VmRSS": 243952,
+    "Threads": 9,
+    "fds": 170
+   },
+   "mock_cpu_s": [
+    6.77,
+    1.38,
+    6.95,
+    2.46
+   ],
+   "driver_cpu_s": 15.07,
+   "drivers": 2
+  },
+  {
+   "t_ns": 8763354397205597,
+   "loadavg": [
+    3.53,
+    3.14,
+    3.98
+   ],
+   "api": {
+    "cpu_s": 106.65,
+    "VmHWM": 298804,
+    "VmRSS": 298804,
+    "Threads": 9,
+    "fds": 290
+   },
+   "mock_cpu_s": [
+    11.43,
+    2.22,
+    11.36,
+    3.82
+   ],
+   "driver_cpu_s": 25.68,
+   "drivers": 2
+  },
+  {
+   "t_ns": 8763414417522443,
+   "loadavg": [
+    2.58,
+    2.96,
+    3.87
+   ],
+   "api": {
+    "cpu_s": 148.1,
+    "VmHWM": 334884,
+    "VmRSS": 334884,
+    "Threads": 9,
+    "fds": 291
+   },
+   "mock_cpu_s": [
+    16.05,
+    3.04,
+    15.98,
+    5.14
+   ],
+   "driver_cpu_s": 36.21,
+   "drivers": 2
+  }
+ ],
+ "provenance": {
+  "code": {
+   "git_head": "b85f318+snapshot",
+   "snapshot": "/tmp/perfa/a4",
+   "files": 448,
+   "tree_digest": "sha256:05584a465a8a07c7aaaed99a4675e2c72e4eddb97b60ff76deabec0944b3ec9a"
+  },
+  "config": {
+   "version": 2,
+   "digest": "sha256:848146b0be5c0d5c51458f73ce608e09961c4b2968e4e43b46892a6c238de4b6"
+  },
+  "scenario_sha256": "65cd42ce9ac19879c8cb2c653b0f03d4ccff14b720e7a9609dc4d004afb2115c",
+  "api": {
+   "image": null,
+   "python": "3.12.12",
+   "executable": "/codes/aghooai/noema/.venv/bin/python"
+  },
+  "placement": {
+   "api": "14-15",
+   "mocks": [
+    "8-9",
+    "32-33",
+    "10-11",
+    "34-35"
+   ],
+   "drivers": "12-13,36-37",
+   "stack": {
+    "noema-perf-a-postgres-1": "4-7",
+    "noema-perf-a-valkey-1": "4-7"
+   }
+  },
+  "dispatch_yields": null,
+  "loadavg_at_start": [
+   3.06,
+   3.23,
+   4.28
+  ]
+ },
+ "config": {
+  "out": "/tmp/perfa/runs/d3-a4",
+  "results": "/tmp/perfa/results/d3-a4.json",
+  "plan": "50:120,100:120",
+  "warmup_s": "60.0",
+  "settle_s": "30.0",
+  "turns_per_session": "10",
+  "scenario": "/tmp/perfa/a4/tests/load/scenarios/overhead.yaml",
+  "api_port": "29790",
+  "mock_port": "29781",
+  "api_cpus": "14-15",
+  "stack_cpus": "4-7",
+  "mock_cpus": "8-9,32-33,10-11,34-35",
+  "driver_cpus": "12-13,36-37",
+  "api_image": "None",
+  "dispatch_yields": "None",
+  "profile": "None",
+  "profile_step": "0",
+  "census": "False",
+  "trace": "False",
+  "gc_threshold": "None",
+  "analyze_only": "False"
+ }
+}

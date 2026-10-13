@@ -1,0 +1,17 @@
+# Allowlist for the media-sandbox build context (repo root): the lock, the project sources, the sandbox files and,
+# for the media-test target, the tests. Everything else (.venv, .git, caches, docs) stays out.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!src/
+!deploy/sandbox/
+!tests/
+!conftest.py
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.hypothesis
+**/.ipynb_checkpoints

@@ -1,0 +1,130 @@
+{
+ "what": "Prometheus v3.5.0 with deploy/observability/prometheus/prometheus.compose.yml and the rule files, on the network of the e2e stack noema-wffix (images :wfinfra, E2E_BUILD=0), after 1 streamed and 80 JSON turns",
+ "at": "2026-10-12T23:27:04+00:00",
+ "targets": [
+  {
+   "job": "noema-api",
+   "pod": "api-1",
+   "instance": "api-1:9464",
+   "health": "up"
+  },
+  {
+   "job": "noema-api",
+   "pod": "api-1",
+   "instance": "api-1:9465",
+   "health": "up"
+  },
+  {
+   "job": "noema-api",
+   "pod": "api-2",
+   "instance": "api-2:9464",
+   "health": "up"
+  },
+  {
+   "job": "noema-api",
+   "pod": "api-2",
+   "instance": "api-2:9465",
+   "health": "up"
+  },
+  {
+   "job": "noema-jobs",
+   "pod": "jobs",
+   "instance": "jobs:9464",
+   "health": "up"
+  },
+  {
+   "job": "noema-media-worker",
+   "pod": "media-worker",
+   "instance": "media-worker:9464",
+   "health": "up"
+  }
+ ],
+ "rules": {
+  "total": 44,
+  "health": {
+   "ok": 44
+  }
+ },
+ "queries": {
+  "noema:pod_turn_slots_held:sum": [
+   {
+    "labels": {
+     "pod": "api-2"
+    },
+    "value": "0"
+   },
+   {
+    "labels": {
+     "pod": "api-1"
+    },
+    "value": "0"
+   }
+  ],
+  "noema:availability_errors:ratio_rate5m": [
+   {
+    "labels": {},
+    "value": "0"
+   }
+  ],
+  "noema:availability_errors:ratio_rate1h": [
+   {
+    "labels": {},
+    "value": "0"
+   }
+  ],
+  "noema:proxy_overhead_seconds:mean5m": [
+   {
+    "labels": {},
+    "value": "0.0037104072052599885"
+   }
+  ],
+  "noema:pod_event_loop_lag_seconds:p99_5m": [
+   {
+    "labels": {
+     "pod": "api-2"
+    },
+    "value": "0.0008676184713840485"
+   },
+   {
+    "labels": {
+     "pod": "api-1"
+    },
+    "value": "0.0008112760633230209"
+   }
+  ],
+  "noema:pod_cpu_cores:rate5m": [],
+  "noema:redis_command_seconds:p99_5m": [
+   {
+    "labels": {},
+    "value": "0.0049499999999999995"
+   }
+  ],
+  "noema:cost_usd_per_turn:rate1h": [
+   {
+    "labels": {},
+    "value": "0.000288"
+   }
+  ],
+  "sum by (job) (up)": [
+   {
+    "labels": {
+     "job": "noema-media-worker"
+    },
+    "value": "1"
+   },
+   {
+    "labels": {
+     "job": "noema-jobs"
+    },
+    "value": "1"
+   },
+   {
+    "labels": {
+     "job": "noema-api"
+    },
+    "value": "4"
+   }
+  ]
+ },
+ "alerts": []
+}

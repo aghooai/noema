@@ -1,0 +1,47 @@
+# The compose stack's default tools/mockbedrock scenario (scenario DSL, tests/fakes/scenario.schema.json): every
+# router-default and answer-verifier question of the vendored platform.example.yaml gets a confident answer, and
+# every streamed call (turn generation) streams a short fixed text. Rules are tried in order (the first match wins).
+# Tests load their own scenario with POST /_mock/scenario; POST /_mock/reset forgets this one.
+scenario: noema-stack-default
+seed: 7
+mantle_auth: bearer_short_term
+defaults:
+  latency: { fixed_ms: 0 }
+rules:
+  # --- generation (turns): every ConverseStream / Mantle chat-stream call -----------------------------------------
+  - match: { op: converse-stream }
+    stream:
+      first_event_ms: 60
+      first_text_ms: 120
+      chunks: ["Paris is the capital ", "of France. ", "It is also ", "its largest city."]
+      chunk_tokens: 4
+      tokens_per_s: 200
+  - match: { op: chat-stream }
+    stream:
+      first_event_ms: 60
+      first_text_ms: 120
+      chunks: ["Paris is the capital ", "of France."]
+      chunk_tokens: 4
+      tokens_per_s: 200
+  # --- router-default (turn routing) ---------------------------------------------------------------------------------
+  - match: { prompt_contains: "primary intent" }
+    answer: { dist: { factual_qa: 0.9, chitchat: 0.05, coding: 0.05 } }
+    latency_ms: 60
+  - match: { prompt_contains: "How hard" }
+    answer: { dist: { trivial: 0.1, moderate: 0.8, hard: 0.1 } }
+    latency_ms: 60
+  # --- answer-verifier (verification) --------------------------------------------------------------------------------
+  - match: { prompt_contains: "directly addresses" }
+    answer: { dist: { "true": 0.95, "false": 0.05 } }
+    latency_ms: 60
+  # --- the questions of the vendored decision-request examples (department, urgency, needs_human) ------------------
+  - match: { prompt_contains: "Which team should handle" }
+    answer: { dist: { billing: 0.8, shipping: 0.15, technical: 0.03, other: 0.02 } }
+    latency_ms: 60
+  - match: { prompt_contains: "How urgent" }
+    answer: { dist: { low: 0.1, medium: 0.2, high: 0.7 } }
+    latency_ms: 60
+  # --- every other predicate (needs_fresh_info, sensitive_data, injection_suspected, unsupported_claims, ...) -------
+  - match: {}
+    answer: { dist: { "true": 0.05, "false": 0.95 } }
+    latency_ms: 60

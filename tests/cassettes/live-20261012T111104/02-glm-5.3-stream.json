@@ -1,0 +1,81 @@
+{
+  "alias": "glm-5.3",
+  "blocks": {
+    "TextBlock": 1
+  },
+  "call_kind": "generation",
+  "counts": {
+    "MessageStart": 1,
+    "ReasoningDelta": 6,
+    "Stop": 1,
+    "TextDelta": 2,
+    "UsageEvent": 1
+  },
+  "e2e_ms": 398,
+  "effort": "low",
+  "estimated_input_tokens": 41,
+  "estimated_input_tokens_chars4": 16,
+  "events": [
+    "MessageStart",
+    "ReasoningDelta",
+    "TextDelta",
+    "Stop",
+    "UsageEvent"
+  ],
+  "input_chars": 59,
+  "max_tokens": 512,
+  "model_id": "us.zai.glm-5.3",
+  "n": 2,
+  "op": "stream",
+  "stop": "end_turn",
+  "t_first_MessageStart_ms": 393,
+  "t_first_ReasoningDelta_ms": 393,
+  "t_first_Stop_ms": 397,
+  "t_first_TextDelta_ms": 397,
+  "t_first_UsageEvent_ms": 397,
+  "test": "tests/live/test_adapters_live.py::test_l2_converse_stream[glm-5.3-low]",
+  "test_call": 1,
+  "text_chars": 3,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 41,
+    "output_tokens": 10,
+    "reasoning_tokens": 3,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "decoder": {
+      "botocore_errors": 0,
+      "botocore_extra": 0,
+      "bytes": 2839,
+      "chunks": 7,
+      "equal": 15,
+      "fallback": false,
+      "messages": 15
+    },
+    "error": null,
+    "events": [
+      "messageStart.p|messageStart.role",
+      "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p",
+      "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+      "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.reasoningContent.text|contentBlockDelta.p*6",
+      "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+      "contentBlockDelta.contentBlockIndex|contentBlockDelta.delta.text|contentBlockDelta.p*2",
+      "contentBlockStop.contentBlockIndex|contentBlockStop.p",
+      "messageStop.p|messageStop.stopReason",
+      "metadata.metrics.latencyMs|metadata.usage.inputTokens|metadata.usage.outputTokens|metadata.usage.totalTokens"
+    ],
+    "response": [],
+    "signer": {
+      "equal_to_botocore": true,
+      "model_path_colon_encoded": false,
+      "session_token": false,
+      "signed": [
+        "authorization",
+        "content-type",
+        "x-amz-date"
+      ]
+    }
+  }
+}

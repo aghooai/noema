@@ -1,0 +1,149 @@
+{
+  "profile": "lightweight-model-decide@1",
+  "input": "Three card payments I never made showed up last night. Please block the card and tell me what happens next.",
+  "questions": [
+    {
+      "type": "choice",
+      "name": "issue",
+      "instructions": "Which specific issue is the customer describing?",
+      "choices": [
+        {
+          "value": "fraud_report",
+          "group": "fraud"
+        },
+        {
+          "value": "billing_double_charge",
+          "group": "billing"
+        },
+        {
+          "value": "billing_refund_status",
+          "group": "billing"
+        },
+        {
+          "value": "billing_invoice_copy",
+          "group": "billing"
+        },
+        {
+          "value": "billing_wrong_amount",
+          "group": "billing"
+        },
+        {
+          "value": "billing_failed_payment",
+          "group": "billing"
+        },
+        {
+          "value": "billing_subscription_cancel",
+          "group": "billing"
+        },
+        {
+          "value": "billing_promo_code",
+          "group": "billing"
+        },
+        {
+          "value": "billing_tax_question",
+          "group": "billing"
+        },
+        {
+          "value": "technical_login_failure",
+          "group": "technical"
+        },
+        {
+          "value": "technical_app_crash",
+          "group": "technical"
+        },
+        {
+          "value": "technical_export_error",
+          "group": "technical"
+        },
+        {
+          "value": "technical_sync_problem",
+          "group": "technical"
+        },
+        {
+          "value": "technical_api_error",
+          "group": "technical"
+        },
+        {
+          "value": "technical_slow_performance",
+          "group": "technical"
+        },
+        {
+          "value": "technical_data_missing",
+          "group": "technical"
+        },
+        {
+          "value": "technical_integration_setup",
+          "group": "technical"
+        },
+        {
+          "value": "shipping_not_delivered",
+          "group": "shipping"
+        },
+        {
+          "value": "shipping_marked_delivered_not_received",
+          "group": "shipping"
+        },
+        {
+          "value": "shipping_damaged_item",
+          "group": "shipping"
+        },
+        {
+          "value": "shipping_wrong_item",
+          "group": "shipping"
+        },
+        {
+          "value": "shipping_delayed",
+          "group": "shipping"
+        },
+        {
+          "value": "shipping_address_change",
+          "group": "shipping"
+        },
+        {
+          "value": "shipping_tracking_missing",
+          "group": "shipping"
+        },
+        {
+          "value": "shipping_customs_hold",
+          "group": "shipping"
+        },
+        {
+          "value": "other_feedback",
+          "group": "other"
+        },
+        {
+          "value": "other_account_deletion",
+          "group": "other"
+        },
+        {
+          "value": "other_partnership",
+          "group": "other"
+        },
+        {
+          "value": "other_press",
+          "group": "other"
+        },
+        {
+          "value": "other_privacy_request",
+          "group": "other"
+        },
+        {
+          "value": "other_accessibility",
+          "group": "other"
+        },
+        {
+          "value": "other_job_inquiry",
+          "group": "other"
+        },
+        {
+          "value": "other_unclear",
+          "group": "other"
+        }
+      ]
+    }
+  ],
+  "deadline_ms": 3000,
+  "include": [
+    "members"
+  ]
+}

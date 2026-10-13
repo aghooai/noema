@@ -1,0 +1,10 @@
+# Allowlist for the api build context (repo root): the lock and the project sources only.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!src/
+**/__pycache__
+**/*.pyc
+**/.mypy_cache
+**/.ipynb_checkpoints

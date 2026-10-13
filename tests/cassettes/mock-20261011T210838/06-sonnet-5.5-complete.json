@@ -1,0 +1,46 @@
+{
+  "alias": "sonnet-5.5",
+  "blocks": {
+    "ImageBlock": 1,
+    "TextBlock": 1
+  },
+  "call_kind": "labeling",
+  "e2e_ms": 616,
+  "effort": null,
+  "estimated_input_tokens": 160,
+  "latency_ms": 616,
+  "logprob_tokens": null,
+  "max_tokens": 128,
+  "model_id": "us.anthropic.claude-sonnet-5-5",
+  "n": 6,
+  "op": "complete",
+  "refused": false,
+  "region": "us-east-1",
+  "stop": "end_turn",
+  "test": "tests/live/test_adapters_live.py::test_l4_sonnet_media[image]",
+  "test_call": 1,
+  "text_chars": 4,
+  "usage": {
+    "cache_write_input_tokens": 0,
+    "cached_input_tokens": 0,
+    "input_tokens": 16,
+    "output_tokens": 1,
+    "reasoning_tokens": 0,
+    "tokens_estimated": false
+  },
+  "wire": {
+    "error": null,
+    "events": [],
+    "response": [
+      "metrics.latencyMs:int",
+      "output.message.content[].text:str",
+      "output.message.role:str",
+      "stopReason:str",
+      "usage.cacheReadInputTokens:int",
+      "usage.cacheWriteInputTokens:int",
+      "usage.inputTokens:int",
+      "usage.outputTokens:int",
+      "usage.totalTokens:int"
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "input": "My package says delivered but I was also charged twice.",
+  "questions": [
+    {
+      "type": "choice",
+      "name": "department",
+      "instructions": "Which team should handle this message?",
+      "choices": [
+        {
+          "value": "billing",
+          "description": "Payments, refunds, invoices"
+        },
+        {
+          "value": "technical",
+          "description": "Bugs and errors"
+        },
+        {
+          "value": "shipping",
+          "description": "Delivery problems"
+        },
+        {
+          "value": "other",
+          "description": null
+        }
+      ]
+    },
+    {
+      "type": "predicate",
+      "name": "needs_human",
+      "instructions": "The customer explicitly asks to speak with a human.",
+      "criteria": {
+        "true": "Asks for a person, agent or call back",
+        "false": "No such request"
+      }
+    },
+    {
+      "type": "score",
+      "name": "urgency",
+      "instructions": "How urgent is the request?",
+      "levels": [
+        {
+          "label": "low",
+          "description": "Can wait days"
+        },
+        {
+          "label": "medium",
+          "description": null
+        },
+        {
+          "label": "high",
+          "description": "Blocking now"
+        }
+      ]
+    }
+  ],
+  "deadline_ms": 1000,
+  "min_quorum": 2,
+  "include": [
+    "members"
+  ],
+  "safety_identifier": "user-7f3a"
+}

@@ -1,0 +1,409 @@
+# HELP aghoo_admission_degraded 1 while the Redis-down local fallback is active.
+# TYPE aghoo_admission_degraded gauge
+aghoo_admission_degraded 0.0
+# HELP aghoo_admission_pending_releases Slot releases kept for a retry.
+# TYPE aghoo_admission_pending_releases gauge
+aghoo_admission_pending_releases 0.0
+# HELP aghoo_db_pool_size Connections the Postgres pool may open (max_size).
+# TYPE aghoo_db_pool_size gauge
+aghoo_db_pool_size{pool="app"} 20.0
+# HELP aghoo_db_pool_in_use Postgres connections checked out.
+# TYPE aghoo_db_pool_in_use gauge
+aghoo_db_pool_in_use{pool="app"} 1.0
+# HELP aghoo_redis_pool_size Connections the Redis pool may open (max_connections).
+# TYPE aghoo_redis_pool_size gauge
+aghoo_redis_pool_size 256.0
+# HELP aghoo_redis_pool_in_use Redis connections checked out (pub/sub ones included).
+# TYPE aghoo_redis_pool_in_use gauge
+aghoo_redis_pool_in_use 5.0
+# HELP aghoo_turn_slots_held Turn slots held by this process (running + admitted turns, decisions).
+# TYPE aghoo_turn_slots_held gauge
+aghoo_turn_slots_held 48.0
+# HELP aghoo_redis_pool_acquire_seconds Wait for a Redis connection (1/16 sampled).
+# TYPE aghoo_redis_pool_acquire_seconds histogram
+aghoo_redis_pool_acquire_seconds_bucket{le="0.005"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="0.01"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="0.025"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="0.05"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="0.1"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="0.25"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="0.5"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="0.75"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="1.0"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="1.5"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="2.0"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="3.0"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="5.0"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="10.0"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="30.0"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="60.0"} 18982.0
+aghoo_redis_pool_acquire_seconds_bucket{le="+Inf"} 18982.0
+aghoo_redis_pool_acquire_seconds_count 18982.0
+aghoo_redis_pool_acquire_seconds_sum 0.30679543875157833
+# HELP aghoo_outbox_backlog Outbox records waiting per sink.
+# TYPE aghoo_outbox_backlog gauge
+aghoo_outbox_backlog{sink="redis"} 0.0
+aghoo_outbox_backlog{sink="memory"} 0.0
+# HELP aghoo_event_loop_lag_seconds Event-loop lag.
+# TYPE aghoo_event_loop_lag_seconds gauge
+aghoo_event_loop_lag_seconds 0.0
+# HELP aghoo_cache_misses_total Cache misses (reason=miss|bypass|error).
+# TYPE aghoo_cache_misses_total counter
+aghoo_cache_misses_total{layer="l2",reason="miss"} 7222.0
+# HELP aghoo_bedrock_cached_input_ratio Cached share of Bedrock input tokens.
+# TYPE aghoo_bedrock_cached_input_ratio gauge
+aghoo_bedrock_cached_input_ratio{model="us.openai.gpt-6-luna"} 0.0
+aghoo_bedrock_cached_input_ratio{model="us.anthropic.claude-haiku-5-5"} 0.0
+aghoo_bedrock_cached_input_ratio{model="deepseek.v3.2"} 0.0
+aghoo_bedrock_cached_input_ratio{model="us.openai.gpt-6.1-sol"} 0.0
+# HELP aghoo_decision_quorum_reached_seconds Time until quorum on every critical.
+# TYPE aghoo_decision_quorum_reached_seconds histogram
+aghoo_decision_quorum_reached_seconds_bucket{le="0.005",profile="router-default"} 0.0
+aghoo_decision_quorum_reached_seconds_bucket{le="0.01",profile="router-default"} 0.0
+aghoo_decision_quorum_reached_seconds_bucket{le="0.025",profile="router-default"} 0.0
+aghoo_decision_quorum_reached_seconds_bucket{le="0.05",profile="router-default"} 0.0
+aghoo_decision_quorum_reached_seconds_bucket{le="0.1",profile="router-default"} 7210.0
+aghoo_decision_quorum_reached_seconds_bucket{le="0.25",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="0.5",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="0.75",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="1.0",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="1.5",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="2.0",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="3.0",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="5.0",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="10.0",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="30.0",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="60.0",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_bucket{le="+Inf",profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_count{profile="router-default"} 7221.0
+aghoo_decision_quorum_reached_seconds_sum{profile="router-default"} 415.62881119921803
+# HELP aghoo_decision_seconds Decision time (stage=quorum|all).
+# TYPE aghoo_decision_seconds histogram
+aghoo_decision_seconds_bucket{le="0.005",member="",profile="router-default",stage="quorum"} 0.0
+aghoo_decision_seconds_bucket{le="0.01",member="",profile="router-default",stage="quorum"} 0.0
+aghoo_decision_seconds_bucket{le="0.025",member="",profile="router-default",stage="quorum"} 0.0
+aghoo_decision_seconds_bucket{le="0.05",member="",profile="router-default",stage="quorum"} 0.0
+aghoo_decision_seconds_bucket{le="0.1",member="",profile="router-default",stage="quorum"} 7186.0
+aghoo_decision_seconds_bucket{le="0.25",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="0.5",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="0.75",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="1.0",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="1.5",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="2.0",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="3.0",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="5.0",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="10.0",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="30.0",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="60.0",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_bucket{le="+Inf",member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_count{member="",profile="router-default",stage="quorum"} 7221.0
+aghoo_decision_seconds_sum{member="",profile="router-default",stage="quorum"} 434.06423794850707
+aghoo_decision_seconds_bucket{le="0.005",member="",profile="router-default",stage="all"} 0.0
+aghoo_decision_seconds_bucket{le="0.01",member="",profile="router-default",stage="all"} 0.0
+aghoo_decision_seconds_bucket{le="0.025",member="",profile="router-default",stage="all"} 0.0
+aghoo_decision_seconds_bucket{le="0.05",member="",profile="router-default",stage="all"} 0.0
+aghoo_decision_seconds_bucket{le="0.1",member="",profile="router-default",stage="all"} 7173.0
+aghoo_decision_seconds_bucket{le="0.25",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="0.5",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="0.75",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="1.0",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="1.5",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="2.0",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="3.0",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="5.0",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="10.0",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="30.0",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="60.0",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_bucket{le="+Inf",member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_count{member="",profile="router-default",stage="all"} 7221.0
+aghoo_decision_seconds_sum{member="",profile="router-default",stage="all"} 447.41981291025877
+# HELP aghoo_first_answer_seconds Attempt start to the first answer text.
+# TYPE aghoo_first_answer_seconds histogram
+aghoo_first_answer_seconds_bucket{le="0.005",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_first_answer_seconds_bucket{le="0.01",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_first_answer_seconds_bucket{le="0.025",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_first_answer_seconds_bucket{le="0.05",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_first_answer_seconds_bucket{le="0.1",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_first_answer_seconds_bucket{le="0.25",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_first_answer_seconds_bucket{le="0.5",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="0.75",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="1.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="1.5",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="2.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="3.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="5.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="10.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="30.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="60.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_bucket{le="+Inf",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_count{model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7217.0
+aghoo_first_answer_seconds_sum{model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 2183.404745319858
+# HELP aghoo_redis_command_seconds A Redis command or pipeline (1/16 sampled).
+# TYPE aghoo_redis_command_seconds histogram
+aghoo_redis_command_seconds_bucket{command="GET",le="0.005"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="0.01"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="0.025"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="0.05"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="0.1"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="0.25"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="0.5"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="0.75"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="1.0"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="1.5"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="2.0"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="3.0"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="5.0"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="10.0"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="30.0"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="60.0"} 941.0
+aghoo_redis_command_seconds_bucket{command="GET",le="+Inf"} 941.0
+aghoo_redis_command_seconds_count{command="GET"} 941.0
+aghoo_redis_command_seconds_sum{command="GET"} 0.33989796973764896
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.005"} 14947.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.01"} 14975.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.025"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.05"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.1"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.25"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.5"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="0.75"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="1.0"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="1.5"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="2.0"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="3.0"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="5.0"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="10.0"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="30.0"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="60.0"} 14981.0
+aghoo_redis_command_seconds_bucket{command="EVALSHA",le="+Inf"} 14981.0
+aghoo_redis_command_seconds_count{command="EVALSHA"} 14981.0
+aghoo_redis_command_seconds_sum{command="EVALSHA"} 5.101002439856529
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.005"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.01"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.025"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.05"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.1"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.25"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.5"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="0.75"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="1.0"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="1.5"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="2.0"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="3.0"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="5.0"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="10.0"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="30.0"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="60.0"} 475.0
+aghoo_redis_command_seconds_bucket{command="EXISTS",le="+Inf"} 475.0
+aghoo_redis_command_seconds_count{command="EXISTS"} 475.0
+aghoo_redis_command_seconds_sum{command="EXISTS"} 0.09028889797627926
+aghoo_redis_command_seconds_bucket{command="SET",le="0.005"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="0.01"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="0.025"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="0.05"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="0.1"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="0.25"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="0.5"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="0.75"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="1.0"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="1.5"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="2.0"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="3.0"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="5.0"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="10.0"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="30.0"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="60.0"} 873.0
+aghoo_redis_command_seconds_bucket{command="SET",le="+Inf"} 873.0
+aghoo_redis_command_seconds_count{command="SET"} 873.0
+aghoo_redis_command_seconds_sum{command="SET"} 0.20699670538306236
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.005"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.01"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.025"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.05"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.1"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.25"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.5"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="0.75"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="1.0"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="1.5"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="2.0"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="3.0"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="5.0"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="10.0"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="30.0"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="60.0"} 59.0
+aghoo_redis_command_seconds_bucket{command="XREADGROUP",le="+Inf"} 59.0
+aghoo_redis_command_seconds_count{command="XREADGROUP"} 59.0
+aghoo_redis_command_seconds_sum{command="XREADGROUP"} 0.011786557734012604
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.005"} 524.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.01"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.025"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.05"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.1"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.25"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.5"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="0.75"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="1.0"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="1.5"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="2.0"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="3.0"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="5.0"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="10.0"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="30.0"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="60.0"} 528.0
+aghoo_redis_command_seconds_bucket{command="XAUTOCLAIM",le="+Inf"} 528.0
+aghoo_redis_command_seconds_count{command="XAUTOCLAIM"} 528.0
+aghoo_redis_command_seconds_sum{command="XAUTOCLAIM"} 0.13638217374682426
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.005"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.01"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.025"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.05"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.1"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.25"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.5"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="0.75"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="1.0"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="1.5"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="2.0"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="3.0"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="5.0"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="10.0"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="30.0"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="60.0"} 440.0
+aghoo_redis_command_seconds_bucket{command="PUBLISH",le="+Inf"} 440.0
+aghoo_redis_command_seconds_count{command="PUBLISH"} 440.0
+aghoo_redis_command_seconds_sum{command="PUBLISH"} 0.09033838659524918
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.005"} 447.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.01"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.025"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.05"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.1"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.25"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.5"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="0.75"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="1.0"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="1.5"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="2.0"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="3.0"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="5.0"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="10.0"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="30.0"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="60.0"} 448.0
+aghoo_redis_command_seconds_bucket{command="DEL",le="+Inf"} 448.0
+aghoo_redis_command_seconds_count{command="DEL"} 448.0
+aghoo_redis_command_seconds_sum{command="DEL"} 0.0817960575222969
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.005"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.01"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.025"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.05"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.1"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.25"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.5"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="0.75"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="1.0"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="1.5"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="2.0"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="3.0"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="5.0"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="10.0"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="30.0"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="60.0"} 146.0
+aghoo_redis_command_seconds_bucket{command="PIPELINE",le="+Inf"} 146.0
+aghoo_redis_command_seconds_count{command="PIPELINE"} 146.0
+aghoo_redis_command_seconds_sum{command="PIPELINE"} 0.0769970752298832
+# HELP aghoo_db_pool_acquire_seconds Wait for a Postgres connection (1/16 sampled).
+# TYPE aghoo_db_pool_acquire_seconds histogram
+aghoo_db_pool_acquire_seconds_bucket{le="0.005",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="0.01",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="0.025",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="0.05",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="0.1",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="0.25",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="0.5",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="0.75",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="1.0",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="1.5",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="2.0",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="3.0",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="5.0",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="10.0",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="30.0",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="60.0",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_bucket{le="+Inf",pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_count{pool="app"} 1222.0
+aghoo_db_pool_acquire_seconds_sum{pool="app"} 0.03163992427289486
+# HELP aghoo_db_command_seconds A unit of work, acquire to release (1/16 sampled).
+# TYPE aghoo_db_command_seconds histogram
+aghoo_db_command_seconds_bucket{le="0.005",pool="app"} 1191.0
+aghoo_db_command_seconds_bucket{le="0.01",pool="app"} 1218.0
+aghoo_db_command_seconds_bucket{le="0.025",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="0.05",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="0.1",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="0.25",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="0.5",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="0.75",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="1.0",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="1.5",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="2.0",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="3.0",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="5.0",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="10.0",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="30.0",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="60.0",pool="app"} 1222.0
+aghoo_db_command_seconds_bucket{le="+Inf",pool="app"} 1222.0
+aghoo_db_command_seconds_count{pool="app"} 1222.0
+aghoo_db_command_seconds_sum{pool="app"} 3.186114152893424
+# HELP aghoo_cost_usd_total Recorded cost in USD.
+# TYPE aghoo_cost_usd_total counter
+aghoo_cost_usd_total{line="decision",tenant="t_acme"} 0.0
+aghoo_cost_usd_total{line="generation",tenant="t_acme"} 0.0
+# HELP aghoo_decision_member_status_total Member results by status.
+# TYPE aghoo_decision_member_status_total counter
+aghoo_decision_member_status_total{member="deepseek-3.2",status="ok"} 35870.0
+aghoo_decision_member_status_total{member="luna-6",status="ok"} 35870.0
+aghoo_decision_member_status_total{member="haiku-5.5",status="ok"} 35870.0
+# HELP aghoo_ttft_seconds Ingress to the first generation.delta.
+# TYPE aghoo_ttft_seconds histogram
+aghoo_ttft_seconds_bucket{le="0.005",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_ttft_seconds_bucket{le="0.01",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_ttft_seconds_bucket{le="0.025",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_ttft_seconds_bucket{le="0.05",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_ttft_seconds_bucket{le="0.1",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_ttft_seconds_bucket{le="0.25",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_ttft_seconds_bucket{le="0.5",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="0.75",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="1.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="1.5",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="2.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="3.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="5.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="10.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="30.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="60.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_bucket{le="+Inf",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_count{model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_ttft_seconds_sum{model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 2214.8073817826807
+# HELP aghoo_e2e_seconds Ingress to turn.completed.
+# TYPE aghoo_e2e_seconds histogram
+aghoo_e2e_seconds_bucket{le="0.005",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="0.01",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="0.025",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="0.05",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="0.1",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="0.25",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="0.5",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="0.75",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="1.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="1.5",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="2.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="3.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="5.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 0.0
+aghoo_e2e_seconds_bucket{le="10.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_e2e_seconds_bucket{le="30.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_e2e_seconds_bucket{le="60.0",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_e2e_seconds_bucket{le="+Inf",model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_e2e_seconds_count{model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 7174.0
+aghoo_e2e_seconds_sum{model="us.openai.gpt-6.1-sol",profile="sol-fast",strategy="holdback"} 49610.24873353727
+# HELP aghoo_spec_agreement_ratio Share of turns whose decided spec equals spec0.
+# TYPE aghoo_spec_agreement_ratio gauge
+aghoo_spec_agreement_ratio{profile="sol-fast"} 1.0

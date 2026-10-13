@@ -1,0 +1,1462 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aghoo.example/schemas/platform-config/v0.2",
+  "title": "Noema platform configuration (v0.2)",
+  "description": "Operator configuration: tenants (one AWS account each, D2), Bedrock models (D1), decision ensembles, generation ensembles, decision-to-generation bindings, routing, and LLM-consensus labeling (D4). Cross-references (model aliases, profile ids) are checked by check_config.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "config_version",
+    "tenants",
+    "models",
+    "templates",
+    "decision_profiles",
+    "generation_profiles",
+    "routing",
+    "labeling"
+  ],
+  "properties": {
+    "config_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "tenants": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/Tenant"
+      }
+    },
+    "models": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/Model"
+      }
+    },
+    "templates": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/Template"
+      },
+      "description": "Versioned prompt templates (08 \u00a73.2). Keys are `name@version`; a member's `template` must exist here."
+    },
+    "decision_profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/DecisionProfile"
+      }
+    },
+    "generation_profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/GenerationProfile"
+      }
+    },
+    "routing": {
+      "$ref": "#/$defs/Routing"
+    },
+    "labeling": {
+      "$ref": "#/$defs/Labeling"
+    },
+    "platform": {
+      "$ref": "#/$defs/Platform"
+    }
+  },
+  "$defs": {
+    "Alias": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+    },
+    "Effort": {
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
+    },
+    "Modality": {
+      "enum": [
+        "text",
+        "image",
+        "document",
+        "audio",
+        "video"
+      ]
+    },
+    "Tenant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aws_account_id",
+        "invoke_role_arn",
+        "external_id_ref",
+        "home_region"
+      ],
+      "properties": {
+        "aws_account_id": {
+          "type": "string",
+          "pattern": "^[0-9]{12}$"
+        },
+        "invoke_role_arn": {
+          "type": "string",
+          "pattern": "^arn:aws:iam::[0-9]{12}:role/[A-Za-z0-9+=,.@_/-]+$"
+        },
+        "external_id_ref": {
+          "type": "string",
+          "pattern": "^aws-sm://"
+        },
+        "home_region": {
+          "type": "string",
+          "pattern": "^[a-z]{2}-[a-z]+-[0-9]$"
+        },
+        "allowed_models": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/Alias"
+          },
+          "description": "Subset of models enabled in this tenant's account; default = all configured models."
+        },
+        "defaults": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "decision_profile": {
+              "$ref": "#/$defs/Alias"
+            },
+            "generation_profile": {
+              "$ref": "#/$defs/Alias"
+            }
+          }
+        },
+        "request_overrides": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Which profiles a request may select explicitly (allowlist).",
+          "properties": {
+            "decision_profiles": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Alias"
+              }
+            },
+            "generation_profiles": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Alias"
+              }
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "rpm_per_key": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "tpm_per_key": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rpm_per_project": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "tpm_per_project": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "concurrent_streams_per_project": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "model_quotas": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "rpm",
+                  "tpm"
+                ],
+                "properties": {
+                  "rpm": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "tpm": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              },
+              "description": "Per model alias: the tenant account's Bedrock quota, so admission throttles before Bedrock does (04:L276)."
+            }
+          }
+        }
+      }
+    },
+    "Model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter",
+        "id",
+        "roles",
+        "modalities",
+        "controls"
+      ],
+      "properties": {
+        "adapter": {
+          "enum": [
+            "bedrock-converse",
+            "bedrock-mantle-chat"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Bedrock model id or inference-profile id, e.g. us.anthropic.claude-haiku-5-5"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "decision",
+              "generation",
+              "labeler",
+              "selector"
+            ]
+          }
+        },
+        "modalities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/Modality"
+          },
+          "description": "Native input modalities on Bedrock (probe-verified); everything else is sent as derivatives."
+        },
+        "controls": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "temperature",
+            "effort",
+            "logprobs"
+          ],
+          "properties": {
+            "temperature": {
+              "type": "boolean"
+            },
+            "effort": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/Effort"
+              },
+              "description": "Accepted Converse outputConfig.effort values (empty = not supported)."
+            },
+            "logprobs": {
+              "type": "boolean"
+            },
+            "top_logprobs_max": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "structured_output": {
+              "type": "boolean"
+            },
+            "reasoning": {
+              "type": "boolean",
+              "description": "Emits reasoningContent before text."
+            }
+          }
+        },
+        "max_output_tokens_cap": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "price_ref": {
+          "type": "string"
+        },
+        "reasoning_reserve_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tokens a reasoning model may spend before the answer; reasoning tokens count toward maxTokens (P6b), so a binding's max_output_tokens + this reserve must not exceed max_output_tokens_cap. Default 0."
+        },
+        "context_window": {
+          "type": "integer",
+          "minimum": 1024,
+          "description": "Input + output tokens the model accepts per request. Absent: 128000 (DEFAULT_CONTEXT_WINDOW, a placeholder until set from the model card). Used by the capability-fit hard filter (04:L32) and the context budget (IMPL-045)."
+        }
+      }
+    },
+    "Member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "elicitation",
+        "template",
+        "weight"
+      ],
+      "properties": {
+        "model": {
+          "$ref": "#/$defs/Alias"
+        },
+        "elicitation": {
+          "enum": [
+            "token_logprobs",
+            "verbalized",
+            "sampling",
+            "native_decision"
+          ]
+        },
+        "template": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+@[0-9]+$"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "effort": {
+          "$ref": "#/$defs/Effort"
+        },
+        "samples": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 16
+        },
+        "optional": {
+          "type": "boolean",
+          "description": "Not counted toward quorum; joins the pool when it answers in time."
+        },
+        "backup_after_ms": {
+          "type": "integer",
+          "minimum": 50,
+          "description": "Send a backup request if no answer by then (tail-latency hedging). It targets commit-critical latency: backup_after_ms + latency_p95_ms must fit inside the profile deadline, otherwise the backup cannot land before the deadline."
+        },
+        "latency_p95_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "p95 latency of one call for this member. Required with backup_after_ms. Until Phase 0 measures it, the upper end of the retained normal range (DeepSeek V3.2: 0.47-0.59 s, P6/P7/P11)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "elicitation": {
+                "const": "sampling"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "samples"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "backup_after_ms"
+            ]
+          },
+          "then": {
+            "required": [
+              "latency_p95_ms"
+            ],
+            "properties": {
+              "latency_p95_ms": true
+            }
+          }
+        }
+      ]
+    },
+    "DecisionProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "deadline_ms",
+        "min_quorum",
+        "members",
+        "aggregation"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deadline_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 30000
+        },
+        "min_quorum": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Member"
+          }
+        },
+        "aggregation": {
+          "enum": [
+            "linear_pool",
+            "log_pool",
+            "stacked"
+          ]
+        },
+        "modality_policy": {
+          "enum": [
+            "derive_for_text_members",
+            "skip_incapable_members"
+          ],
+          "default": "derive_for_text_members"
+        },
+        "escalation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "to_profile",
+            "when"
+          ],
+          "description": "Decision cascade (cf. Vercel decision fallbacks): re-ask a larger profile when the result is weak.",
+          "properties": {
+            "to_profile": {
+              "$ref": "#/$defs/Alias"
+            },
+            "when": {
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "properties": {
+                "confidence_below": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "margin_below": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "any_refused": {
+                  "type": "boolean"
+                },
+                "unavailable": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "questions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Platform (config) questions that may escalate; absent: every platform question. Request-defined questions (/v1/decisions, the facade, turn app questions) are always eligible, subject to the triggers, the budget and K <= L(target) (IMPL-068)."
+            }
+          }
+        },
+        "swap_note": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConfigQuestion"
+          },
+          "description": "Built-in question set (router, verifier, selector profiles)."
+        },
+        "commit_critical": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Question names the turn commit waits for; others are non-blocking."
+        },
+        "batch_questions": {
+          "type": "boolean",
+          "default": false,
+          "description": "One call per member for all questions (cheaper, loses independence). Default: one call per question."
+        }
+      }
+    },
+    "GenMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model"
+      ],
+      "properties": {
+        "model": {
+          "$ref": "#/$defs/Alias"
+        },
+        "effort": {
+          "$ref": "#/$defs/Effort"
+        },
+        "max_output_tokens": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "GenerationProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "members"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "single",
+            "fallback",
+            "race",
+            "best_of_n",
+            "fuse"
+          ],
+          "description": "single: one model; fallback: ordered chain; race: start all, stream the first to commit; best_of_n: generate all, a selector decision picks one; fuse: generate all, a synthesizer merges."
+        },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/GenMember"
+          }
+        },
+        "selector": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "decision_profile",
+            "question"
+          ],
+          "properties": {
+            "decision_profile": {
+              "$ref": "#/$defs/Alias"
+            },
+            "question": {
+              "type": "string"
+            }
+          }
+        },
+        "synthesizer": {
+          "$ref": "#/$defs/GenMember"
+        },
+        "streaming": {
+          "enum": [
+            "live",
+            "after_selection"
+          ],
+          "description": "best_of_n/fuse can only stream after selection/synthesis."
+        },
+        "cost_multiplier_max": {
+          "type": "number",
+          "minimum": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "best_of_n"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "selector"
+            ],
+            "properties": {
+              "members": {
+                "minItems": 2
+              },
+              "streaming": {
+                "const": "after_selection"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "fuse"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "synthesizer"
+            ],
+            "properties": {
+              "members": {
+                "minItems": 2
+              },
+              "streaming": {
+                "const": "after_selection"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "enum": [
+                  "race",
+                  "fallback"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "members": {
+                "minItems": 2
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "single"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "members": {
+                "maxItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "when",
+        "then"
+      ],
+      "properties": {
+        "when": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "answer"
+          ],
+          "properties": {
+            "answer": {
+              "type": "string"
+            },
+            "mode": {
+              "enum": [
+                "rule",
+                "expected_utility"
+              ]
+            },
+            "value_in": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "boolean"
+                ]
+              }
+            },
+            "level_in": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "p_max_gte": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "probability_gte": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "margin_gte": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "confidence_band": {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            },
+            "requires_calibrated": {
+              "type": "boolean"
+            },
+            "heuristic_threshold": {
+              "type": "boolean"
+            },
+            "eval_ref": {
+              "type": "string"
+            },
+            "source": {
+              "enum": [
+                "platform",
+                "request"
+              ],
+              "default": "platform",
+              "description": "platform: `answer` is a question of the router profile (reserved names, checked at compile time). request: `answer` is a question supplied by the request; it must not use a reserved router name and must declare `answer_type`."
+            },
+            "answer_type": {
+              "enum": [
+                "predicate",
+                "choice",
+                "score"
+              ],
+              "description": "Required when source is request; the binding matches only a request question with this name and type."
+            }
+          }
+        },
+        "then": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "generation_profile": {
+              "type": "string",
+              "description": "Profile id, or \"intent_routes[<answer>]\"."
+            },
+            "effort": {
+              "$ref": "#/$defs/Effort"
+            },
+            "max_output_tokens": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "conditioning": {
+              "enum": [
+                "direct",
+                "cover_top2_and_clarify",
+                "clarify_first",
+                "none"
+              ]
+            },
+            "disable_tools": {
+              "type": "boolean"
+            },
+            "spotlight": {
+              "enum": [
+                "standard",
+                "strict"
+              ]
+            },
+            "response_cache": {
+              "enum": [
+                "on",
+                "off"
+              ]
+            },
+            "log_content": {
+              "enum": [
+                "full",
+                "redacted",
+                "none"
+              ]
+            },
+            "verify_answer": {
+              "type": "boolean",
+              "description": "Run the post-generation verification questions."
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "when": {
+                "properties": {
+                  "mode": {
+                    "const": "rule"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "when": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "eval_ref"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "requires_calibrated": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "requires_calibrated"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "when": {
+                "properties": {
+                  "source": {
+                    "const": "request"
+                  }
+                },
+                "required": [
+                  "source"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "when": {
+                "required": [
+                  "answer_type"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "when": {
+                "properties": {
+                  "mode": {
+                    "const": "expected_utility"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "when": {
+                "properties": {
+                  "requires_calibrated": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "requires_calibrated"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_version",
+        "router_profile",
+        "intent_routes",
+        "uncertain_profile",
+        "bindings",
+        "speculation",
+        "confidence_bands"
+      ],
+      "properties": {
+        "policy_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "router_profile": {
+          "$ref": "#/$defs/Alias"
+        },
+        "intent_routes": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Alias"
+          }
+        },
+        "uncertain_profile": {
+          "$ref": "#/$defs/Alias"
+        },
+        "default_profile": {
+          "$ref": "#/$defs/Alias"
+        },
+        "confidence_bands": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "high_gte",
+            "low_lt"
+          ],
+          "description": "Band boundaries on calibrated p_max when calibrated, else on heuristic confidence (marked heuristic).",
+          "properties": {
+            "high_gte": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "low_lt": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Binding"
+          }
+        },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "decision_profile": {
+              "$ref": "#/$defs/Alias"
+            },
+            "questions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "speculation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "holdback_ms"
+          ],
+          "properties": {
+            "holdback_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "commit_on_quorum": {
+              "type": "boolean",
+              "default": false,
+              "description": "[X] Experimental. Commit before the slowest required member answers. Default false (gate / bounded holdback). true requires `proof_ref` and a restricted binding grammar (02 \u00a76.3); the all-vertex rule alone is unsound."
+            },
+            "restart_on_conditioning_change": {
+              "type": "boolean"
+            },
+            "max_hold_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000,
+              "description": "Max time buffered answer text waits for the decision."
+            },
+            "slack_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2000
+            },
+            "proof_ref": {
+              "type": "string",
+              "pattern": "^rpt_[a-z0-9_]+$",
+              "description": "Report id of the early-commit property test (random weights and missing counts) that licenses commit_on_quorum: true. Test evidence, not a proof."
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "commit_on_quorum": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "commit_on_quorum"
+                ]
+              },
+              "then": {
+                "required": [
+                  "proof_ref"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "Labeling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "labelers",
+        "rule",
+        "sample",
+        "runs_in",
+        "family_overlap_lift_max"
+      ],
+      "properties": {
+        "labelers": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/Alias"
+          }
+        },
+        "rule": {
+          "const": "unanimous"
+        },
+        "sample": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "uniform_rate",
+            "uncertainty_rate"
+          ],
+          "properties": {
+            "uniform_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "uncertainty_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "max_per_day_per_tenant": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "runs_in": {
+          "const": "tenant_account"
+        },
+        "family_overlap_lift_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.1,
+          "description": "Calibration is blocked for a profile when the largest member-labeler agreement lift over a random-label baseline exceeds this value (06 \u00a72.2). Initial value 0.10; tuned in Phase 0."
+        },
+        "acceptance": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ece_max": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.05,
+              "default": 0.05
+            },
+            "n_min": {
+              "type": "integer",
+              "minimum": 300,
+              "default": 300
+            },
+            "class_n_min": {
+              "type": "integer",
+              "minimum": 30,
+              "default": 30
+            },
+            "consensus_min": {
+              "type": "number",
+              "minimum": 0.6,
+              "maximum": 1,
+              "default": 0.6
+            },
+            "drift_ece_max": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.08
+            },
+            "subset_min_share": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.05
+            }
+          }
+        }
+      }
+    },
+    "ConfigQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "name",
+        "instructions"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "predicate",
+            "choice",
+            "score"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^(?!q[0-9]+$)[a-z][a-z0-9_]{0,63}$"
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1
+        },
+        "criteria": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "true": {
+              "type": "string"
+            },
+            "false": {
+              "type": "string"
+            }
+          }
+        },
+        "choices": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 255,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value"
+            ],
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "dynamic_choices": {
+          "const": "candidates",
+          "description": "Choices are filled at runtime with permuted candidate ids (best_of_n selector)."
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "choice"
+              }
+            }
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "choices"
+                ]
+              },
+              {
+                "required": [
+                  "dynamic_choices"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "score"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "levels"
+            ]
+          }
+        }
+      ]
+    },
+    "Template": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "elicitation",
+        "max_choices"
+      ],
+      "properties": {
+        "elicitation": {
+          "enum": [
+            "token_logprobs",
+            "verbalized",
+            "sampling",
+            "native_decision"
+          ],
+          "description": "Must equal the elicitation of every member that uses the template."
+        },
+        "max_choices": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 255,
+          "description": "Largest option set one call may carry. token_logprobs: at most min(top_logprobs_max - 4, 16), the 4 being a reserve for EOS and whitespace variants of the option codes; verbalized: at most 26 (letters A-Z). A question with more choices uses the hierarchical method (08 \u00a73.4)."
+        }
+      }
+    },
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Platform-wide operational settings (Phase 1). All optional; defaults are the initial design values.",
+      "properties": {
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "max_json_body_bytes": {
+              "type": "integer",
+              "minimum": 1048576,
+              "maximum": 104857600,
+              "default": 52428800
+            },
+            "rpm_per_key": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 6000
+            },
+            "tpm_per_key": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 20000000
+            },
+            "rpm_per_project": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 30000
+            },
+            "tpm_per_project": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 100000000
+            },
+            "concurrent_streams_per_project": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1000
+            },
+            "admission_queue_timeout_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30000,
+              "default": 2000
+            }
+          }
+        },
+        "idempotency": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ttl_s": {
+              "type": "integer",
+              "minimum": 3600,
+              "maximum": 604800,
+              "default": 86400
+            }
+          }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "resume_window_s": {
+              "type": "integer",
+              "minimum": 30,
+              "maximum": 3600,
+              "default": 300
+            }
+          }
+        },
+        "sessions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "queue_timeout_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30000,
+              "default": 2000
+            }
+          }
+        },
+        "decision_cache": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ttl_s": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 86400,
+              "default": 600
+            }
+          }
+        },
+        "cost": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cancel_overrun_tokens": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4096,
+              "default": 64
+            },
+            "prices_ref": {
+              "type": "string",
+              "pattern": "^(db:[1-9][0-9]*|file:\\S+)$",
+              "description": "Price catalog (IMPL-019): db:<version> of platform.price_catalog, or file:<path> in dev/test only. Absent: every price is TBD (cost_estimated)."
+            }
+          }
+        },
+        "media": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "inline_wait_ms": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 30000,
+              "default": 3000
+            }
+          }
+        },
+        "credentials": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mantle_auth": {
+              "enum": [
+                "bearer_short_term",
+                "sigv4"
+              ],
+              "default": "bearer_short_term"
+            }
+          }
+        },
+        "data_classes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "public": {
+              "$ref": "#/$defs/DataClassPolicy"
+            },
+            "internal": {
+              "$ref": "#/$defs/DataClassPolicy"
+            },
+            "confidential": {
+              "$ref": "#/$defs/DataClassPolicy"
+            },
+            "restricted": {
+              "$ref": "#/$defs/DataClassPolicy"
+            }
+          }
+        }
+      }
+    },
+    "DataClassPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "store_content": {
+          "enum": [
+            "full",
+            "redacted",
+            "metadata_only"
+          ]
+        },
+        "retain_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3650
+        },
+        "l2_cache": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

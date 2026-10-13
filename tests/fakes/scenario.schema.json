@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noema.local/schemas/scenario/v1",
+  "title": "Noema scenario DSL (spec-10 §2.4)",
+  "description": "One document drives the fakes (FakeClock, virtual ms) and tools/mockbedrock (wall-clock ms). Rules are evaluated in order per request; the first rule that matches and applies answers; no match is a test failure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scenario", "rules"],
+  "properties": {
+    "scenario": { "type": "string", "minLength": 1 },
+    "seed": { "type": "integer", "minimum": 0, "default": 0 },
+    "mantle_auth": { "enum": ["bearer_short_term", "sigv4"], "default": "bearer_short_term" },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "latency": {
+          "oneOf": [
+            { "const": "probe" },
+            { "type": "object", "additionalProperties": false, "required": ["fixed_ms"], "properties": { "fixed_ms": { "type": "number", "minimum": 0 } } }
+          ]
+        }
+      }
+    },
+    "rules": { "type": "array", "items": { "$ref": "#/$defs/Rule" } }
+  },
+  "$defs": {
+    "Ms": { "type": "number", "minimum": 0 },
+    "Prob": { "type": "number", "minimum": 0, "maximum": 1 },
+    "Match": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "model": { "type": "string", "description": "Bedrock model or inference-profile id" },
+        "op": { "enum": ["converse", "converse-stream", "chat", "chat-stream"] },
+        "prompt_contains": { "type": "string", "description": "substring of the concatenated system + message text" },
+        "nth": { "type": "integer", "minimum": 1, "description": "the rule applies only to the n-th request matching it (1-based)" },
+        "tenant_akid": { "type": "string" }
+      }
+    },
+    "Answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Decision-member answer: `dist` by option value (predicates: \"true\"/\"false\"), mapped to the request's letters through its <app_question> options, or `raw_text` verbatim.",
+      "properties": {
+        "dist": { "type": "object", "additionalProperties": { "$ref": "#/$defs/Prob" } },
+        "raw_text": { "type": "string" },
+        "top_k": { "type": "integer", "minimum": 1, "description": "logprobs: keep the k most probable top entries" },
+        "split_tokens": { "type": "object", "additionalProperties": { "$ref": "#/$defs/Prob" }, "description": "logprobs: extra mass on a split (lower-case) fragment of the option's letter, which the parser counts as other mass" },
+        "whitespace_variants": { "type": "object", "additionalProperties": { "$ref": "#/$defs/Prob" }, "description": "logprobs: extra mass on the \" <letter>\" variant of the option" },
+        "eos_mass": { "$ref": "#/$defs/Prob" },
+        "other_tokens": { "type": "object", "additionalProperties": { "$ref": "#/$defs/Prob" }, "description": "logprobs: arbitrary extra top entries (token -> probability)" },
+        "censor": { "type": "array", "items": { "type": "string" }, "description": "logprobs: option values absent from the top list" },
+        "harmony_final": { "type": "boolean", "description": "wrap the verbalized JSON in the harmony final-channel markers (Luna)" }
+      },
+      "oneOf": [{ "required": ["dist"] }, { "required": ["raw_text"] }]
+    },
+    "Latency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["p5", "p95"],
+      "properties": {
+        "p5": { "$ref": "#/$defs/Ms" },
+        "p95": { "$ref": "#/$defs/Ms" },
+        "tail_p": { "$ref": "#/$defs/Prob" },
+        "tail_ms": { "type": "array", "prefixItems": [{ "$ref": "#/$defs/Ms" }, { "$ref": "#/$defs/Ms" }], "minItems": 2, "maxItems": 2 }
+      }
+    },
+    "Usage": {
+      "oneOf": [
+        { "const": "auto" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input_tokens", "output_tokens"],
+          "properties": {
+            "input_tokens": { "type": "integer", "minimum": 0 },
+            "output_tokens": { "type": "integer", "minimum": 0 },
+            "cached_input_tokens": { "type": "integer", "minimum": 0 },
+            "cache_write_input_tokens": { "type": "integer", "minimum": 0 },
+            "reasoning_tokens": { "type": "integer", "minimum": 0 }
+          }
+        },
+        { "const": "none" }
+      ]
+    },
+    "Stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "first_event_ms": { "$ref": "#/$defs/Ms" },
+        "first_text_ms": { "$ref": "#/$defs/Ms" },
+        "tokens_per_s": { "type": "number", "exclusiveMinimum": 0 },
+        "chunk_tokens": { "type": "integer", "minimum": 1 },
+        "reasoning": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "deltas": { "type": "integer", "minimum": 0 },
+            "every_ms": { "$ref": "#/$defs/Ms" },
+            "hidden_tokens": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "non-streaming calls: reasoning tokens Bedrock hides before the text (Claude: one reasoningContent block with an empty text and a signature; the OpenAI family: redactedContent). They count toward the request's maxTokens: at or above it the answer has no text and stops max_tokens (live Haiku 5.5 at effort low, 2026-10-11)"
+            }
+          }
+        },
+        "text": { "type": "string" },
+        "tokens": { "type": "integer", "minimum": 0, "description": "filler text of n tokens (4 characters each) instead of `text`" },
+        "chunks": { "type": "array", "items": { "type": "string" }, "description": "explicit text chunks (one TextDelta each) instead of `text`" },
+        "stop": { "enum": ["end_turn", "max_tokens", "stop_sequence", "content_filtered", "guardrail_intervened"] },
+        "usage": { "$ref": "#/$defs/Usage" },
+        "pad": { "type": "integer", "minimum": 0 },
+        "stamp": { "type": "boolean" }
+      }
+    },
+    "Fault": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "enum": ["throttling", "access_denied", "validation", "http_5xx", "model_timeout", "connect_reset",
+                   "hang_before_first_byte", "stall_after", "exception_event", "reasoning_only", "empty_text",
+                   "malformed", "truncated_json", "invalid_verbalized", "refusal"]
+        },
+        "message": { "type": "string" },
+        "status": { "enum": [500, 503] },
+        "n": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string" },
+        "after": { "type": "integer", "minimum": 0 },
+        "variant": { "enum": ["bad_crc", "bad_sse_line", "no_done", "missing_letter", "sum_out_of_range", "not_json"] },
+        "retry_after_s": { "type": "number", "minimum": 0 },
+        "rate": { "$ref": "#/$defs/Prob" },
+        "window_ms": { "type": "array", "prefixItems": [{ "$ref": "#/$defs/Ms" }, { "$ref": "#/$defs/Ms" }], "minItems": 2, "maxItems": 2 }
+      }
+    },
+    "Rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["match"],
+      "properties": {
+        "match": { "$ref": "#/$defs/Match" },
+        "answer": { "$ref": "#/$defs/Answer" },
+        "latency_ms": { "$ref": "#/$defs/Ms" },
+        "latency": { "$ref": "#/$defs/Latency" },
+        "barrier": { "type": "string", "minLength": 1 },
+        "stream": { "$ref": "#/$defs/Stream" },
+        "fault": { "$ref": "#/$defs/Fault" }
+      },
+      "not": { "anyOf": [{ "required": ["latency_ms", "latency"] }] },
+      "anyOf": [{ "required": ["answer"] }, { "required": ["stream"] }, { "required": ["fault"] }, { "required": ["barrier"] }]
+    }
+  }
+}

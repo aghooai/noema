@@ -1,0 +1,81 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "id": "cal_1",
+        "object": "calibrator",
+        "scope": "tenant",
+        "question_name": "intent",
+        "status": "fitted",
+        "method": "temperature",
+        "parameters": {
+          "pooled": {
+            "temperature": 1.3
+          },
+          "member_T": {
+            "m1": 1.1,
+            "m2": 0.9
+          },
+          "epsilon": 0.001
+        },
+        "binding": {
+          "profile_id": "router-default",
+          "profile_version": "1",
+          "question_signature": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "input_view_signature": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "choice_method": "flat"
+        },
+        "member_subset": [
+          "m1",
+          "m2"
+        ],
+        "holdout": null,
+        "acceptance": {
+          "passed": false,
+          "failed_rules": [
+            "n_min"
+          ]
+        },
+        "reliability": {
+          "bins": [
+            {
+              "lower": 0.0,
+              "upper": 0.5,
+              "n": 10,
+              "mean_predicted": 0.3,
+              "observed": 0.25
+            },
+            {
+              "lower": 0.5,
+              "upper": 1.0,
+              "n": 0,
+              "mean_predicted": null,
+              "observed": null
+            }
+          ],
+          "ci": {
+            "ece": [
+              0.01,
+              0.04
+            ]
+          }
+        },
+        "created_at": 1791633600,
+        "approved_by": null,
+        "activated_by": [],
+        "activated_at": null,
+        "downgraded_at": null,
+        "downgrade_reason": null,
+        "retired_at": null,
+        "retired_reason": null
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null
+  }
+}

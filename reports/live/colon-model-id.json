@@ -1,0 +1,18 @@
+{
+  "answer_391": true,
+  "latency_ms": 375,
+  "model_id": "arn:aws:bedrock:us-east-1:976939723775:inference-profile/us.openai.gpt-6-luna",
+  "ok": true,
+  "region": "us-east-1",
+  "signer": {
+    "equal_to_botocore": true,
+    "model_path_colon_encoded": true,
+    "session_token": false,
+    "signed": [
+      "authorization",
+      "content-type",
+      "x-amz-date"
+    ]
+  },
+  "stop": "end_turn"
+}

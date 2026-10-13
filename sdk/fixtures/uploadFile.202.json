@@ -1,0 +1,16 @@
+{
+  "status": 202,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "id": "file_1",
+    "filename": "invoice.pdf",
+    "media_type": "application/pdf",
+    "bytes": 48213,
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "status": "quarantined",
+    "derivatives": []
+  }
+}

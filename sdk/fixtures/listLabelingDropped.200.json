@@ -1,0 +1,47 @@
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "x-request-id": "req_01JA0000000000000000000000"
+  },
+  "body": {
+    "data": [
+      {
+        "id": "ldrop_1",
+        "object": "labeling_dropped_item",
+        "run_id": "lrun_1",
+        "decision_id": "dec_1",
+        "question_name": "intent",
+        "question_signature": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "input_view_signature": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "reason": "disagreed",
+        "sample_reason": "uniform",
+        "labeler_answers": [
+          {
+            "model": "us.openai.gpt-6.1-sol",
+            "status": "ok",
+            "value": "billing"
+          },
+          {
+            "model": "us.anthropic.claude-sonnet-5-5",
+            "status": "ok",
+            "value": "other"
+          }
+        ],
+        "ensemble": {
+          "value": "billing",
+          "probability": 0.62,
+          "band": "medium",
+          "calibration_status": "uncalibrated"
+        },
+        "content": {
+          "excerpt": "I was charged twice",
+          "redacted": false
+        },
+        "sampled_at": 1791633700
+      }
+    ],
+    "has_more": false,
+    "next_cursor": null
+  }
+}

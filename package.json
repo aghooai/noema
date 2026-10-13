@@ -1,0 +1,27 @@
+{
+  "name": "noema-workspace",
+  "private": true,
+  "description": "Pinned JavaScript toolchain of the Noema repo (spec-10 §7): contract tooling, the TypeScript SDK (sdk/typescript) and the Web UI (web/) resolve their packages from this root node_modules. Agents run `npm ci --offline --ignore-scripts`; only the platform role changes this file.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-markdown": "10.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@redocly/cli": "2.62.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "msw": "3.0.3",
+    "openai": "7.32.0",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  }
+}

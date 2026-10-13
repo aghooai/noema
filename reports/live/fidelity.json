@@ -1,0 +1,153 @@
+{
+  "distinct_differences": {
+    "deepseek-3.2 complete error": [
+      "{\"live\":null,\"mock\":[\"tenant_access\",\"401\"]}"
+    ],
+    "deepseek-3.2 complete raw_error": [
+      "{\"live\":null,\"mock\":[401,401,\"HTTP 401\"]}"
+    ],
+    "deepseek-3.2 complete stop": [
+      "{\"live\":\"end_turn\",\"mock\":null}"
+    ],
+    "deepseek-3.2 complete usage_nonzero": [
+      "{\"live\":[\"input_tokens\",\"output_tokens\"],\"mock\":[]}"
+    ],
+    "deepseek-3.2 complete wire_response": [
+      "{\"live_only\":[\"choices[].finish_reason:str\",\"choices[].index:int\",\"choices[].logprobs:NoneType\",\"choices[].message.content:str\",\"choices[].message.refusal:NoneType\",\"choices[].message.role:str\",\"created:int\",\"id:str\",\"model:str\",\"object:str\",\"service_tier:str\",\"usage.completion_tokens:int\",\"usage.prompt_tokens:int\",\"usage.total_tokens:int\"],\"mock_only\":[]}"
+    ],
+    "haiku-5.5 complete stop": [
+      "{\"live\":\"max_tokens\",\"mock\":\"end_turn\"}"
+    ],
+    "haiku-5.5 complete usage_nonzero": [
+      "{\"live\":[\"input_tokens\",\"output_tokens\"],\"mock\":[\"input_tokens\",\"output_tokens\",\"reasoning_tokens\"]}"
+    ],
+    "haiku-5.5 complete wire_response": [
+      "{\"live_only\":[],\"mock_only\":[\"output.message.content[].text:str\"]}"
+    ],
+    "sol-6.1 stream usage_nonzero": [
+      "{\"live\":[\"input_tokens\",\"output_tokens\"],\"mock\":[\"input_tokens\",\"output_tokens\",\"reasoning_tokens\"]}"
+    ]
+  },
+  "identical": 20,
+  "live_only_calls": [
+    "tests/live/test_adapters_live.py::test_l1_converse_complete_glm_effort_none | glm-5.3 | complete | generation",
+    "tests/live/test_adapters_live.py::test_l2_converse_stream[glm-5.3-none] | glm-5.3 | stream | generation"
+  ],
+  "live_runs": [
+    "live-20261011T073404",
+    "live-20261011T073549",
+    "live-20261011T073610"
+  ],
+  "mock_only_calls": [
+    "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification | luna-6 | complete | verification_member"
+  ],
+  "mock_runs": [
+    "mock-20261011T210838"
+  ],
+  "pairs": {
+    "tests/live/test_adapters_live.py::test_capability_provider_probes | haiku-5.5 | complete | generation": "identical",
+    "tests/live/test_adapters_live.py::test_capability_provider_probes | sol-6.1 | complete | generation": "identical",
+    "tests/live/test_adapters_live.py::test_capability_provider_probes | sonnet-5.5 | complete | generation": "identical",
+    "tests/live/test_adapters_live.py::test_l1_converse_complete_glm | glm-5.3 | complete | generation": "identical",
+    "tests/live/test_adapters_live.py::test_l2_converse_stream[glm-5.3-low] | glm-5.3 | stream | generation": "identical",
+    "tests/live/test_adapters_live.py::test_l2_converse_stream[opus-5.5-low] | opus-5.5 | stream | generation": "identical",
+    "tests/live/test_adapters_live.py::test_l3_mantle_auth_probes | deepseek-3.2 | complete | decision_member": {
+      "error": {
+        "live": null,
+        "mock": [
+          "tenant_access",
+          "401"
+        ]
+      },
+      "raw_error": {
+        "live": null,
+        "mock": [
+          401,
+          401,
+          "HTTP 401"
+        ]
+      },
+      "stop": {
+        "live": "end_turn",
+        "mock": null
+      },
+      "usage_nonzero": {
+        "live": [
+          "input_tokens",
+          "output_tokens"
+        ],
+        "mock": []
+      },
+      "wire_response": {
+        "live_only": [
+          "choices[].finish_reason:str",
+          "choices[].index:int",
+          "choices[].logprobs:NoneType",
+          "choices[].message.content:str",
+          "choices[].message.refusal:NoneType",
+          "choices[].message.role:str",
+          "created:int",
+          "id:str",
+          "model:str",
+          "object:str",
+          "service_tier:str",
+          "usage.completion_tokens:int",
+          "usage.prompt_tokens:int",
+          "usage.total_tokens:int"
+        ],
+        "mock_only": []
+      }
+    },
+    "tests/live/test_adapters_live.py::test_l4_sonnet_media[image] | sonnet-5.5 | complete | labeling": "identical",
+    "tests/live/test_adapters_live.py::test_l4_sonnet_media[pdf] | sonnet-5.5 | complete | labeling": "identical",
+    "tests/live/test_adapters_live.py::test_l8_direct_streams | sol-6.1 | stream | generation": "identical",
+    "tests/live/test_api_live.py::test_l5_lightweight_decide_jev | luna-6 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l6_router_default_one_question | deepseek-3.2 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l6_router_default_one_question | haiku-5.5 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l6_router_default_one_question | luna-6 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification | deepseek-3.2 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification | haiku-5.5 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification | haiku-5.5 | complete | verification_member": {
+      "stop": {
+        "live": "max_tokens",
+        "mock": "end_turn"
+      },
+      "usage_nonzero": {
+        "live": [
+          "input_tokens",
+          "output_tokens"
+        ],
+        "mock": [
+          "input_tokens",
+          "output_tokens",
+          "reasoning_tokens"
+        ]
+      },
+      "wire_response": {
+        "live_only": [],
+        "mock_only": [
+          "output.message.content[].text:str"
+        ]
+      }
+    },
+    "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification | luna-6 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l7_one_routed_turn_with_verification | sol-6.1 | stream | generation": {
+      "usage_nonzero": {
+        "live": [
+          "input_tokens",
+          "output_tokens"
+        ],
+        "mock": [
+          "input_tokens",
+          "output_tokens",
+          "reasoning_tokens"
+        ]
+      }
+    },
+    "tests/live/test_api_live.py::test_l8_pinned_turns | luna-6 | complete | decision_member": "identical",
+    "tests/live/test_api_live.py::test_l8_pinned_turns | sol-6.1 | stream | generation": "identical",
+    "tests/live/test_labelers_live.py::test_both_labelers_answer_one_letter | sol-6.1 | complete | labeling": "identical",
+    "tests/live/test_labelers_live.py::test_both_labelers_answer_one_letter | sonnet-5.5 | complete | labeling": "identical"
+  },
+  "pairs_compared": 23
+}

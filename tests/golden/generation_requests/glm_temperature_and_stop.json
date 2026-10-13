@@ -1,0 +1,66 @@
+{
+  "expected": {
+    "api": "ConverseStream",
+    "body": {
+      "inferenceConfig": {
+        "maxTokens": 4096,
+        "stopSequences": [
+          "END"
+        ],
+        "temperature": 0.2
+      },
+      "messages": [
+        {
+          "content": [
+            {
+              "text": "What is the capital of France?"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "modelId": "us.zai.glm-5.3",
+      "outputConfig": {
+        "effort": "low"
+      },
+      "system": [
+        {
+          "text": "You are an assistant served through the Noema platform."
+        },
+        {
+          "text": "Answer briefly."
+        }
+      ]
+    }
+  },
+  "model_alias": "glm-5.3",
+  "name": "glm_temperature_and_stop",
+  "op": "converse-stream",
+  "request": {
+    "call_kind": "generation",
+    "effort": "low",
+    "logprobs": false,
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "content": [
+          {
+            "text": "What is the capital of France?"
+          }
+        ],
+        "role": "user"
+      }
+    ],
+    "model_alias": "glm-5.3",
+    "retry": "default",
+    "stop": [
+      "END"
+    ],
+    "system": [
+      "You are an assistant served through the Noema platform.",
+      "Answer briefly."
+    ],
+    "temperature": 0.2,
+    "top_logprobs": null
+  }
+}
